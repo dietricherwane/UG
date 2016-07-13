@@ -1,0 +1,36 @@
+<div class="page-header">
+  <div class="icon">
+    <span class="ico-arrow-right"></span>
+  </div>
+  <h1>Loto bonheur - <%= session[:bet] %><small>Choisissez votre formule</small></h1>
+</div>
+
+<div class="row-fluid">
+  <div class="row-form">
+    <div class="span12">
+      <%= link_to '1- Simple', loto_bet_path('Simple') %>
+    </div>
+  </div>
+  <div class="row-form">
+    <div class="span12">
+      <%= link_to '2- Perm', loto_bet_path('Perm') %>
+    </div>
+  </div>
+  <% if session[:bet] != '1N' %>
+    <div class="row-form">
+      <div class="span12">
+        <%= link_to '3- Champ réduit', loto_bet_path('Champ reduit') %>
+      </div>
+    </div>
+    <div class="row-form">
+      <div class="span12">
+        <%= link_to '4- Champ total', loto_bet_path('Champ total') %>
+      </div>
+    </div>
+  <% end %>
+  <div class="row-form">
+    <div class="span12">
+      <%= link_to 'Retour', loto_bet_selection_path(session[:drawing]) %>
+    </div>
+  </div>
+</div>
