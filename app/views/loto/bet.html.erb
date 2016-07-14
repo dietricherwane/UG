@@ -6,39 +6,45 @@
 </div>
 
 <div class="row-fluid">
-  <div class="row-form">
-    <div class="span12">
-      <input type="text" name="numbers" placeholder="Numéros"/>
-      <span class="bottom">Numéros</span>
+  <%= form_tag loto_place_bet_path do %>
+    <div class="row-form">
+      <div class="span12">
+        <input type="text" name="numbers" placeholder="Numéros"/>
+        <span class="bottom">Numéros</span>
+      </div>
     </div>
-  </div>
-  <div class="row-form">
-    <div class="span12">
-      <input type="text" name="stake" placeholder="Mise de base"/>
-      <span class="bottom">Mise de base</span>
+    <div class="row-form">
+      <div class="span12">
+        <input type="text" name="stake" placeholder="Mise de base"/>
+        <span class="bottom">Mise de base</span>
+      </div>
     </div>
-  </div>
-  <div class="row-form">
-    <div class="span12">
-      <input type="text" name="gamer_id" placeholder="ID parieur"/>
-      <span class="bottom">ID parieur</span>
+    <div class="row-form">
+      <div class="span12">
+        <input type="text" name="paymoney_account_number" placeholder="Numéro de compte Paymoney"/>
+        <span class="bottom">Numéro de compte Paymoney</span>
+      </div>
     </div>
-  </div>
-  <div class="row-form">
-    <div class="span12">
-      <input type="text" name="paymoney_account_number" placeholder="Numéro de compte Paymoney"/>
-      <span class="bottom">Numéro de compte Paymoney</span>
+    <div class="row-form">
+      <div class="span12">
+        <input type="text" name="paymoney_account_password" placeholder="Mot de passe du compte Paymoney"/>
+        <span class="bottom">Mot de passe du compte Paymoney</span>
+      </div>
     </div>
-  </div>
-  <div class="row-form">
-    <div class="span12">
-      <input type="text" name="paymoney_account_password" placeholder="Mot de passe du compte Paymoney"/>
-      <span class="bottom">Mot de passe du compte Paymoney</span>
+    <div class="row-form">
+      <div class="span12">
+        <button class="btn">Valider <span class="icon-arrow-next icon-white"></span></button>
+      </div>
     </div>
-  </div>
+    <div class="row-form">
+      <div class="span12">
+        <%= link_to 'Retour', loto_formula_selection_path(session[:bet]) %>
+      </div>
+    </div>
+  <% end %>
   <div class="row-form">
     <div class="span12">
-      <%= link_to 'Retour', loto_formula_selection_path(session[:bet]) %>
+      <%= link_to 'Accueil', root_path %>
     </div>
   </div>
 </div>

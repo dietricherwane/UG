@@ -1,0 +1,57 @@
+BETCODE
+1N = 229
+2N = 231
+3N = 232
+4N = 233
+5N = 234
+
+SELECTOR1
+Etoile = 1
+Fortune = 2
+Solution = 3
+Diamant = 4
+
+SELECTOR2
+Etoile = 203
+Fortune = 209
+Solution = 203
+Diamant = 210
+
+Get UUID
+/8ba869a7a9c59f3a0/api/users/gamer_id/07773704
+
+# Deploy folder
+/media/ngser/plateforme
+
+# Place a bet url
+/ail/loto/api/96455396dc/bet/place/:gamer_id/:paymoney_account_number/:password
+
+@bet_code = json_request["bet_code"]
+@bet_modifier = json_request["bet_modifier"]
+@selector1 = json_request["selector1"]
+@selector2 = json_request["selector2"]
+@repeats = json_request["repeats"]
+@special_entries = json_request["special_entries"]
+@normal_entries = json_request["normal_entries"]
+@draw_day = json_request["draw_day"]
+@draw_number = json_request["draw_number"]
+@begin_date = json_request["begin_date"]
+@end_date = json_request["end_date"]
+@basis_amount = json_request["basis_amount"] rescue ""
+
+%Q[
+{
+"bet_code":"",
+"bet_modifier":"",
+"selector1":"",
+"selector2":"",
+"repeats":"",
+"special_entries":"",
+"normal_entries":"",
+"draw_day":"",
+"draw_number":"",
+"begin_date":"",
+"end_date":"",
+"basis_amount":""
+}
+]

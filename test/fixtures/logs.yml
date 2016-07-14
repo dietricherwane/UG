@@ -1,0 +1,17 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  msisdn: MyString
+  gamer_id: MyString
+  paymoney_account_number: MyString
+  paymoney_password: MyString
+  bet_request: MyText
+  bet_response: MyText
+
+two:
+  msisdn: MyString
+  gamer_id: MyString
+  paymoney_account_number: MyString
+  paymoney_password: MyString
+  bet_request: MyText
+  bet_response: MyText
