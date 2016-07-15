@@ -16,13 +16,18 @@ class LotoController < ApplicationController
     session[:formula] = params[:formula]
   end
 
+  def select_bet
+    session[:numbers] = params[:numbers]
+    session[:stake] = params[:stake]
+    session[:selection] = params[:selection]
+
+    flash.now[:success] = "Le montant du pari est de: #{session[:stake].to_i} FCFA veuillez entrer vos informations Paymoney pour confirmer."
+  end
+
   def place_bet
     @gamer_id = RestClient.get(Parameter.first.gateway_url + "/8ba869a7a9c59f3a0/api/users/gamer_id/#{session[:msisdn]}") rescue ''
     @paymoney_account_number = params[:paymoney_account_number]
     @paymoney_account_password = params[:paymoney_account_password]
-    @numbers = params[:numbers]
-    @basis_amount = params[:stake]
-
     url = Parameter.first.gateway_url + "/ail/loto/api/96455396dc/bet/place/#{@gamer_id}/#{@paymoney_account_number}/#{@paymoney_account_password}"
 
     if valid_bet_params
@@ -37,12 +42,12 @@ class LotoController < ApplicationController
                     "selector2":"#{@selector2}",
                     "repeats":"#{@repeats}",
                     "special_entries":"",
-                    "normal_entries":"#{@numbers.split.join(',')}",
+                    "normal_entries":"#{@numbers.join(',')}",
                     "draw_day":"",
                     "draw_number":"",
                     "begin_date":"#{@begin_date}",
                     "end_date":"#{@end_date}",
-                    "basis_amount":"#{@basis_amount}"
+                    "basis_amount":"#{session[:stake]}"
                   }
                 ]
         request = Typhoeus::Request.new(
@@ -73,7 +78,8 @@ Consultez les résultats le #{@end_date}.
         Log.create(msisdn: session[:msisdn], gamer_id: @gamer_id, paymoney_account_number: @paymoney_account_number, paymoney_password: @paymoney_account_password, drawing: session[:drawing], bet: session[:bet], formula: session[:formula], bet_request: request_body, bet_response: body, status: status)
       end
     end
-    render :bet
+
+    render :select_bet
   end
 
   def valid_bet_params
@@ -83,7 +89,7 @@ Consultez les résultats le #{@end_date}.
       @status = false
     else
       # Vérification de l'existence des numéros de compte, mot de passe, numéros pariés et mise (existence et numéricité)
-      if @paymoney_account_number.blank? || @paymoney_account_password.blank? || @numbers.blank? || @basis_amount.blank? || not_a_number?(@basis_amount)
+      if @paymoney_account_number.blank? || @paymoney_account_password.blank? || session[:numbers].blank? || session[:stake].blank? || not_a_number?(session[:stake])
         flash.now[:error] = "Veuillez renseigner le numéro de compte paymoney, le mot de passe, les numéros pariés et une mise valide"
         @status = false
       end
@@ -94,7 +100,7 @@ Consultez les résultats le #{@end_date}.
 
   def valid_numbers
     @status = true
-    @numbers = @numbers.split rescue nil
+    @numbers = session[:numbers].split rescue nil
     if @numbers.blank?
       flash.now[:error] = "Veuillez renseigner des numéros à miser"
       @status = false
@@ -186,7 +192,7 @@ Consultez les résultats le #{@end_date}.
 
   def set_repeats
     @repeats = ''
-    @repeats = (@basis_amount.to_i / 25).to_i
+    @repeats = (session[:stake].to_i / 25).to_i
 =begin
     if session[:formula] = 'Simple'
       @repeats = (@basis_amount.to_i / 25).to_i

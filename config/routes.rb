@@ -11,6 +11,7 @@ Rails.application.routes.draw do
   get '/loto/bet_selection/:drawing' => 'loto#bet_selection', as: :loto_bet_selection
   get '/loto/formula_selection/:bet' => 'loto#formula_selection', as: :loto_formula_selection
   get '/loto/bet/:formula' => 'loto#bet', as: :loto_bet
+  post '/loto/select_bet' => 'loto#select_bet', as: :loto_select_bet
   post '/loto/place_bet' => 'loto#place_bet', as: :loto_place_bet
 
   # The priority is based upon order of creation: first created -> highest priority.
