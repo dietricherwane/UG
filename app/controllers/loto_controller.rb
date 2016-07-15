@@ -193,7 +193,7 @@ Consultez les résultats le #{@end_date}.
   def set_repeats
     @repeats = ''
     @repeats = session[:stake].to_i
-    @repeats = (session[:stake].to_i / 25).to_i
+    #@repeats = (session[:stake].to_i / 25).to_i
 =begin
     if session[:formula] = 'Simple'
       @repeats = (@basis_amount.to_i / 25).to_i
