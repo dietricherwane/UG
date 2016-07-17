@@ -165,15 +165,15 @@ Consultez les résultats le #{@end_date}.
     @selector2 = ''
     case session[:drawing]
       when 'Etoile'
-        @selector2 = -8 + DateTime.parse("01/01/#{Date.today.year} 17:00:00").upto(DateTime.now).count(&:monday?)
+        @selector2 = -26 + DateTime.parse("01/01/#{Date.today.year} 17:00:00").upto(DateTime.now).count(&:monday?)
       when 'Emergence'
-        @selector2 = -27 + DateTime.parse("01/01/#{Date.today.year} 17:00:00").upto(DateTime.now).count(&:tuesday?)
+        @selector2 = -26 + DateTime.parse("01/01/#{Date.today.year} 17:00:00").upto(DateTime.now).count(&:tuesday?)
       when 'Fortune'
-        @selector2 = -9 + DateTime.parse("01/01/#{Date.today.year} 17:00:00").upto(DateTime.now).count(&:wednesday?)
+        @selector2 = -8 + DateTime.parse("01/01/#{Date.today.year} 17:00:00").upto(DateTime.now).count(&:wednesday?)
       when 'Privilege'
-        @selector2 = -27 + DateTime.parse("01/01/#{Date.today.year} 17:00:00").upto(DateTime.now).count(&:thursday?)
+        @selector2 = -26 + DateTime.parse("01/01/#{Date.today.year} 17:00:00").upto(DateTime.now).count(&:thursday?)
       when 'Solution'
-        @selector2 = -28 + DateTime.parse("01/01/#{Date.today.year} 17:00:00").upto(DateTime.now).count(&:friday?)
+        @selector2 = -27 + DateTime.parse("01/01/#{Date.today.year} 17:00:00").upto(DateTime.now).count(&:friday?)
       when 'Diamant'
         @selector2 = -8 + DateTime.parse("01/01/#{Date.today.year} 17:00:00").upto(DateTime.now).count(&:saturday?)
       end
