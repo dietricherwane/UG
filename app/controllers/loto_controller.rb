@@ -148,8 +148,12 @@ Consultez les résultats le #{@end_date}.
     case session[:drawing]
       when 'Etoile'
         @selector1 = '1'
+      when 'Emergence'
+        @selector1 = '5'
       when 'Fortune'
         @selector1 = '2'
+      when 'Privilege'
+        @selector1 = '6'
       when 'Solution'
         @selector1 = '3'
       when 'Diamant'
@@ -161,13 +165,17 @@ Consultez les résultats le #{@end_date}.
     @selector2 = ''
     case session[:drawing]
       when 'Etoile'
-        @selector2 = 175 + (DateTime.parse("01/01/#{Date.today.year} 17:00:00")).upto(DateTime.now).count(&:monday?)
+        @selector2 = -8 + DateTime.parse("01/01/#{Date.today.year} 17:00:00").upto(DateTime.now).count(&:monday?)
+      when 'Emergence'
+        @selector2 = -27 + DateTime.parse("01/01/#{Date.today.year} 17:00:00").upto(DateTime.now).count(&:tuesday?)
       when 'Fortune'
-        @selector2 = 181 + (DateTime.parse("01/01/#{Date.today.year} 17:00:00")).upto(DateTime.now).count(&:wednesday?)
+        @selector2 = -9 + DateTime.parse("01/01/#{Date.today.year} 17:00:00").upto(DateTime.now).count(&:wednesday?)
+      when 'Privilege'
+        @selector2 = -27 + DateTime.parse("01/01/#{Date.today.year} 17:00:00").upto(DateTime.now).count(&:thursday?)
       when 'Solution'
-        @selector2 = 174 + (DateTime.parse("01/01/#{Date.today.year} 17:00:00")).upto(DateTime.now).count(&:friday?)
+        @selector2 = -28 + DateTime.parse("01/01/#{Date.today.year} 17:00:00").upto(DateTime.now).count(&:friday?)
       when 'Diamant'
-        @selector2 = 181 + (DateTime.parse("01/01/#{Date.today.year} 17:00:00")).upto(DateTime.now).count(&:saturday?)
+        @selector2 = -8 + DateTime.parse("01/01/#{Date.today.year} 17:00:00").upto(DateTime.now).count(&:saturday?)
       end
   end
 
@@ -178,9 +186,15 @@ Consultez les résultats le #{@end_date}.
       when 'Etoile'
         @begin_date = Date.commercial(Date.today.year, Date.today.cwday.modulo(4)+Date.today.cweek, 1).strftime("%d-%m-%Y 17:00:00")
         @end_date = Date.commercial(Date.today.year, 1 + Date.today.cweek, 1).strftime("%d-%m-%Y 17:00:00")
+      when 'Emergence'
+        @begin_date = Date.commercial(Date.today.year, Date.today.cwday.modulo(4)+Date.today.cweek, 2).strftime("%d-%m-%Y 17:00:00")
+        @end_date = Date.commercial(Date.today.year, 1 + Date.today.cweek, 2).strftime("%d-%m-%Y 17:00:00")
       when 'Fortune'
         @begin_date = Date.commercial(Date.today.year, Date.today.cwday.modulo(4)+Date.today.cweek, 3).strftime("%d-%m-%Y 17:00:00")
         @end_date = Date.commercial(Date.today.year, 1 + Date.today.cweek, 3).strftime("%d-%m-%Y 17:00:00")
+      when 'Privilege'
+        @begin_date = Date.commercial(Date.today.year, Date.today.cwday.modulo(4)+Date.today.cweek, 4).strftime("%d-%m-%Y 17:00:00")
+        @end_date = Date.commercial(Date.today.year, 1 + Date.today.cweek, 4).strftime("%d-%m-%Y 17:00:00")
       when 'Solution'
         @begin_date = Date.commercial(Date.today.year, Date.today.cwday.modulo(4)+Date.today.cweek, 5).strftime("%d-%m-%Y 17:00:00")
         @end_date = Date.commercial(Date.today.year, 1 + Date.today.cweek, 5).strftime("%d-%m-%Y 17:00:00")
