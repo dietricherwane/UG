@@ -66,7 +66,7 @@ class LotoController < ApplicationController
           if json_object["error"].blank?
             status = true
             flash.now[:success] = %Q[
-              Loto Bonheur – #{session[:formula]} - « FELCITATIONS, votre pari a bien été  enregistré. N° ticket : #{json_object["bet"]["ticket_number"]} / Réf. : #{json_object["bet"]["ref_number"]}
+              Loto Bonheur – #{session[:formula]} - « FELICITATIONS, votre pari a bien été  enregistré. N° ticket : #{json_object["bet"]["ticket_number"]} / Réf. : #{json_object["bet"]["ref_number"]}
 Consultez les résultats le #{@end_date}.
             ]
           else
@@ -206,7 +206,16 @@ Consultez les résultats le #{@end_date}.
 
   def set_repeats
     @repeats = ''
-    @repeats = session[:stake].to_i
+    if session[:bet] != '1N'
+      case session[:formula]
+        when 'Simple'
+          @repeats = session[:stake].to_i
+        when 'Perm'
+          @repeats = @numbers.combination(session[:bet].sub('n', '').to_i) * session[:stake].to_i
+      end
+    else
+      @repeats = session[:stake].to_i
+    end
     #@repeats = (session[:stake].to_i / 25).to_i
 =begin
     if session[:formula] = 'Simple'
