@@ -225,6 +225,9 @@ Consultez les résultats le #{@end_date}.
 
   def set_repeats
     @repeats = ''
+    @numbers = session[:numbers].split rescue 0
+    @selection = session[:selection].split rescue 0
+
     if session[:bet] != '1N'
       case session[:formula]
         when 'Simple'
