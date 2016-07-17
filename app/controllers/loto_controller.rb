@@ -236,6 +236,8 @@ Consultez les résultats le #{@end_date}.
           @repeats = @numbers.combination(session[:bet].sub('n', '').to_i).count * session[:stake].to_i
         when 'Champ reduit'
           @repeats = @selection.combination(session[:bet].sub('n', '').to_i - @numbers.count).count * session[:stake].to_i
+        when 'Champ total'
+          @repeats = Array.new(90 - @numbers.count).combination(session[:bet].sub('n', '').to_i - @numbers.count).count * session[:stake].to_i
       end
     else
       @repeats = session[:stake].to_i
