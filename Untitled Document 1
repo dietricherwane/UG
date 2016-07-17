@@ -1,4 +1,4 @@
-[10,9,8,7,6,5,4,3,2,1].combination(2).count = 45
+[10,9,8].combination(2).count = 45
 
 BETCODE
 1N = 229
