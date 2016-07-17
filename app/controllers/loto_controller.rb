@@ -21,7 +21,7 @@ class LotoController < ApplicationController
     session[:stake] = params[:stake]
     session[:selection] = params[:selection]
 
-    flash.now[:success] = "Le montant du pari est de: #{session[:stake].to_i} FCFA veuillez entrer vos informations Paymoney pour confirmer."
+    flash.now[:success] = "Le montant du pari est de: #{(session[:numbers].split.combination(session[:bet].sub('n', '').count) rescue 0) * session[:stake].to_i} FCFA veuillez entrer vos informations Paymoney pour confirmer."
   end
 
   def place_bet
@@ -211,7 +211,7 @@ Consultez les résultats le #{@end_date}.
         when 'Simple'
           @repeats = session[:stake].to_i
         when 'Perm'
-          @repeats = @numbers.combination(session[:bet].sub('n', '').to_i) * session[:stake].to_i
+          @repeats = @numbers.combination(session[:bet].sub('n', '').to_i).count * session[:stake].to_i
       end
     else
       @repeats = session[:stake].to_i
