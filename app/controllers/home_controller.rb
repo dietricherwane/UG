@@ -27,7 +27,19 @@ class HomeController < ApplicationController
   end
 
   def create_parionsdirect_account
+    pseudo = params[:pseudo]
+    firstname = params[:firstname]
+    lastname = params[:lastname]
+    email = params[:email]
+    password = params[:password]
+    password_confirmation = params[:password_confirmation]
+    birthdate = params[:birthdate]
 
+    parionsdirect_account = JSON.parse(RestClient.get(Parameter.first.gateway_url + "/6ba041bf35229938ba869a7a9c59f3a0/api/users/account/create/1/1/#{pseudo}/#{firstname}/#{lastname}/#{email}/#{password}/#{password_confirmation}/#{session[:msisdn]}/birthdate/2")) rescue nil
+
+    flash.now[:error] = parionsdirect_account.to_s
+
+    render :new_parionsdirect_account
   end
 
   def parionsdirect_authentication_form
