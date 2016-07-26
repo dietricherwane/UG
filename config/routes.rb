@@ -4,6 +4,7 @@ Rails.application.routes.draw do
 
   post '/main_menu' => 'home#index', as: :main_menu
   get '/main_menu' => 'home#get_msisdn'
+  post '/parionsdirect_account/create' => 'home#create_parionsdirect_account', as: :create_parionsdirect_account
   get '/games/list' => 'home#list_games', as: :list_games
 
   # Loto

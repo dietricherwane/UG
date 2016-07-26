@@ -1,0 +1,46 @@
+<div class="page-header">
+  <div class="icon">
+    <span class="ico-arrow-right"></span>
+  </div>
+  <h1>Parionsdirect<small>Formulaire de création de compte</small></h1>
+</div>
+
+<div class="row-fluid">
+  <%= form_tag create_parionsdirect_account_path do %>
+    <div class="row-form">
+      <div class="span12">
+        <input type="text" name="pseudo" placeholder="Pseudonyme"/>
+        <span class="bottom">Pseudonyme</span>
+      </div>
+    </div>
+    <div class="row-form">
+      <div class="span12">
+        <input type="text" name="firstname" placeholder="Nom"/>
+        <span class="bottom">Nom</span>
+      </div>
+    </div>
+    <div class="row-form">
+      <div class="span12">
+        <input type="text" name="lastname" placeholder="Prénoms"/>
+        <span class="bottom">Prénoms</span>
+      </div>
+    </div>
+    <div class="row-form">
+      <div class="span12">
+        <input type="text" name="email" placeholder="Email"/>
+        <span class="bottom">Email</span>
+      </div>
+    </div>
+    <div class="row-form">
+      <div class="span12">
+        <input type="text" class = "mask_date" name="birthdate" placeholder="Date de naissance"/>
+        <span class="bottom">Date de naissance</span>
+      </div>
+    </div>
+    <div class="row-form">
+      <div class="span12">
+        <button class="btn">Valider <span class="icon-arrow-next icon-white"></span></button>
+      </div>
+    </div>
+  <% end %>
+</div>

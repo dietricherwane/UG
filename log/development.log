@@ -30544,3 +30544,539 @@ Started GET "/assets/application.js?body=1" for 127.0.0.1 at 2016-07-15 02:34:46
 
 
 Started GET "/assets/backgrounds/default.jpg" for 127.0.0.1 at 2016-07-15 02:34:46 +0000
+
+
+Started GET "/" for 127.0.0.1 at 2016-07-25 17:50:26 +0000
+  [1m[36mActiveRecord::SchemaMigration Load (33.4ms)[0m  [1mSELECT "schema_migrations".* FROM "schema_migrations"[0m
+Processing by HomeController#get_msisdn as HTML
+  Rendered home/get_msisdn.html.erb within layouts/application (3.1ms)
+Completed 200 OK in 1393ms (Views: 1371.6ms | ActiveRecord: 0.0ms)
+
+
+Started GET "/" for 127.0.0.1 at 2016-07-25 17:50:29 +0000
+Processing by HomeController#get_msisdn as HTML
+  Rendered home/get_msisdn.html.erb within layouts/application (0.9ms)
+Completed 200 OK in 305ms (Views: 302.7ms | ActiveRecord: 0.0ms)
+
+
+Started GET "/assets/tagsinput/jquery.tagsinput.css?body=1" for 127.0.0.1 at 2016-07-25 17:50:30 +0000
+
+
+Started GET "/assets/validation/validationEngine.jquery.css?body=1" for 127.0.0.1 at 2016-07-25 17:50:30 +0000
+
+
+Started GET "/assets/uniform/uniform.css?body=1" for 127.0.0.1 at 2016-07-25 17:50:30 +0000
+
+
+Started GET "/assets/application.css?body=1" for 127.0.0.1 at 2016-07-25 17:50:30 +0000
+
+
+Started GET "/assets/bootstrap/bootstrap-fileupload.css?body=1" for 127.0.0.1 at 2016-07-25 17:50:30 +0000
+
+
+Started GET "/assets/bootstrap/bootstrap.min.css?body=1" for 127.0.0.1 at 2016-07-25 17:50:30 +0000
+
+
+Started GET "/assets/fancybox/jquery.fancybox.css?body=1" for 127.0.0.1 at 2016-07-25 17:50:30 +0000
+
+
+Started GET "/assets/icons.css?body=1" for 127.0.0.1 at 2016-07-25 17:50:30 +0000
+
+
+Started GET "/assets/jquery/ui.css?body=1" for 127.0.0.1 at 2016-07-25 17:50:30 +0000
+
+
+Started GET "/assets/loto.css?body=1" for 127.0.0.1 at 2016-07-25 17:50:30 +0000
+
+
+Started GET "/assets/ie.css?body=1" for 127.0.0.1 at 2016-07-25 17:50:30 +0000
+
+
+Started GET "/assets/epiechart/jquery.easy-pie-chart.css?body=1" for 127.0.0.1 at 2016-07-25 17:50:30 +0000
+
+
+Started GET "/assets/cleditor/cleditor.css?body=1" for 127.0.0.1 at 2016-07-25 17:50:30 +0000
+
+
+Started GET "/assets/opera.css?body=1" for 127.0.0.1 at 2016-07-25 17:50:30 +0000
+
+
+Started GET "/assets/bootstrap/bootstrap-responsive.min.css?body=1" for 127.0.0.1 at 2016-07-25 17:50:30 +0000
+
+
+Started GET "/assets/mystyles.css?body=1" for 127.0.0.1 at 2016-07-25 17:50:30 +0000
+
+
+Started GET "/assets/mcustomscrollbar/mCustomScrollbar.css?body=1" for 127.0.0.1 at 2016-07-25 17:50:30 +0000
+
+
+Started GET "/assets/home.css?body=1" for 127.0.0.1 at 2016-07-25 17:50:30 +0000
+
+
+Started GET "/assets/shbrush/shCoreDefault.css?body=1" for 127.0.0.1 at 2016-07-25 17:50:30 +0000
+
+
+Started GET "/assets/sources_loader.css?body=1" for 127.0.0.1 at 2016-07-25 17:50:30 +0000
+
+
+Started GET "/assets/multiselect/multiselect.css?body=1" for 127.0.0.1 at 2016-07-25 17:50:30 +0000
+
+
+Started GET "/assets/shbrush/shThemeDefault.css?body=1" for 127.0.0.1 at 2016-07-25 17:50:30 +0000
+
+
+Started GET "/assets/reconciliation.css?body=1" for 127.0.0.1 at 2016-07-25 17:50:30 +0000
+
+
+Started GET "/assets/select/select.css?body=1" for 127.0.0.1 at 2016-07-25 17:50:30 +0000
+
+
+Started GET "/assets/stylesheets.css?body=1" for 127.0.0.1 at 2016-07-25 17:50:30 +0000
+
+
+Started GET "/assets/stepywizard/jquery.stepy.css?body=1" for 127.0.0.1 at 2016-07-25 17:50:30 +0000
+
+
+Started GET "/assets/styling.css?body=1" for 127.0.0.1 at 2016-07-25 17:50:30 +0000
+
+
+Started GET "/assets/stylesheet.css?body=1" for 127.0.0.1 at 2016-07-25 17:50:30 +0000
+
+
+Started GET "/assets/plugins/jquery/jquery-1.9.1.min.js?body=1" for 127.0.0.1 at 2016-07-25 17:50:30 +0000
+
+
+Started GET "/assets/plugins/other/excanvas.js?body=1" for 127.0.0.1 at 2016-07-25 17:50:30 +0000
+
+
+Started GET "/assets/plugins/other/jquery.mousewheel.min.js?body=1" for 127.0.0.1 at 2016-07-25 17:50:30 +0000
+
+
+Started GET "/assets/jquery_ujs.js?body=1" for 127.0.0.1 at 2016-07-25 17:50:30 +0000
+
+
+Started GET "/assets/plugins/jquery/jquery-ui-1.10.1.custom.min.js?body=1" for 127.0.0.1 at 2016-07-25 17:50:30 +0000
+
+
+Started GET "/assets/plugins/jquery/jquery-migrate-1.1.1.min.js?body=1" for 127.0.0.1 at 2016-07-25 17:50:30 +0000
+
+
+Started GET "/assets/plugins/jflot/jquery.flot.stack.js?body=1" for 127.0.0.1 at 2016-07-25 17:50:30 +0000
+
+
+Started GET "/assets/plugins/jquery/globalize.js?body=1" for 127.0.0.1 at 2016-07-25 17:50:30 +0000
+
+
+Started GET "/assets/plugins/jflot/jquery.flot.resize.js?body=1" for 127.0.0.1 at 2016-07-25 17:50:30 +0000
+
+
+Started GET "/assets/plugins/sparklines/jquery.sparkline.min.js?body=1" for 127.0.0.1 at 2016-07-25 17:50:30 +0000
+
+
+Started GET "/assets/plugins/mcustomscrollbar/jquery.mCustomScrollbar.min.js?body=1" for 127.0.0.1 at 2016-07-25 17:50:30 +0000
+
+
+Started GET "/assets/plugins/uniform/jquery.uniform.min.js?body=1" for 127.0.0.1 at 2016-07-25 17:50:30 +0000
+
+
+Started GET "/assets/plugins/jflot/jquery.flot.pie.js?body=1" for 127.0.0.1 at 2016-07-25 17:50:30 +0000
+
+
+Started GET "/assets/plugins/bootstrap/bootstrap.min.js?body=1" for 127.0.0.1 at 2016-07-25 17:50:30 +0000
+
+
+Started GET "/assets/plugins/cookies/jquery.cookies.2.2.0.min.js?body=1" for 127.0.0.1 at 2016-07-25 17:50:30 +0000
+
+
+Started GET "/assets/plugins/shbrush/shBrushJScript.js?body=1" for 127.0.0.1 at 2016-07-25 17:50:30 +0000
+
+
+Started GET "/assets/plugins/shbrush/XRegExp.js?body=1" for 127.0.0.1 at 2016-07-25 17:50:30 +0000
+
+
+Started GET "/assets/plugins.js?body=1" for 127.0.0.1 at 2016-07-25 17:50:30 +0000
+
+
+Started GET "/assets/plugins/jflot/jquery.flot.js?body=1" for 127.0.0.1 at 2016-07-25 17:50:30 +0000
+
+
+Started GET "/assets/plugins/shbrush/shCore.js?body=1" for 127.0.0.1 at 2016-07-25 17:50:30 +0000
+
+
+Started GET "/assets/application.js?body=1" for 127.0.0.1 at 2016-07-25 17:50:30 +0000
+
+
+Started GET "/assets/plugins/shbrush/shBrushXml.js?body=1" for 127.0.0.1 at 2016-07-25 17:50:30 +0000
+
+
+Started GET "/assets/plugins/shbrush/shBrushCss.js?body=1" for 127.0.0.1 at 2016-07-25 17:50:30 +0000
+
+
+Started GET "/assets/charts.js?body=1" for 127.0.0.1 at 2016-07-25 17:50:30 +0000
+
+
+Started GET "/assets/actions.js?body=1" for 127.0.0.1 at 2016-07-25 17:50:30 +0000
+
+
+Started GET "/assets/backgrounds/default.jpg" for 127.0.0.1 at 2016-07-25 17:50:30 +0000
+
+
+Started GET "/assets/next.png" for 127.0.0.1 at 2016-07-25 17:50:30 +0000
+
+
+Started GET "/assets/fonts/icomoon.woff" for 127.0.0.1 at 2016-07-25 17:50:30 +0000
+
+
+Started GET "/" for 127.0.0.1 at 2016-07-26 15:01:18 +0000
+  [1m[36mActiveRecord::SchemaMigration Load (33.5ms)[0m  [1mSELECT "schema_migrations".* FROM "schema_migrations"[0m
+Processing by HomeController#get_msisdn as HTML
+  Rendered home/get_msisdn.html.erb within layouts/application (3.8ms)
+Completed 200 OK in 1491ms (Views: 1470.0ms | ActiveRecord: 0.0ms)
+
+
+Started GET "/" for 127.0.0.1 at 2016-07-26 15:01:21 +0000
+Processing by HomeController#get_msisdn as HTML
+  Rendered home/get_msisdn.html.erb within layouts/application (0.5ms)
+Completed 200 OK in 242ms (Views: 241.3ms | ActiveRecord: 0.0ms)
+
+
+Started GET "/assets/bootstrap/bootstrap-fileupload.css?body=1" for 127.0.0.1 at 2016-07-26 15:01:21 +0000
+
+
+Started GET "/assets/ie.css?body=1" for 127.0.0.1 at 2016-07-26 15:01:21 +0000
+
+
+Started GET "/assets/home.css?body=1" for 127.0.0.1 at 2016-07-26 15:01:21 +0000
+
+
+Started GET "/assets/bootstrap/bootstrap-responsive.min.css?body=1" for 127.0.0.1 at 2016-07-26 15:01:21 +0000
+
+
+Started GET "/assets/icons.css?body=1" for 127.0.0.1 at 2016-07-26 15:01:21 +0000
+
+
+Started GET "/assets/bootstrap/bootstrap.min.css?body=1" for 127.0.0.1 at 2016-07-26 15:01:21 +0000
+
+
+Started GET "/assets/loto.css?body=1" for 127.0.0.1 at 2016-07-26 15:01:21 +0000
+
+
+Started GET "/assets/jquery/ui.css?body=1" for 127.0.0.1 at 2016-07-26 15:01:21 +0000
+
+
+Started GET "/assets/cleditor/cleditor.css?body=1" for 127.0.0.1 at 2016-07-26 15:01:21 +0000
+
+
+Started GET "/assets/multiselect/multiselect.css?body=1" for 127.0.0.1 at 2016-07-26 15:01:21 +0000
+
+
+Started GET "/assets/epiechart/jquery.easy-pie-chart.css?body=1" for 127.0.0.1 at 2016-07-26 15:01:21 +0000
+
+
+Started GET "/assets/reconciliation.css?body=1" for 127.0.0.1 at 2016-07-26 15:01:21 +0000
+
+
+Started GET "/assets/mcustomscrollbar/mCustomScrollbar.css?body=1" for 127.0.0.1 at 2016-07-26 15:01:21 +0000
+
+
+Started GET "/assets/shbrush/shCoreDefault.css?body=1" for 127.0.0.1 at 2016-07-26 15:01:21 +0000
+
+
+Started GET "/assets/shbrush/shThemeDefault.css?body=1" for 127.0.0.1 at 2016-07-26 15:01:21 +0000
+
+
+Started GET "/assets/sources_loader.css?body=1" for 127.0.0.1 at 2016-07-26 15:01:21 +0000
+
+
+Started GET "/assets/stepywizard/jquery.stepy.css?body=1" for 127.0.0.1 at 2016-07-26 15:01:21 +0000
+
+
+Started GET "/assets/stylesheet.css?body=1" for 127.0.0.1 at 2016-07-26 15:01:21 +0000
+
+
+Started GET "/assets/stylesheets.css?body=1" for 127.0.0.1 at 2016-07-26 15:01:21 +0000
+
+
+Started GET "/assets/styling.css?body=1" for 127.0.0.1 at 2016-07-26 15:01:21 +0000
+
+
+Started GET "/assets/tagsinput/jquery.tagsinput.css?body=1" for 127.0.0.1 at 2016-07-26 15:01:21 +0000
+
+
+Started GET "/assets/uniform/uniform.css?body=1" for 127.0.0.1 at 2016-07-26 15:01:21 +0000
+
+
+Started GET "/assets/validation/validationEngine.jquery.css?body=1" for 127.0.0.1 at 2016-07-26 15:01:21 +0000
+
+
+Started GET "/assets/application.css?body=1" for 127.0.0.1 at 2016-07-26 15:01:21 +0000
+
+
+Started GET "/assets/opera.css?body=1" for 127.0.0.1 at 2016-07-26 15:01:21 +0000
+
+
+Started GET "/assets/select/select.css?body=1" for 127.0.0.1 at 2016-07-26 15:01:21 +0000
+
+
+Started GET "/assets/mystyles.css?body=1" for 127.0.0.1 at 2016-07-26 15:01:21 +0000
+
+
+Started GET "/assets/fancybox/jquery.fancybox.css?body=1" for 127.0.0.1 at 2016-07-26 15:01:21 +0000
+
+
+Started GET "/assets/plugins/jquery/jquery-1.9.1.min.js?body=1" for 127.0.0.1 at 2016-07-26 15:01:21 +0000
+
+
+Started GET "/assets/plugins/jquery/jquery-migrate-1.1.1.min.js?body=1" for 127.0.0.1 at 2016-07-26 15:01:22 +0000
+
+
+Started GET "/assets/plugins/jquery/globalize.js?body=1" for 127.0.0.1 at 2016-07-26 15:01:22 +0000
+
+
+Started GET "/assets/plugins/other/excanvas.js?body=1" for 127.0.0.1 at 2016-07-26 15:01:22 +0000
+
+
+Started GET "/assets/jquery_ujs.js?body=1" for 127.0.0.1 at 2016-07-26 15:01:22 +0000
+
+
+Started GET "/assets/plugins/other/jquery.mousewheel.min.js?body=1" for 127.0.0.1 at 2016-07-26 15:01:22 +0000
+
+
+Started GET "/assets/plugins/bootstrap/bootstrap.min.js?body=1" for 127.0.0.1 at 2016-07-26 15:01:22 +0000
+
+
+Started GET "/assets/plugins/jflot/jquery.flot.js?body=1" for 127.0.0.1 at 2016-07-26 15:01:22 +0000
+
+
+Started GET "/assets/plugins/jflot/jquery.flot.stack.js?body=1" for 127.0.0.1 at 2016-07-26 15:01:22 +0000
+
+
+Started GET "/assets/plugins/jflot/jquery.flot.pie.js?body=1" for 127.0.0.1 at 2016-07-26 15:01:22 +0000
+
+
+Started GET "/assets/plugins/jflot/jquery.flot.resize.js?body=1" for 127.0.0.1 at 2016-07-26 15:01:22 +0000
+
+
+Started GET "/assets/plugins/sparklines/jquery.sparkline.min.js?body=1" for 127.0.0.1 at 2016-07-26 15:01:22 +0000
+
+
+Started GET "/assets/plugins/mcustomscrollbar/jquery.mCustomScrollbar.min.js?body=1" for 127.0.0.1 at 2016-07-26 15:01:22 +0000
+
+
+Started GET "/assets/plugins/uniform/jquery.uniform.min.js?body=1" for 127.0.0.1 at 2016-07-26 15:01:22 +0000
+
+
+Started GET "/assets/plugins/shbrush/XRegExp.js?body=1" for 127.0.0.1 at 2016-07-26 15:01:22 +0000
+
+
+Started GET "/assets/plugins/shbrush/shCore.js?body=1" for 127.0.0.1 at 2016-07-26 15:01:22 +0000
+
+
+Started GET "/assets/plugins/shbrush/shBrushXml.js?body=1" for 127.0.0.1 at 2016-07-26 15:01:22 +0000
+
+
+Started GET "/assets/plugins/jquery/jquery-ui-1.10.1.custom.min.js?body=1" for 127.0.0.1 at 2016-07-26 15:01:22 +0000
+
+
+Started GET "/assets/plugins/shbrush/shBrushCss.js?body=1" for 127.0.0.1 at 2016-07-26 15:01:22 +0000
+
+
+Started GET "/assets/plugins.js?body=1" for 127.0.0.1 at 2016-07-26 15:01:22 +0000
+
+
+Started GET "/assets/charts.js?body=1" for 127.0.0.1 at 2016-07-26 15:01:22 +0000
+
+
+Started GET "/assets/actions.js?body=1" for 127.0.0.1 at 2016-07-26 15:01:22 +0000
+
+
+Started GET "/assets/application.js?body=1" for 127.0.0.1 at 2016-07-26 15:01:22 +0000
+
+
+Started GET "/assets/plugins/shbrush/shBrushJScript.js?body=1" for 127.0.0.1 at 2016-07-26 15:01:22 +0000
+
+
+Started GET "/assets/plugins/cookies/jquery.cookies.2.2.0.min.js?body=1" for 127.0.0.1 at 2016-07-26 15:01:22 +0000
+
+
+Started GET "/assets/fonts/icomoon.woff" for 127.0.0.1 at 2016-07-26 15:01:22 +0000
+
+
+Started GET "/assets/backgrounds/default.jpg" for 127.0.0.1 at 2016-07-26 15:01:22 +0000
+
+
+Started GET "/assets/next.png" for 127.0.0.1 at 2016-07-26 15:01:22 +0000
+
+
+Started GET "/" for 127.0.0.1 at 2016-07-26 15:01:32 +0000
+Processing by HomeController#get_msisdn as HTML
+  Rendered home/get_msisdn.html.erb within layouts/application (0.4ms)
+Completed 200 OK in 271ms (Views: 270.3ms | ActiveRecord: 0.0ms)
+
+
+Started GET "/assets/bootstrap/bootstrap.min.css?body=1" for 127.0.0.1 at 2016-07-26 15:01:32 +0000
+
+
+Started GET "/assets/cleditor/cleditor.css?body=1" for 127.0.0.1 at 2016-07-26 15:01:32 +0000
+
+
+Started GET "/assets/bootstrap/bootstrap-fileupload.css?body=1" for 127.0.0.1 at 2016-07-26 15:01:33 +0000
+
+
+Started GET "/assets/bootstrap/bootstrap-responsive.min.css?body=1" for 127.0.0.1 at 2016-07-26 15:01:33 +0000
+
+
+Started GET "/assets/fancybox/jquery.fancybox.css?body=1" for 127.0.0.1 at 2016-07-26 15:01:33 +0000
+
+
+Started GET "/assets/epiechart/jquery.easy-pie-chart.css?body=1" for 127.0.0.1 at 2016-07-26 15:01:33 +0000
+
+
+Started GET "/assets/home.css?body=1" for 127.0.0.1 at 2016-07-26 15:01:33 +0000
+
+
+Started GET "/assets/icons.css?body=1" for 127.0.0.1 at 2016-07-26 15:01:33 +0000
+
+
+Started GET "/assets/ie.css?body=1" for 127.0.0.1 at 2016-07-26 15:01:33 +0000
+
+
+Started GET "/assets/jquery/ui.css?body=1" for 127.0.0.1 at 2016-07-26 15:01:33 +0000
+
+
+Started GET "/assets/loto.css?body=1" for 127.0.0.1 at 2016-07-26 15:01:33 +0000
+
+
+Started GET "/assets/mcustomscrollbar/mCustomScrollbar.css?body=1" for 127.0.0.1 at 2016-07-26 15:01:33 +0000
+
+
+Started GET "/assets/multiselect/multiselect.css?body=1" for 127.0.0.1 at 2016-07-26 15:01:33 +0000
+
+
+Started GET "/assets/opera.css?body=1" for 127.0.0.1 at 2016-07-26 15:01:33 +0000
+
+
+Started GET "/assets/reconciliation.css?body=1" for 127.0.0.1 at 2016-07-26 15:01:33 +0000
+
+
+Started GET "/assets/mystyles.css?body=1" for 127.0.0.1 at 2016-07-26 15:01:33 +0000
+
+
+Started GET "/assets/select/select.css?body=1" for 127.0.0.1 at 2016-07-26 15:01:33 +0000
+
+
+Started GET "/assets/shbrush/shCoreDefault.css?body=1" for 127.0.0.1 at 2016-07-26 15:01:33 +0000
+
+
+Started GET "/assets/shbrush/shThemeDefault.css?body=1" for 127.0.0.1 at 2016-07-26 15:01:33 +0000
+
+
+Started GET "/assets/sources_loader.css?body=1" for 127.0.0.1 at 2016-07-26 15:01:33 +0000
+
+
+Started GET "/assets/stepywizard/jquery.stepy.css?body=1" for 127.0.0.1 at 2016-07-26 15:01:33 +0000
+
+
+Started GET "/assets/stylesheet.css?body=1" for 127.0.0.1 at 2016-07-26 15:01:33 +0000
+
+
+Started GET "/assets/stylesheets.css?body=1" for 127.0.0.1 at 2016-07-26 15:01:33 +0000
+
+
+Started GET "/assets/styling.css?body=1" for 127.0.0.1 at 2016-07-26 15:01:33 +0000
+
+
+Started GET "/assets/tagsinput/jquery.tagsinput.css?body=1" for 127.0.0.1 at 2016-07-26 15:01:33 +0000
+
+
+Started GET "/assets/uniform/uniform.css?body=1" for 127.0.0.1 at 2016-07-26 15:01:33 +0000
+
+
+Started GET "/assets/validation/validationEngine.jquery.css?body=1" for 127.0.0.1 at 2016-07-26 15:01:33 +0000
+
+
+Started GET "/assets/application.css?body=1" for 127.0.0.1 at 2016-07-26 15:01:33 +0000
+
+
+Started GET "/assets/plugins/jquery/jquery-1.9.1.min.js?body=1" for 127.0.0.1 at 2016-07-26 15:01:33 +0000
+
+
+Started GET "/assets/jquery_ujs.js?body=1" for 127.0.0.1 at 2016-07-26 15:01:33 +0000
+
+
+Started GET "/assets/plugins/jquery/jquery-ui-1.10.1.custom.min.js?body=1" for 127.0.0.1 at 2016-07-26 15:01:33 +0000
+
+
+Started GET "/assets/plugins/jquery/jquery-migrate-1.1.1.min.js?body=1" for 127.0.0.1 at 2016-07-26 15:01:33 +0000
+
+
+Started GET "/assets/plugins/jquery/globalize.js?body=1" for 127.0.0.1 at 2016-07-26 15:01:33 +0000
+
+
+Started GET "/assets/plugins/other/excanvas.js?body=1" for 127.0.0.1 at 2016-07-26 15:01:33 +0000
+
+
+Started GET "/assets/plugins/other/jquery.mousewheel.min.js?body=1" for 127.0.0.1 at 2016-07-26 15:01:33 +0000
+
+
+Started GET "/assets/plugins/cookies/jquery.cookies.2.2.0.min.js?body=1" for 127.0.0.1 at 2016-07-26 15:01:33 +0000
+
+
+Started GET "/assets/plugins/bootstrap/bootstrap.min.js?body=1" for 127.0.0.1 at 2016-07-26 15:01:33 +0000
+
+
+Started GET "/assets/plugins/jflot/jquery.flot.js?body=1" for 127.0.0.1 at 2016-07-26 15:01:33 +0000
+
+
+Started GET "/assets/plugins/jflot/jquery.flot.stack.js?body=1" for 127.0.0.1 at 2016-07-26 15:01:33 +0000
+
+
+Started GET "/assets/plugins/jflot/jquery.flot.pie.js?body=1" for 127.0.0.1 at 2016-07-26 15:01:33 +0000
+
+
+Started GET "/assets/plugins/jflot/jquery.flot.resize.js?body=1" for 127.0.0.1 at 2016-07-26 15:01:33 +0000
+
+
+Started GET "/assets/plugins/sparklines/jquery.sparkline.min.js?body=1" for 127.0.0.1 at 2016-07-26 15:01:33 +0000
+
+
+Started GET "/assets/plugins/mcustomscrollbar/jquery.mCustomScrollbar.min.js?body=1" for 127.0.0.1 at 2016-07-26 15:01:33 +0000
+
+
+Started GET "/assets/plugins/shbrush/XRegExp.js?body=1" for 127.0.0.1 at 2016-07-26 15:01:33 +0000
+
+
+Started GET "/assets/plugins/shbrush/shBrushJScript.js?body=1" for 127.0.0.1 at 2016-07-26 15:01:33 +0000
+
+
+Started GET "/assets/plugins/uniform/jquery.uniform.min.js?body=1" for 127.0.0.1 at 2016-07-26 15:01:33 +0000
+
+
+Started GET "/assets/plugins/shbrush/shCore.js?body=1" for 127.0.0.1 at 2016-07-26 15:01:33 +0000
+
+
+Started GET "/assets/plugins/shbrush/shBrushXml.js?body=1" for 127.0.0.1 at 2016-07-26 15:01:33 +0000
+
+
+Started GET "/assets/plugins/shbrush/shBrushCss.js?body=1" for 127.0.0.1 at 2016-07-26 15:01:33 +0000
+
+
+Started GET "/assets/plugins.js?body=1" for 127.0.0.1 at 2016-07-26 15:01:33 +0000
+
+
+Started GET "/assets/charts.js?body=1" for 127.0.0.1 at 2016-07-26 15:01:33 +0000
+
+
+Started GET "/assets/actions.js?body=1" for 127.0.0.1 at 2016-07-26 15:01:33 +0000
+
+
+Started GET "/assets/application.js?body=1" for 127.0.0.1 at 2016-07-26 15:01:33 +0000
+
+
+Started GET "/assets/backgrounds/default.jpg" for 127.0.0.1 at 2016-07-26 15:01:33 +0000
+
+
+Started GET "/assets/fonts/icomoon.woff" for 127.0.0.1 at 2016-07-26 15:01:33 +0000
+
+
+Started GET "/assets/next.png" for 127.0.0.1 at 2016-07-26 15:01:33 +0000
