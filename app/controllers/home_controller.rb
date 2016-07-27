@@ -36,7 +36,7 @@ class HomeController < ApplicationController
     @birthdate = params[:birthdate]
 
     if valid_parionsdirect_account_params?
-      url = Parameter.first.gateway_url + "/6ba041bf35229938ba869a7a9c59f3a0/api/users/account/create/1/1/#{@pseudo}/#{@firstname}/#{@lastname}/#{@email}/#{@password}/#{@password_confirmation}/#{session[:msisdn]}/#{@birthdate}/2"
+      url = Parameter.first.gateway_url + "/6ba041bf35229938ba869a7a9c59f3a0/api/users/account/create/1/1/#{@pseudo}/#{@firstname}/#{@lastname}/#{@email}/#{@password}/#{@password_confirmation}/#{session[:msisdn]}/#{@birthdate}/d2a29d336c48fe68df6e5827cc49a042"
 
       parionsdirect_account = RestClient.get(url) rescue nil
 
