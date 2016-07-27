@@ -9,43 +9,43 @@
   <%= form_tag create_parionsdirect_account_path do %>
     <div class="row-form">
       <div class="span12">
-        <input type="text" name="pseudo" placeholder="Pseudonyme"/>
+        <input type="text" value = "<%= @pseudo %>" name="pseudo" placeholder="Pseudonyme"/>
         <span class="bottom">Pseudonyme</span>
       </div>
     </div>
     <div class="row-form">
       <div class="span12">
-        <input type="text" name="password" placeholder="Mot de passe"/>
+        <input type="text" value = "<%= @password %>" name="password" placeholder="Mot de passe"/>
         <span class="bottom">Mot de passe</span>
       </div>
     </div>
     <div class="row-form">
       <div class="span12">
-        <input type="text" name="password_confirmation" placeholder="Confirmation du mot de passe"/>
+        <input type="text" value = "<%= @password_confirmation %>" name="password_confirmation" placeholder="Confirmation du mot de passe"/>
         <span class="bottom">Confirmation du mot de passe</span>
       </div>
     </div>
     <div class="row-form">
       <div class="span12">
-        <input type="text" name="firstname" placeholder="Nom"/>
+        <input type="text" value = "<%= @firstname %>" name="firstname" placeholder="Nom"/>
         <span class="bottom">Nom</span>
       </div>
     </div>
     <div class="row-form">
       <div class="span12">
-        <input type="text" name="lastname" placeholder="Prénoms"/>
+        <input type="text" value = "<%= @lastname %>" name="lastname" placeholder="Prénoms"/>
         <span class="bottom">Prénoms</span>
       </div>
     </div>
     <div class="row-form">
       <div class="span12">
-        <input type="text" name="email" placeholder="Email"/>
+        <input type="text" value = "<%= @email %>" name="email" placeholder="Email"/>
         <span class="bottom">Email</span>
       </div>
     </div>
     <div class="row-form">
       <div class="span12">
-        <input type="text" class = "mask_date" name="birthdate" placeholder="Date de naissance"/>
+        <input type="text" value = "<%= @birthdate %>" class = "mask_date" name="birthdate" placeholder="Date de naissance"/>
         <span class="bottom">Date de naissance</span>
       </div>
     </div>
