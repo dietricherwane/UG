@@ -35,7 +35,13 @@ class HomeController < ApplicationController
     password_confirmation = params[:password_confirmation]
     birthdate = params[:birthdate]
 
-    parionsdirect_account = JSON.parse(RestClient.get(Parameter.first.gateway_url + "/6ba041bf35229938ba869a7a9c59f3a0/api/users/account/create/1/1/#{pseudo}/#{firstname}/#{lastname}/#{email}/#{password}/#{password_confirmation}/#{session[:msisdn]}/birthdate/2")) rescue nil
+    url = Parameter.first.gateway_url + "/6ba041bf35229938ba869a7a9c59f3a0/api/users/account/create/1/1/#{pseudo}/#{firstname}/#{lastname}/#{email}/#{password}/#{password_confirmation}/#{session[:msisdn]}/birthdate/2"
+
+    parionsdirect_account = RestClient.get(url) rescue nil
+
+    GenericLog.create(operation: "Create parionsdirect account", request_log: url, response_log: parionsdirect_account)
+
+    parionsdirect_account = JSON.parse(parionsdirect_account) rescue nil
 
     flash.now[:error] = parionsdirect_account.to_s
 

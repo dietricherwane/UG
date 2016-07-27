@@ -11,10 +11,18 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160714012416) do
+ActiveRecord::Schema.define(version: 20160726171638) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "generic_logs", force: true do |t|
+    t.text     "operation"
+    t.text     "request_log"
+    t.text     "response_log"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "logs", force: true do |t|
     t.string   "msisdn"
