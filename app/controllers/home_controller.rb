@@ -34,6 +34,33 @@ class HomeController < ApplicationController
 
   end
 
+  def paymoney_balance
+
+  end
+
+  def get_paymoney_balance
+    password = params[:password]
+
+    if password.blank?
+      flash.now[:error] = "Veuillez entrer un mot de passe"
+    else
+      url = Parameter.first.paymoney_url + "/PAYMONEY_WALLET/rest/solte_compte/#{session[:paymoney_account_number]}/#{password}"
+      balance = RestClient.get(url) rescue nil
+
+      GenericLog.create(operation: "Paymoney balance", request_log: url, response_log: balance)
+
+      balance = JSON.parse(balance) rescue nil
+
+      if balance.blank?
+        flash.now[:error] = "Le mot de passe saisi n'est pas valide"
+      else
+        flash.now[:success] = "Votre solde est de: #{balance["solde"] rescue 0} FCFA"
+      end
+    end
+
+    render :paymoney_balance
+  end
+
   def new_parionsdirect_account
 
   end
