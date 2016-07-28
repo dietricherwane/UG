@@ -10,6 +10,7 @@ Rails.application.routes.draw do
   post '/paymoney_account/validate' => 'home#validate_paymoney_account', as: :validate_paymoney_account
   get '/paymoney_account/create' => 'home#create_paymoney_account', as: :create_paymoney_account
   get '/paymoney_balance' => 'home#paymoney_balance', as: :paymoney_balance
+  post '/paymoney_balance/get' => 'home#get_paymoney_balance', as: :get_paymoney_balance
 
   # Loto
   get '/loto/main_menu' => 'loto#index', as: :loto_main_menu
