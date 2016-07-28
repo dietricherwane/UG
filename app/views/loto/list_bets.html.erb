@@ -20,12 +20,12 @@
         </div>
       </div>
     <% end %>
-  <% end %>
-  <div class="row-form">
-    <div class="span12">
-      <%= paginate @bets %>
+    <div class="row-form">
+      <div class="span12">
+        <%= paginate @bets %>
+      </div>
     </div>
-  </div>
+  <% end %>
   <div class="row-form">
     <div class="span12">
       <%= link_to 'Retour', list_games_path %>
