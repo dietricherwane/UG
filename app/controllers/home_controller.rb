@@ -112,6 +112,9 @@ class HomeController < ApplicationController
   # If the gamer does not have a paymoney account, it should be created
   def create_paymoney_account
     url = ""
+    paymoney_account = RestClient.get(url) rescue nil
+
+    render :set_paymoney_account
   end
 
   def parionsdirect_authentication_form
