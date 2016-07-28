@@ -253,4 +253,8 @@ Consultez les résultats le #{@end_date}.
 =end
   end
 
+  def list_bets
+
+  end
+
 end
