@@ -77,7 +77,7 @@ class HomeController < ApplicationController
       GenericLog.create(operation: "Check paymoney account saved paymoney account", request_log: url, response_log: paymoney_token)
 
       if !paymoney_token.blank? && paymoney_token != 'null'
-        session[:paymoney_account_number] = paymoney_account_number
+        session[:paymoney_account_number] = paymoney_account
 
         # Link msisdn to paymoney account
         AccountProfile.find_by_msisdn(session[:msisdn]).update_attributes(paymoney_account_number: paymoney_account)
