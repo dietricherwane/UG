@@ -8,7 +8,7 @@ class HomeController < ApplicationController
     session[:msisdn] = params[:msisdn]
     if not_a_phone_number?(params[:msisdn])
       flash.now[:error] = "Veuillez entrer un numéro de téléphone valide"
-      #render :get_msisdn
+      render :get_msisdn
     else
       url = Parameter.first.gateway_url + "/85fg69a7a9c59f3a0/api/users/password/#{session[:msisdn]}"
       password_salt = RestClient.get(url) rescue ''
