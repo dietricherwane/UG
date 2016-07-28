@@ -10,7 +10,12 @@ class HomeController < ApplicationController
       flash.now[:error] = "Veuillez entrer un numéro de téléphone valide"
       #render :get_msisdn
     else
-      password_salt = RestClient.get(Parameter.first.gateway_url + "/85fg69a7a9c59f3a0/api/users/password/#{session[:msisdn]}").split('-') rescue ''
+      url = Parameter.first.gateway_url + "/85fg69a7a9c59f3a0/api/users/password/#{session[:msisdn]}"
+      password_salt = RestClient.get(url) rescue ''
+
+      GenericLog.create(operation: "Check user existence", request_log: url, response_log: password_salt)
+
+      password_salt = password_salt.split('-') rescue ''
       password = password_salt[0]
       salt = password_salt[1]
       # The phone number does not exists in the database so Parionsdirect account should be created
