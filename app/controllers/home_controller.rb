@@ -61,6 +61,35 @@ class HomeController < ApplicationController
     render :paymoney_balance
   end
 
+  def saved_paymoney_account
+
+  end
+
+  def update_saved_paymoney_account
+    paymoney_account = params[:paymoney_account]
+
+    if paymoney_account.blank?
+      flash.now[:error] = "Veuillez entrer un numéro de compte Paymoney associé au compte"
+    else
+      url = Parameter.first.paymoney_url + "/PAYMONEY_WALLET/rest/check2_compte/#{paymoney_account}"
+      paymoney_token = RestClient.get(url) rescue nil
+
+      GenericLog.create(operation: "Check paymoney account saved paymoney account", request_log: url, response_log: paymoney_token)
+
+      if !paymoney_token.blank? && paymoney_token != 'null'
+        session[:paymoney_account_number] = paymoney_account_number
+
+        # Link msisdn to paymoney account
+        AccountProfile.find_by_msisdn(session[:msisdn]).update_attributes(paymoney_account_number: paymoney_account)
+        flash.now[:success] = "Votre compte Paymoney associé a été mis à jour"
+      else
+        flash.now[:error] = "Le compte Paymoney saisi n'est pas valide"
+      end
+    end
+
+    render :saved_paymoney_account
+  end
+
   def new_parionsdirect_account
 
   end
