@@ -6,6 +6,8 @@ Rails.application.routes.draw do
   get '/main_menu' => 'home#get_msisdn'
   post '/parionsdirect_account/create' => 'home#create_parionsdirect_account', as: :create_parionsdirect_account
   get '/games/list' => 'home#list_games', as: :list_games
+  post '/parionsdirect_account/authenticate' => 'home#authenticate_parionsdirect_account', as: :authenticate_parionsdirect_account
+  post '/paymoney_account/validate' => 'home#validate_paymoney_account', as: :validate_paymoney_account
 
   # Loto
   get '/loto/main_menu' => 'loto#index', as: :loto_main_menu

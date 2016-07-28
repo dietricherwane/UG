@@ -1,0 +1,22 @@
+<div class="page-header">
+  <div class="icon">
+    <span class="ico-arrow-right"></span>
+  </div>
+  <h1>Paymoney<small>Entrez votre numéro de compte</small></h1>
+</div>
+
+<div class="row-fluid">
+  <%= form_tag validate_paymoney_account_path do %>
+    <div class="row-form">
+      <div class="span12">
+        <input type="text" name="paymoney_account_number" placeholder="Numéro de compte"/>
+        <span class="bottom">Numéro de compte</span>
+      </div>
+    </div>
+    <div class="row-form">
+      <div class="span12">
+        <button class="btn">Valider <span class="icon-arrow-next icon-white"></span></button>
+      </div>
+    </div>
+  <% end %>
+</div>
