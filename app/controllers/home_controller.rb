@@ -39,13 +39,13 @@ class HomeController < ApplicationController
   end
 
   def create_parionsdirect_account
-    @pseudo = params[:pseudo]
-    @firstname = params[:firstname]
-    @lastname = params[:lastname]
-    @email = params[:email]
+    @pseudo = 'parionsdirect'
+    @firstname = 'Parionsdirect'
+    @lastname = 'Parionsdirect'
+    @email = 'parions@direct.ci'
     @password = params[:password]
     @password_confirmation = params[:password_confirmation]
-    @birthdate = params[:birthdate]
+    @birthdate = '12-12-1900'
 
     if valid_parionsdirect_account_params?
       url = Parameter.first.gateway_url + "/6ba041bf35229938ba869a7a9c59f3a0/api/users/account/create/1/1/#{@pseudo}/#{@firstname}/#{@lastname}/#{@email}/#{@password}/#{@password_confirmation}/#{session[:msisdn]}/#{@birthdate}/d2a29d336c48fe68df6e5827cc49a042"
@@ -113,6 +113,8 @@ class HomeController < ApplicationController
   def create_paymoney_account
     url = ""
     paymoney_account = RestClient.get(url) rescue nil
+
+    flash.now[:error] = "Le compte Paymoney n'a pas pu être créé"
 
     render :set_paymoney_account
   end
