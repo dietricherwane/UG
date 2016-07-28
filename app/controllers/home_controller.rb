@@ -49,12 +49,12 @@ class HomeController < ApplicationController
 
       GenericLog.create(operation: "Paymoney balance", request_log: url, response_log: balance)
 
-      balance = JSON.parse(balance) rescue nil
+      balance = JSON.parse(balance)["solde"] rescue nil
 
       if balance.blank?
         flash.now[:error] = "Le mot de passe saisi n'est pas valide"
       else
-        flash.now[:success] = "Votre solde est de: #{balance["solde"] rescue 0} FCFA"
+        flash.now[:success] = "Votre solde est de: #{balance rescue 0} FCFA"
       end
     end
 
