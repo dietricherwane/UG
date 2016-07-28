@@ -94,7 +94,7 @@ class HomeController < ApplicationController
       flash.now[:error] = "Veuillez renseigner un numéro de compte"
       render :set_paymoney_account
     else
-      url = Parameter.first.gateway_url + "/PAYMONEY_WALLET/rest/check2_compte/#{paymoney_account_number}"
+      url = Parameter.first.paymoney_url + "/PAYMONEY_WALLET/rest/check2_compte/#{paymoney_account_number}"
       paymoney_token = RestClient.get(url) rescue nil
 
       GenericLog.create(operation: "Check paymoney account existence with account number", request_log: url, response_log: paymoney_token)
@@ -111,7 +111,7 @@ class HomeController < ApplicationController
 
   # If the gamer does not have a paymoney account, it should be created
   def create_paymoney_account
-
+    url = ""
   end
 
   def parionsdirect_authentication_form
@@ -122,7 +122,7 @@ class HomeController < ApplicationController
     password = Digest::SHA2.hexdigest(session[:salt] + params[:password])
 
     if password == session[:password]
-      url = Parameter.first.gateway_url + "/rest/check4_compte/#{session[:msisdn]}"
+      url = Parameter.first.paymoney_url + "/rest/check4_compte/#{session[:msisdn]}"
       paymoney_account = RestClient.get(url) rescue nil
 
       GenericLog.create(operation: "Check paymoney account existence with msisdn", request_log: url, response_log: paymoney_account)
