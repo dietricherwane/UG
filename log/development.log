@@ -31087,3 +31087,10 @@ Migrating to CreateGenericLogs (20160726171638)
   [1m[35mSQL (0.7ms)[0m  INSERT INTO "schema_migrations" ("version") VALUES ($1)  [["version", "20160726171638"]]
   [1m[36m (16.7ms)[0m  [1mCOMMIT[0m
   [1m[35mActiveRecord::SchemaMigration Load (0.7ms)[0m  SELECT "schema_migrations".* FROM "schema_migrations"
+  [1m[36mActiveRecord::SchemaMigration Load (30.8ms)[0m  [1mSELECT "schema_migrations".* FROM "schema_migrations"[0m
+Migrating to AddPaymoneyUrlToParameters (20160728081145)
+  [1m[35m (0.4ms)[0m  BEGIN
+  [1m[36m (267.1ms)[0m  [1mALTER TABLE "parameters" ADD COLUMN "paymoney_url" character varying(255)[0m
+  [1m[35mSQL (0.6ms)[0m  INSERT INTO "schema_migrations" ("version") VALUES ($1)  [["version", "20160728081145"]]
+  [1m[36m (25.0ms)[0m  [1mCOMMIT[0m
+  [1m[35mActiveRecord::SchemaMigration Load (0.6ms)[0m  SELECT "schema_migrations".* FROM "schema_migrations"

@@ -30,6 +30,10 @@ class HomeController < ApplicationController
     end
   end
 
+  def main_menu
+
+  end
+
   def new_parionsdirect_account
 
   end
@@ -85,7 +89,24 @@ class HomeController < ApplicationController
   end
 
   def validate_paymoney_account
+    paymoney_account_number = params[:paymoney_account_number]
+    if paymoney_account_number.blank?
+      flash.now[:error] = "Veuillez renseigner un numéro de compte"
+      render :set_paymoney_account
+    else
+      url = Parameter.first.gateway_url + "/PAYMONEY_WALLET/rest/check2_compte/#{paymoney_account_number}"
+      paymoney_token = RestClient.get(url) rescue nil
 
+      GenericLog.create(operation: "Check paymoney account existence with account number", request_log: url, response_log: paymoney_token)
+
+      if !paymoney_token.blank? && paymoney_token != 'null'
+        render :main_menu
+      else
+        flash.now[:error] = "Le numéro de compte Paymoney n'est pas valide"
+        render :set_paymoney_account
+      end
+    end
+    # http://94.247.178.141:8080/rest/check4_compte/58908957
   end
 
   # If the gamer does not have a paymoney account, it should be created
@@ -101,7 +122,18 @@ class HomeController < ApplicationController
     password = Digest::SHA2.hexdigest(session[:salt] + params[:password])
 
     if password == session[:password]
-      render :set_paymoney_account
+      url = Parameter.first.gateway_url + "/rest/check4_compte/#{session[:msisdn]}"
+      paymoney_account = RestClient.get(url) rescue nil
+
+      GenericLog.create(operation: "Check paymoney account existence with msisdn", request_log: url, response_log: paymoney_account)
+
+      # If paymoney account exists
+      if !paymoney_account.blank? && paymoney_account != 'null'
+        session[:paymoney_account_number] = paymoney_account
+        render :main_menu
+      else
+        render :set_paymoney_account
+      end
     else
       flash.now[:error] = "Le mot de passe n'est pas valide"
       render :parionsdirect_authentication_form
