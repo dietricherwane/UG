@@ -11,10 +11,17 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160728081145) do
+ActiveRecord::Schema.define(version: 20160728143626) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "account_profiles", force: true do |t|
+    t.string   "msisdn"
+    t.string   "paymoney_account_number"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "generic_logs", force: true do |t|
     t.text     "operation"

@@ -100,6 +100,11 @@ class HomeController < ApplicationController
       GenericLog.create(operation: "Check paymoney account existence with account number", request_log: url, response_log: paymoney_token)
 
       if !paymoney_token.blank? && paymoney_token != 'null'
+        session[:paymoney_account_number] = paymoney_account_number
+
+        # Link msisdn to paymoney account
+        AccountProfile.create(msisdn: session[:msisdn], paymoney_account_number: paymoney_account_number)
+
         render :main_menu
       else
         flash.now[:error] = "Le numéro de compte Paymoney n'est pas valide"
@@ -127,10 +132,11 @@ class HomeController < ApplicationController
     password = Digest::SHA2.hexdigest(session[:salt] + params[:password])
 
     if password == session[:password]
-      url = Parameter.first.paymoney_url + "/rest/check4_compte/#{session[:msisdn]}"
-      paymoney_account = RestClient.get(url) rescue nil
+      #url = Parameter.first.paymoney_url + "/rest/check4_compte/#{session[:msisdn]}"
+      #paymoney_account = RestClient.get(url) rescue nil
+      paymoney_account = AccountProfile.find_by_msisdn(session[:msisdn]).paymoney_account_number rescue nil
 
-      GenericLog.create(operation: "Check paymoney account existence with msisdn", request_log: url, response_log: paymoney_account)
+      #GenericLog.create(operation: "Check paymoney account existence with msisdn", request_log: url, response_log: paymoney_account)
 
       # If paymoney account exists
       if !paymoney_account.blank? && paymoney_account != 'null'
