@@ -28,7 +28,7 @@ class LotoController < ApplicationController
 
   def place_bet
     @gamer_id = RestClient.get(Parameter.first.gateway_url + "/8ba869a7a9c59f3a0/api/users/gamer_id/#{session[:msisdn]}") rescue ''
-    @paymoney_account_number = params[:paymoney_account_number]
+    @paymoney_account_number = session[:paymoney_account_number]
     @paymoney_account_password = params[:paymoney_account_password]
     url = Parameter.first.gateway_url + "/ail/loto/api/96455396dc/bet/place/#{@gamer_id}/#{@paymoney_account_number}/#{@paymoney_account_password}"
 
