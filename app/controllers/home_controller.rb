@@ -211,4 +211,8 @@ class HomeController < ApplicationController
 
   end
 
+  def list_games_bets
+
+  end
+
 end

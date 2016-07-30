@@ -13,6 +13,7 @@ Rails.application.routes.draw do
   post '/paymoney_balance/get' => 'home#get_paymoney_balance', as: :get_paymoney_balance
   get '/saved_paymoney_account' => 'home#saved_paymoney_account', as: :saved_paymoney_account
   post '/saved_paymoney_account/update' => 'home#update_saved_paymoney_account', as: :update_saved_paymoney_account
+  get '/games/list_bets' => 'home#list_games_bets', as: :list_game_bets
 
   # Loto
   get '/loto/main_menu' => 'loto#index', as: :loto_main_menu
