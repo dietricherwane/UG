@@ -11,6 +11,8 @@ Rails.application.routes.draw do
   get '/paymoney_account/create' => 'home#create_paymoney_account', as: :create_paymoney_account
   get '/paymoney_balance' => 'home#paymoney_balance', as: :paymoney_balance
   post '/paymoney_balance/get' => 'home#get_paymoney_balance', as: :get_paymoney_balance
+  get '/other_account/paymoney_balance' => 'home#other_account_paymoney_balance', as: :other_account_paymoney_balance
+  post '/other_account/paymoney_balance/get' => 'home#get_other_paymoney_balance', as: :get_other_paymoney_balance
   get '/saved_paymoney_account' => 'home#saved_paymoney_account', as: :saved_paymoney_account
   post '/saved_paymoney_account/update' => 'home#update_saved_paymoney_account', as: :update_saved_paymoney_account
   get '/games/list_bets' => 'home#list_games_bets', as: :list_game_bets

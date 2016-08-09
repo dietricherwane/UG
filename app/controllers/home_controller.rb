@@ -61,6 +61,34 @@ class HomeController < ApplicationController
     render :paymoney_balance
   end
 
+  def other_account_paymoney_balance
+
+  end
+
+  def get_other_paymoney_balance
+    paymoney_account_number = params[:paymoney_account_number]
+    password = params[:password]
+
+    if paymoney_account_number.blank? || password.blank?
+      flash.now[:error] = "Veuillez renseigner tous les champs"
+    else
+      url = Parameter.first.paymoney_url + "/PAYMONEY_WALLET/rest/solte_compte/#{paymoney_account_number}/#{password}"
+      balance = RestClient.get(url) rescue nil
+
+      GenericLog.create(operation: "Other account Paymoney balance", request_log: url, response_log: balance)
+
+      balance = JSON.parse(balance)["solde"] rescue nil
+
+      if balance.blank?
+        flash.now[:error] = "Veuillez vérifier le numéro de compte et le mot de passe"
+      else
+        flash.now[:success] = "Votre solde est de: #{balance rescue 0} FCFA"
+      end
+    end
+
+    render :other_account_paymoney_balance
+  end
+
   def saved_paymoney_account
 
   end
