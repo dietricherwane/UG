@@ -24,6 +24,15 @@ Rails.application.routes.draw do
   post '/loto/place_bet' => 'loto#place_bet', as: :loto_place_bet
   get '/loto/list_bets' => 'loto#list_bets', as: :loto_list_bets
 
+  # PMU PLR
+  get '/plr/list_bets' => 'plr#list_bets', as: :plr_bets
+
+  # PMU ALR
+  get '/pmu_alr/list_bets' => 'pmu_alr#list_bets', as: :pmu_alr_bets
+
+  # SPORTCASH
+  get '/sportcash/list_bets' => 'sportcash#list_bets', as: :sportcash_bets
+
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 

@@ -1,0 +1,2 @@
+module SportcashHelper
+end
