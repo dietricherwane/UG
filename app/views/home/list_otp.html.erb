@@ -1,0 +1,39 @@
+<div class="page-header">
+  <div class="icon">
+    <span class="ico-arrow-right"></span>
+  </div>
+  <h1>Paymoney<small>Liste des OTP</small></h1>
+</div>
+
+<div class="row-fluid">
+  <% if @otps.blank? %>
+  <div class="row-form">
+    <div class="span12">
+      Aucune transaction à afficher
+    </div>
+  </div>
+  <% else %>
+    <% @otps.each do |otp| %>
+      <div class="row-form">
+        <div class="span12">
+          Transaction: <%= otp["transaction_type"] %> - OTP: <%= otp["pin"] %>
+        </div>
+      </div>
+    <% end %>
+    <div class="row-form">
+      <div class="span12">
+        <%= paginate @otps %>
+      </div>
+    </div>
+  <% end %>
+  <div class="row-form">
+    <div class="span12">
+      <%= link_to 'Retour', gaming_menu_path %>
+    </div>
+  </div>
+  <div class="row-form">
+    <div class="span12">
+      <%= link_to 'Accueil', root_path %>
+    </div>
+  </div>
+</div>
