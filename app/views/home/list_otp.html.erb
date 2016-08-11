@@ -17,7 +17,7 @@
       <div class="row-form">
         <div class="span12">
           <% t = Time.at(((otp["otpDate"].to_s)[0..9]).to_i) %>
-          <%= otp["otpPin"] %> - <%= otp["otpStatus"] == true ? 'Succès' : 'Echec' %> - <%= t.strftime("%d-%m-%Y") %> à <%= t.strftime("%Hh %Mmn") %>
+          <%= otp["otpPin"] %>  <%= otp["otpStatus"] == true ? 'Valide' : 'Désactivé' %>  <%= t.strftime("%d-%m-%Y") %> <%= t.strftime("%Hh %Mmn") %>
         </div>
       </div>
     <% end %>
