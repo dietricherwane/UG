@@ -16,7 +16,7 @@
     <% @otps.each do |otp| %>
       <div class="row-form">
         <div class="span12">
-          <% t = Time.at(otp["otpDate"][0..9].to_i) %>
+          <% t = Time.at((otp["otpDate"][0..9]).to_i) %>
           <%= otp["otpPin"] %> - <%= otp["otpStatus"] == 'true' ? 'Succès' : 'Echec' %> - <%= t.strftime("%d-%m-%Y") %> à <%= t.strftime("%Hh %Mmn") %>
         </div>
       </div>
