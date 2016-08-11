@@ -269,8 +269,31 @@ class HomeController < ApplicationController
     end
   end
 
-  def list_other_otp
+  def other_otp
 
+  end
+
+  def list_other_otp
+    password = params[:password]
+    account_number = params[:account_number]
+
+    if password.blank? || account_number.blank?
+      flash.now[:error] = "Veuillez renseigner tous les champs"
+      render :other_otp
+    else
+      url = Parameter.first.paymoney_url + "/PAYMONEY_WALLET/rest/getLastOtp/#{account_number}/#{password}/"
+      otps = RestClient.get(url) rescue ""
+
+      GenericLog.create(operation: "List other OTP", request_log: url, response_log: otps)
+
+      otps = %Q[{"otps":] + otps + %Q[}]
+
+      otps = JSON.parse(otps)["otps"] rescue nil
+
+      unless otps.blank?
+        @otps = Kaminari.paginate_array(otps).page(params[:page])
+      end
+    end
   end
 
 end
