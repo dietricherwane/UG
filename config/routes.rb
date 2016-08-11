@@ -16,7 +16,9 @@ Rails.application.routes.draw do
   get '/saved_paymoney_account' => 'home#saved_paymoney_account', as: :saved_paymoney_account
   post '/saved_paymoney_account/update' => 'home#update_saved_paymoney_account', as: :update_saved_paymoney_account
   get '/games/list_bets' => 'home#list_games_bets', as: :list_game_bets
-  get '/games/list_otp' => 'home#list_otp', as: :list_otp
+  get '/games/otp' => 'home#otp', as: :otp
+  post '/games/otp/list' => 'home#list_otp', as: :list_otp
+  get '/games/list_other_otp' => 'home#list_other_otp', as: :list_other_otp
 
   # Loto
   get '/loto/main_menu' => 'loto#index', as: :loto_main_menu

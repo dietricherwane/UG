@@ -16,16 +16,17 @@
     <% @otps.each do |otp| %>
       <div class="row-form">
         <div class="span12">
-          Transaction: <%= otp["transaction_type"] %> - OTP: <%= otp["pin"] %>
+          <% t = Time.at(otp["otpDate"][0..9].to_i) %>
+          <%= otp["otpPin"] %> - <%= otp["otpStatus"] == 'true' ? 'Succès' : 'Echec' %> - <%= t.strftime("%d-%m-%Y") %> à <%= t.strftime("%Hh %Mmn") %>
         </div>
       </div>
     <% end %>
-    <div class="row-form">
-      <div class="span12">
-        <%= paginate @otps %>
-      </div>
-    </div>
   <% end %>
+  <div class="row-form">
+    <div class="span12">
+      <%= link_to '1- OTP autre compte', '#' %>
+    </div>
+  </div>
   <div class="row-form">
     <div class="span12">
       <%= link_to 'Retour', gaming_menu_path %>

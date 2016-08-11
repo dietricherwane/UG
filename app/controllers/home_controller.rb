@@ -243,17 +243,27 @@ class HomeController < ApplicationController
 
   end
 
+  def otp
+
+  end
+
   def list_otp
-    url = Parameter.first.paymoney_wallet_url + "/api/4c4556c239/otp/#{session[:paymoney_account_number]}"
-    otps = RestClient.get(url) rescue nil
+    url = Parameter.first.paymoney_url + "/PAYMONEY_WALLET/rest/getLastOtp/#{session[:paymoney_account_number]}/:code secret paymoney"
+    otps = RestClient.get(url) rescue ""
 
     GenericLog.create(operation: "List OTP", request_log: url, response_log: otps)
+
+    otps = %Q[{"otps":] + otps + %Q[}]
 
     otps = JSON.parse(otps)["otps"] rescue nil
 
     unless otps.blank?
       @otps = Kaminari.paginate_array(otps).page(params[:page])
     end
+  end
+
+  def list_other_otp
+
   end
 
 end
