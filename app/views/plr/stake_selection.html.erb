@@ -2,15 +2,15 @@
   <div class="icon">
     <span class="ico-arrow-right"></span>
   </div>
-  <h1>PMU PLR<small>Veuillez entrer votre numéro de course <br /> Réunion: <%= session[:plr_reunion_number] %></small></h1>
+  <h1>PMU PLR<small>Veuillez saisir le nombre de fois que vous souhaitez miser <br /> Réunion: <%= session[:plr_reunion_number] %> <br /> Type de pari: <%= session[:bet_type_value] %> <br />Chevaux: <%= session[:horses_numbers] %></small></h1>
 </div>
 
 <div class="row-fluid">
-  <%= form_tag plr_game_selection_path do %>
+  <%= form_tag plr_bet_path do %>
     <div class="row-form">
       <div class="span12">
-        <input type="text" name="plr_race_number" placeholder="Numéro de course"/>
-        <span class="bottom">Numéro de course</span>
+        <input type="text" name="plr_stake" placeholder="Nombre de fois"/>
+        <span class="bottom">Nombre de fois</span>
       </div>
     </div>
     <div class="row-form">
