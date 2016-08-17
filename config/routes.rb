@@ -35,7 +35,10 @@ Rails.application.routes.draw do
   post 'plr/race_selection' => 'plr#race_selection', as: :plr_race_selection
   post 'plr/game_selection' => 'plr#game_selection', as: :plr_game_selection
   get 'plr/bet_type' => 'plr#bet_type', as: :plr_bet_type
+  get '/plr/select_formula/:bet_type' => 'plr#select_formula', as: :plr_select_formula
+  post 'plr/stake_selection' => 'plr#stake_selection', as: :plr_stake_selection
   get '/plr/list_bets' => 'plr#list_bets', as: :plr_bets
+
 
   # PMU ALR
   get '/pmu_alr/list_bets' => 'pmu_alr#list_bets', as: :pmu_alr_bets

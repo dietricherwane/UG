@@ -30,6 +30,20 @@ class PlrController < ApplicationController
 
   end
 
+  def select_formula
+    session[:bet_type] = params[:bet_type]
+
+    if ["trio", "jumele_gagnant", "jumele_place"].include?(session[:bet_type])
+      @menu_index = 1
+    else
+      @menu_index = 2
+    end
+  end
+
+  def stake_selection
+
+  end
+
   def list_bets
     url = Parameter.first.gateway_url + "/ail/pmu/ussd/064582ec4/gamer/bets/list/#{session[:msisdn]}"
     bets = RestClient.get(url) rescue nil
