@@ -31,6 +31,9 @@ Rails.application.routes.draw do
   get '/loto/list_bets' => 'loto#list_bets', as: :loto_list_bets
 
   # PMU PLR
+  get 'plr' => 'plr#index', as: :plr
+  post 'plr/race_selection' => 'plr#race_selection', as: :plr_race_selection
+  post 'plr/game_selection' => 'plr#game_selection', as: :plr_game_selection
   get '/plr/list_bets' => 'plr#list_bets', as: :plr_bets
 
   # PMU ALR
