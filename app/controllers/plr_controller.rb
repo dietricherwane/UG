@@ -26,6 +26,10 @@ class PlrController < ApplicationController
     end
   end
 
+  def bet_type
+
+  end
+
   def list_bets
     url = Parameter.first.gateway_url + "/ail/pmu/ussd/064582ec4/gamer/bets/list/#{session[:msisdn]}"
     bets = RestClient.get(url) rescue nil

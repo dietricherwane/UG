@@ -1,0 +1,44 @@
+<div class="page-header">
+  <div class="icon">
+    <span class="ico-arrow-right"></span>
+  </div>
+  <h1>PMU PLR<small>Choisissez votre type de pari: R<%= session[:plr_reunion_number] %>C<%= session[:race_number] %></small></h1>
+</div>
+
+<div class="row-fluid">
+  <div class="row-form">
+    <div class="span12">
+      <%= link_to '1- Trio', '#' %>
+    </div>
+  </div>
+  <div class="row-form">
+    <div class="span12">
+      <%= link_to '2- Jumelé gagnant', '#' %>
+    </div>
+  </div>
+  <div class="row-form">
+    <div class="span12">
+      <%= link_to '3- Jumelé placé', '#' %>
+    </div>
+  </div>
+  <div class="row-form">
+    <div class="span12">
+      <%= link_to '4- Simple gagnant', '#' %>
+    </div>
+  </div>
+  <div class="row-form">
+    <div class="span12">
+      <%= link_to '5- Simple placé', '#' %>
+    </div>
+  </div>
+  <div class="row-form">
+    <div class="span12">
+      <%= link_to 'Retour', plr_path %>
+    </div>
+  </div>
+  <div class="row-form">
+    <div class="span12">
+      <%= link_to 'Accueil', root_path %>
+    </div>
+  </div>
+</div>

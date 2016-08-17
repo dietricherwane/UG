@@ -34,6 +34,7 @@ Rails.application.routes.draw do
   get 'plr' => 'plr#index', as: :plr
   post 'plr/race_selection' => 'plr#race_selection', as: :plr_race_selection
   post 'plr/game_selection' => 'plr#game_selection', as: :plr_game_selection
+  get 'plr/bet_type' => 'plr#bet_type', as: :plr_bet_type
   get '/plr/list_bets' => 'plr#list_bets', as: :plr_bets
 
   # PMU ALR
