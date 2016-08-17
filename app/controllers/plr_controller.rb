@@ -84,6 +84,23 @@ class PlrController < ApplicationController
 
   end
 
+  def formula_selection
+    session[:plr_formula] = params[:formula]
+
+    case session[:plr_formula]
+      when "longchamp"
+        session[:plr_formula_value] = "Long champs"
+      when "champ_reduit"
+        session[:plr_formula_value] = "Champ réduit"
+      when "champ_total"
+        session[:plr_formula_value] = "Champ total"
+      end
+
+    session[:menu_index] = 2
+
+    render :select_formula
+  end
+
   def list_bets
     url = Parameter.first.gateway_url + "/ail/pmu/ussd/064582ec4/gamer/bets/list/#{session[:msisdn]}"
     bets = RestClient.get(url) rescue nil

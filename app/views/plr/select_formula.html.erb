@@ -9,17 +9,17 @@
   <% if session[:menu_index] == 1 %>
     <div class="row-form">
       <div class="span12">
-        <%= link_to '1- Long champ', plr_select_formula_path("trio") %>
+        <%= link_to '1- Long champ', plr_formula_selection_path("longchamp") %>
       </div>
     </div>
     <div class="row-form">
       <div class="span12">
-        <%= link_to '2- Champ réduit', plr_select_formula_path("jumele_gagnant") %>
+        <%= link_to '2- Champ réduit', plr_formula_selection_path("champ_reduit") %>
       </div>
     </div>
     <div class="row-form">
       <div class="span12">
-        <%= link_to '3- Champ total', plr_select_formula_path("jumele_place") %>
+        <%= link_to '3- Champ total', plr_formula_selection_path("champ_total") %>
       </div>
     </div>
   <% else %>
