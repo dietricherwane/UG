@@ -53,6 +53,20 @@ class PlrController < ApplicationController
     end
   end
 
+  def races_list
+    url = Parameter.first.parionsdirect_url + "/ussd_pmu/get_plr_race_list"
+    races = RestClient.get(url) rescue nil
+
+    GenericLog.create(operation: "List PMU PLR races", request_log: url, response_log: races)
+
+    races = JSON.parse(races) rescue nil
+    races = races["plr_race_list"] rescue nil
+
+    unless races.blank?
+      @races = Kaminari.paginate_array(races).page(params[:page])
+    end
+  end
+
   def stake_selection
     @horses_numbers = params[:horses_numbers]
 
