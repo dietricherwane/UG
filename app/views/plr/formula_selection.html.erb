@@ -2,7 +2,7 @@
   <div class="icon">
     <span class="ico-arrow-right"></span>
   </div>
-  <h1>PMU PLR<small><%= session[:plr_formula_value] == "Long champs" ? "Saisissez les numéros de vos chevaux en les separant d'un espace" : "Saisissez votre base en les séparant d'un espace" %>: R<%= session[:plr_reunion_number] %>C<%= session[:race_number] %><br />Formule: <%= session[:plr_formula_value] %></small></h1>
+  <h1>PMU PLR<small><%= session[:plr_formula_value] == "Long champs" ? "Saisissez les numéros de vos chevaux en les separant d'un espace" : "Saisissez votre base en les séparant d'un espace" %>: R<%= session[:plr_reunion_number] %>C<%= session[:race_number] %><br /><%= session[:bet_type_value] %> > <%= session[:plr_formula_value] %></small></h1>
 </div>
 
 <div class="row-fluid">
