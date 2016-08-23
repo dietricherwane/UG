@@ -71,9 +71,42 @@ class PlrController < ApplicationController
     @horses_numbers = params[:horses_numbers]
 
     if valid_horses_numbers
-      session[:horses_numbers] = @horses_numbers.split
+      session[:horses_numbers] = @horses_numbers.split.join('-')
     else
-      flash.now[:error] = "Veuillez entrer des numéros de chevaux valides"
+      flash.now[:error] = 'Veuillez entrer des numéros de chevaux valides'
+      render :select_formula
+    end
+  end
+
+  def base_selection
+    @base = params[:plr_base]
+
+    if valid_base
+      session[:plr_base] = @base.split.join('-')
+    else
+      flash.now[:error] = 'Veuillez entrer une base valide'
+      render :formula_selection
+    end
+  end
+
+  def selection
+    @base = params[:selection]
+
+    if valid_base
+      session[:plr_selection] = @base.split.join('-')
+    else
+      flash.now[:error] = 'Veuillez entrer une sélection'
+      render :base_selection
+    end
+  end
+
+  def alternative_stake_selection
+    @horses_numbers = params[:horses_numbers]
+
+    if valid_horses_numbers
+      session[:horses_numbers] = @horses_numbers.split.join('-')
+    else
+      flash.now[:error] = 'Veuillez entrer des numéros de chevaux valides'
       render :select_formula
     end
   end
@@ -86,6 +119,22 @@ class PlrController < ApplicationController
     else
       @horses_numbers.split.each do |horse_number|
         if not_a_number?(horse_number)
+          status = false
+        end
+      end
+    end
+
+    return status
+  end
+
+  def valid_base
+    status = true
+
+    if @base.blank?
+      status = false
+    else
+      @base.split.each do |base|
+        if not_a_number?(base)
           status = false
         end
       end

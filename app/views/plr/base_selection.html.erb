@@ -1,0 +1,32 @@
+<div class="page-header">
+  <div class="icon">
+    <span class="ico-arrow-right"></span>
+  </div>
+  <h1>PMU PLR<small>Saisissez votre sélection en les separant d un espace: R<%= session[:plr_reunion_number] %>C<%= session[:race_number] %></small></h1>
+</div>
+
+<div class="row-fluid">
+  <%= form_tag plr_selection_path do %>
+    <div class="row-form">
+      <div class="span12">
+        <input type="text" name="selection" placeholder="Sélection"/>
+        <span class="bottom">Sélection</span>
+      </div>
+    </div>
+    <div class="row-form">
+      <div class="span12">
+        <button class="btn">Valider <span class="icon-arrow-next icon-white"></span></button>
+      </div>
+    </div>
+  <% end %>
+  <div class="row-form">
+    <div class="span12">
+      <%= link_to 'Retour', plr_bet_type_path %>
+    </div>
+  </div>
+  <div class="row-form">
+    <div class="span12">
+      <%= link_to 'Accueil', root_path %>
+    </div>
+  </div>
+</div>
