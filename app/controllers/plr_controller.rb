@@ -159,9 +159,7 @@ class PlrController < ApplicationController
         session[:plr_formula_value] = "Champ total"
       end
 
-    session[:menu_index] = 2
-
-    render :select_formula
+    #session[:menu_index] = 2
   end
 
   def list_bets
