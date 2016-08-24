@@ -40,9 +40,12 @@ Rails.application.routes.draw do
   get '/plr/formula_selection/:formula' => 'plr#formula_selection', as: :plr_formula_selection
   post '/plr/base_selection' => 'plr#base_selection', as: :plr_base_selection
   post 'plr/selection' => 'plr#selection', as: :plr_selection
+  post 'plr/total_selection' => 'plr#total_selection', as: :plr_total_selection
   post 'plr/stake_selection' => 'plr#stake_selection', as: :plr_stake_selection
   post 'plr/alternative_stake_selection' => 'plr#alternative_stake_selection', as: :plr_alternative_stake_selection
   post 'plr/bet' => 'plr#bet', as: :plr_bet
+  post 'plr/bet/evaluate' => 'plr#evaluate_bet', as: :plr_evaluate_bet
+  post 'plr/bet/place' => 'plr#place_bet', as: :plr_place_bet
   get '/plr/list_bets' => 'plr#list_bets', as: :plr_bets
 
 
