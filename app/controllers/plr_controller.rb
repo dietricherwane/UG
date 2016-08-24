@@ -142,7 +142,7 @@ class PlrController < ApplicationController
   def valid_base
     status = true
 
-    if @base.blank? || @base.split.length > 2
+    if @base.blank? #|| @base.split.length > 2
       status = false
     else
       @base.split.each do |base|
@@ -218,8 +218,6 @@ class PlrController < ApplicationController
     @paymoney_account_number = session[:paymoney_account_number]
     @paymoney_account_password = params[:paymoney_account_password]
     url = Parameter.first.gateway_url + "/ail/pmu/api/dik749742e/bet/place/#{@gamer_id}/#{@paymoney_account_number}/#{@paymoney_account_password}"
-
-
   end
 
   def set_bet_code_and_modifier
