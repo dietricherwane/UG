@@ -105,6 +105,7 @@ class PlrController < ApplicationController
 
     if valid_base
       session[:plr_base] = @base.split.join(',')
+      render :stake_selection
     else
       flash.now[:error] = 'Veuillez entrer une base valide'
       render :formula_selection
