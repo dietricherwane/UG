@@ -22,10 +22,11 @@
     <% end %>
   <% else %>
     <% if session[:plr_formula_value] == "Champ réduit" %>
-      <%= form_tag plr_base_selection_path do %>
+      <% url = plr_base_selection_path %>
     <% else %>
-      <%= form_tag plr_total_selection_path do %>
+      <% url = plr_total_selection_path %>
     <% end %>
+      <%= form_tag url do %>
       <div class="row-form">
         <div class="span12">
           <input type="text" name="plr_base" placeholder="Base"/>
