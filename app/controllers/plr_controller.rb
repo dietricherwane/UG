@@ -74,7 +74,7 @@ class PlrController < ApplicationController
       session[:plr_selection] = @horses_numbers.split.join('-')
     else
       flash.now[:error] = 'Veuillez entrer des numéros de chevaux valides'
-      render :stake_selection
+      render :select_formula
     end
   end
 
@@ -119,7 +119,7 @@ class PlrController < ApplicationController
       session[:plr_selection] = @horses_numbers.split.join('-')
     else
       flash.now[:error] = 'Veuillez entrer des numéros de chevaux valides'
-      render :select_formula
+      render :formula_selection
     end
   end
 
