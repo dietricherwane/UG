@@ -68,10 +68,10 @@ class PlrController < ApplicationController
   end
 
   def stake_selection
-    @horses_numbers = params[:horses_numbers]
+    @horses_numbers = params[:plr_selection]
 
     if valid_horses_numbers
-      session[:horses_numbers] = @horses_numbers.split.join('-')
+      session[:plr_selection] = @horses_numbers.split.join('-')
     else
       flash.now[:error] = 'Veuillez entrer des numéros de chevaux valides'
       render :select_formula
@@ -116,7 +116,7 @@ class PlrController < ApplicationController
     @horses_numbers = params[:horses_numbers]
 
     if valid_horses_numbers
-      session[:horses_numbers] = @horses_numbers.split.join('-')
+      session[:plr_selection] = @horses_numbers.split.join('-')
     else
       flash.now[:error] = 'Veuillez entrer des numéros de chevaux valides'
       render :select_formula
@@ -174,7 +174,7 @@ class PlrController < ApplicationController
                       "bet_code":"#{@bet_code}",
                       "bet_modifier":"#{@bet_modifier}",
                       "selector1":"#{session[:plr_reunion_number]}",
-                      "selector2":"#{session[:race_number]}",
+                      "selector2":"#{session[:plr_race_number]}",
                       "repeats":"#{session[:repeats]}",
                       "special_entries":"#{session[:plr_base]}",
                       "normal_entries":"#{session[:plr_selection]}"
@@ -286,6 +286,8 @@ class PlrController < ApplicationController
 
   def formula_selection
     session[:plr_formula] = params[:formula]
+    session[:plr_base] = ''
+    session[:plr_selection] = ''
 
     case session[:plr_formula]
       when "longchamp"
