@@ -218,6 +218,79 @@ class PlrController < ApplicationController
     @paymoney_account_number = session[:paymoney_account_number]
     @paymoney_account_password = params[:paymoney_account_password]
     url = Parameter.first.gateway_url + "/ail/pmu/api/dik749742e/bet/place/#{@gamer_id}/#{@paymoney_account_number}/#{@paymoney_account_password}"
+
+    if valid_bet_params
+      set_bet_code_and_modifier
+      set_bet_params
+
+      request_body = %Q[
+                    {
+                      "bet_code":"#{@bet_code}",
+                      "bet_modifier":"#{@bet_modifier}",
+                      "selector1":"#{session[:plr_reunion_number]}",
+                      "selector2":"#{session[:plr_race_number]}",
+                      "repeats":"#{session[:repeats]}",
+                      "special_entries":"#{session[:plr_base]}",
+                      "normal_entries":"#{session[:plr_selection]}",
+                      "race_details":"#{session[:plr_race_details]}",
+                      "begin_date":"#{session[:plr_begin_date]}",
+                      "end_date":""
+                    }
+                  ]
+      request = Typhoeus::Request.new(
+      url,
+      method: :post,
+      body: request_body
+      )
+      request.run
+      response = request.response
+      body = response.body
+
+      json_object = JSON.parse(body) rescue nil
+      if json_object.blank?
+        flash.now[:error] = "Code: 0 -- Message: Le pari n'a pas pu être pris"
+      else
+        if json_object["error"].blank?
+          status = true
+          flash.now[:success] = %Q[
+            PMU PLR – R#{session[:plr_reunion_number]}C#{session[:race_number]}
+            #{session[:bet_type_value]} > #{session[:plr_formula_value]}
+            Base: #{session[:plr_base]}
+            Sélection: #{session[:plr_selection]}.
+          ]
+        else
+          status = false
+          flash.now[:error] = "Code: #{json_object["error"]["code"]} -- Message: #{json_object["error"]["description"]}"
+        end
+      end
+
+      Log.create(msisdn: session[:msisdn], gamer_id: @gamer_id, paymoney_account_number: @paymoney_account_number, paymoney_password: @paymoney_account_password, bet_request: request_body, bet_response: body, status: status)
+    end
+  end
+
+  def valid_bet_params
+    status = true
+    if @gamer_id.blank?
+      flash.now[:error] = "Le compte parieur n'a pas été trouvé"
+      status = false
+    end
+
+    return status
+  end
+
+  def set_bet_params
+    url = Parameter.first.parionsdirect_url + "/ussd_pmu/get_plr_race_list_info/R#{session[:plr_reunion_number]}/C#{session[:plr_race_number]}"
+    races = RestClient.get(url) rescue nil
+
+    GenericLog.create(operation: "List PMU PLR races", request_log: url, response_log: races)
+
+    races = JSON.parse(races) rescue nil
+    races = races["plr_race_list"] rescue nil
+
+    unless races.blank?
+      session[:plr_race_details] = races.first["details"]
+      session[:plr_begin_date] = races.first["depart"]
+    end
   end
 
   def set_bet_code_and_modifier
