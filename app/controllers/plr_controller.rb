@@ -266,6 +266,8 @@ class PlrController < ApplicationController
 
       Log.create(msisdn: session[:msisdn], gamer_id: @gamer_id, paymoney_account_number: @paymoney_account_number, paymoney_password: @paymoney_account_password, bet_request: request_body, bet_response: body, status: status)
     end
+
+    render :index
   end
 
   def valid_bet_params
