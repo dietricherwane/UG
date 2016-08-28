@@ -415,4 +415,21 @@ class PlrController < ApplicationController
       end
     end
   end
+
+  def list_races
+    url = Parameter.first.parionsdirect_url + "/ussd_pmu/get_plr_race_list"
+    races = RestClient.get(url) rescue nil
+    @reunions = []
+
+    GenericLog.create(operation: "List PMU PLR races", request_log: url, response_log: races)
+
+    races = JSON.parse(races) rescue nil
+    races = races["plr_race_list"] rescue nil
+
+    unless races.blank?
+      @races = races
+    end
+  end
+
+
 end

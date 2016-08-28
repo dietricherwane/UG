@@ -33,6 +33,7 @@ Rails.application.routes.draw do
   # PMU PLR
   get 'plr' => 'plr#index', as: :plr
   get 'plr/reunions/list' => 'plr#list_reunions', as: :plr_list_reunions
+  get 'plr/races/list' => 'plr#list_races', as: :plr_list_races
   post 'plr/race_selection' => 'plr#race_selection', as: :plr_race_selection
   post 'plr/game_selection' => 'plr#game_selection', as: :plr_game_selection
   get 'plr/races_list' => 'plr#races_list', as: :plr_races_list
