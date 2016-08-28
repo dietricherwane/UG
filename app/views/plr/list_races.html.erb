@@ -17,10 +17,8 @@
       <% if "R" + session[:plr_reunion_number] == race["reunion"] %>
         <div class="row-form">
           <div class="span12">
-            Numéro de course: <%= race["numero_course"] %> - Départ: <%= race["depart"] %> <br />
-            Réunion: <%= race["reunion"] %> - Course: <%= race["course"] %> <br />
-            Nombre de partants: <%= race["Partants"] %> <br />
-            Détails: <%= race["details"] %>
+            Départ: <%= race["depart"] %> <br />
+            Réunion: <%= race["reunion"] %> - Course: <%= race["course"] %>
           </div>
         </div>
       <% end %>
