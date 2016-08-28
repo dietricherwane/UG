@@ -292,6 +292,7 @@ class PlrController < ApplicationController
     unless races.blank?
       session[:plr_race_details] = races.first["details"]
       session[:plr_begin_date] = races.first["depart"]
+      session[:plr_number_of_horses] = races.first["Partants"]
     end
   end
 
