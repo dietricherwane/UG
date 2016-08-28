@@ -81,7 +81,7 @@ class PlrController < ApplicationController
   def base_selection
     @base = params[:plr_base]
 
-    if valid_base
+    if valid_numbers
       session[:plr_base] = @base.split.join(',')
     else
       flash.now[:error] = 'Veuillez entrer une base valide'
@@ -92,7 +92,7 @@ class PlrController < ApplicationController
   def selection
     @base = params[:selection]
 
-    if valid_base
+    if valid_numbers
       session[:plr_selection] = @base.split.join(',')
     else
       flash.now[:error] = 'Veuillez entrer une sélection valide'
@@ -103,7 +103,7 @@ class PlrController < ApplicationController
   def total_selection
     @base = params[:plr_base]
 
-    if valid_base
+    if valid_numbers
       session[:plr_base] = @base.split.join(',')
       render :stake_selection
     else
@@ -139,7 +139,7 @@ class PlrController < ApplicationController
     return status
   end
 
-  def valid_base
+  def valid_numbers
     status = true
 
     if @base.blank? #|| @base.split.length > 2
@@ -153,6 +153,12 @@ class PlrController < ApplicationController
     end
 
     return status
+  end
+
+  def valid_base
+    status = true
+
+
   end
 
   def bet
@@ -388,6 +394,25 @@ class PlrController < ApplicationController
 
     unless bets.blank?
       @bets = Kaminari.paginate_array(bets).page(params[:page])
+    end
+  end
+
+  def list_reunions
+    url = Parameter.first.parionsdirect_url + "/ussd_pmu/get_plr_race_list"
+    races = RestClient.get(url) rescue nil
+    @reunions = []
+
+    GenericLog.create(operation: "List PMU PLR races", request_log: url, response_log: races)
+
+    races = JSON.parse(races) rescue nil
+    races = races["plr_race_list"] rescue nil
+
+    unless races.blank?
+      races.each do |race|
+        if !@reunions.include?(race["reunion"])
+          @reunions << race["reunion"]
+        end
+      end
     end
   end
 end
