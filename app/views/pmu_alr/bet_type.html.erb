@@ -1,0 +1,61 @@
+<div class="page-header">
+  <div class="icon">
+    <span class="ico-arrow-right"></span>
+  </div>
+  <h1>PMU ALR<small>
+  <%= session[:alr_national] %><br />
+  Choisissez votre type de pari</small></h1>
+</div>
+
+<div class="row-fluid">
+  <div class="row-form">
+    <div class="span12">
+      <%= link_to '1- Couplé placé', pmu_alr_generic_formula_selection_path('couple_place') %>
+    </div>
+  </div>
+  <div class="row-form">
+    <div class="span12">
+      <%= link_to '2- Couplé gagnant', pmu_alr_generic_formula_selection_path('couple_gagnant') %>
+    </div>
+  </div>
+  <div class="row-form">
+    <div class="span12">
+      <%= link_to '3- Tiercé', pmu_alr_generic_formula_selection_path('tierce') %>
+    </div>
+  </div>
+  <div class="row-form">
+    <div class="span12">
+      <%= link_to '4- Quarté', pmu_alr_generic_formula_selection_path('quarte') %>
+    </div>
+  </div>
+  <div class="row-form">
+    <div class="span12">
+      <%= link_to '5- Quinté', pmu_alr_generic_formula_selection_path('quinte') %>
+    </div>
+  </div>
+  <div class="row-form">
+    <div class="span12">
+      <%= link_to '6- Quinté +', pmu_alr_generic_formula_selection_path('quinte_plus') %>
+    </div>
+  </div>
+  <div class="row-form">
+    <div class="span12">
+      <%= link_to '7- Multi', pmu_alr_multi_formula_selection_path('multi') %>
+    </div>
+  </div>
+  <div class="row-form">
+    <div class="span12">
+      <%= link_to '8- Consulter la liste des partants', '#' %>
+    </div>
+  </div>
+  <div class="row-form">
+    <div class="span12">
+      <%= link_to 'Retour', pmu_alr_path %>
+    </div>
+  </div>
+  <div class="row-form">
+    <div class="span12">
+      <%= link_to 'Accueil', root_path %>
+    </div>
+  </div>
+</div>

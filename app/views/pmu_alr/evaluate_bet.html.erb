@@ -1,0 +1,27 @@
+<div class="page-header">
+  <div class="icon">
+    <span class="ico-arrow-right"></span>
+  </div>
+  <h1>PMU ALR<small>
+<%= session[:alr_national] %> > <%= session[:alr_bet_type] %> > <%= session[:alr_formula] %><br />
+Chevaux: <%= session[:alr_horses] %><br />
+Saisissez le nombre de fois</small></h1>
+</div>
+
+<div class="row-fluid">
+  <div class="row-form">
+    <div class="span12">
+      <%= link_to 'Retour', pmu_alr_select_horses_path %>
+    </div>
+  </div>
+  <div class="row-form">
+    <div class="span12">
+      <%= link_to 'Retour', pmu_alr_select_horses_path %>
+    </div>
+  </div>
+  <div class="row-form">
+    <div class="span12">
+      <%= link_to 'Accueil', root_path %>
+    </div>
+  </div>
+</div>

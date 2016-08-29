@@ -3,12 +3,12 @@
     <span class="ico-arrow-right"></span>
   </div>
   <h1>PMU PLR<small>
-<%= session[:plr_race_details] %><br />
-<%= session[:plr_begin_date] %><br />
-<%= session[:plr_number_of_horses] %><br />
+Réunion: R<%= session[:plr_reunion_number] %> - Course: C<%= session[:plr_race_number] %> <br />
+<%= session[:plr_number_of_horses] %> partants <%= session[:plr_begin_date] %><br />
 <%= session[:bet_type_value] %> > <%= session[:plr_formula_value] %><br />
+Base: <%= session[:plr_base] %><br />
 Chevaux: <%= session[:plr_selection] %><br />
-<%= session[:plr_formula_value] == "Long champs" ? "Saisissez les numéros de vos chevaux en les separant d'un espace" : "Saisissez votre base en les séparant d'un espace" %><br />Réunion: R<%= session[:plr_reunion_number] %> - Course: C<%= session[:plr_race_number] %></small></h1>
+<%= session[:plr_formula_value] == "Long champs" ? "Saisissez les numéros de vos chevaux en les separant d'un espace" : "Saisissez votre base en les séparant d'un espace" %></small></h1>
 </div>
 
 <div class="row-fluid">
