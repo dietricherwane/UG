@@ -239,7 +239,7 @@ class PlrController < ApplicationController
                       "special_entries":"#{session[:plr_base]}",
                       "normal_entries":"#{session[:plr_selection]}",
                       "race_details":"#{session[:plr_race_details]}",
-                      "begin_date":"#{session[:plr_begin_date]}",
+                      "begin_date":"#{ Date.today.strftime('%d-%m-%Y') + ' ' + session[:plr_begin_date].gsub('H', ':') + ':00'}",
                       "end_date":""
                     }
                   ]
@@ -262,7 +262,8 @@ class PlrController < ApplicationController
             PMU PLR – R#{session[:plr_reunion_number]}C#{session[:race_number]}
             #{session[:bet_type_value]} > #{session[:plr_formula_value]}
             Base: #{session[:plr_base]}
-            Sélection: #{session[:plr_selection]}.
+            Sélection: #{session[:plr_selection]}
+            N° de ticket: #{json_object["bet"]["ticket_number"]}
           ]
         else
           status = false
