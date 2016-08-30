@@ -6,8 +6,8 @@
 Réunion: R<%= session[:plr_reunion_number] %> - Course: C<%= session[:plr_race_number] %> <br />
 <%= session[:plr_number_of_horses] %> partants <%= session[:plr_begin_date] %><br />
 <%= session[:bet_type_value] %> > <%= session[:plr_formula_value] %><br />
-Base: <%= session[:plr_base] %><br />
-Chevaux: <%= session[:plr_selection] %><br />
+<%= session[:plr_selection].blank? ? '' : 'Chevaux: ' + session[:plr_selection] + '<br />'.html_safe %>
+<%= session[:plr_base].blank? ? '' : 'Base: ' + session[:plr_base] + '<br />'.html_safe %>
 Saisissez votre code secret Paymoney</small></h1>
 </div>
 

@@ -6,8 +6,8 @@
 Réunion: R<%= session[:plr_reunion_number] %> - Course: C<%= session[:plr_race_number] %><br />
 partants <%= session[:plr_begin_date] %> <%= session[:plr_number_of_horses] %><br />
 <%= session[:bet_type_value] %> > <%= session[:plr_formula_value] %><br />
-Base: <%= session[:plr_base] %><br />
-Sélection: <%= session[:plr_selection] %><br />
+<%= session[:plr_selection].blank? ? '' : 'Chevaux: ' + session[:plr_selection] + '<br />'.html_safe %>
+<%= session[:plr_base].blank? ? '' : 'Base: ' + session[:plr_base] + '<br />'.html_safe %>
 Saisissez votre sélection en les separant d'un espace</small></h1>
 </div>
 

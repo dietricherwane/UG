@@ -203,7 +203,7 @@ class PlrController < ApplicationController
           status = true
           flash.now[:success] = %Q[
             Vous vous apprêtez à prendre un pari PMU PLR
-            R#{session[:plr_reunion_number]}C#{session[:race_number]}
+            R#{session[:plr_reunion_number]}C#{session[:plr_race_number]}
             #{session[:bet_type_value]} > #{session[:plr_formula_value]}
             Base: #{session[:plr_base]}
             Sélection: #{session[:plr_selection]}
@@ -259,7 +259,7 @@ class PlrController < ApplicationController
         if json_object["error"].blank?
           status = true
           flash.now[:success] = %Q[
-            PMU PLR – R#{session[:plr_reunion_number]}C#{session[:race_number]}
+            PMU PLR – R#{session[:plr_reunion_number]}C#{session[:plr_race_number]}
             #{session[:bet_type_value]} > #{session[:plr_formula_value]}
             Base: #{session[:plr_base]}
             Sélection: #{session[:plr_selection]}
