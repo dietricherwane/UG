@@ -151,7 +151,8 @@ class PmuAlrController < ApplicationController
 
   def set_bet_parameters
     @program_id = session[:alr_program_id]
-    @race_id = session[:alr_race_ids][session[:alr_national][-1, 1]]
+    race_index = session[:alr_national][-1, 1]
+    @race_id = session[:alr_race_ids][race_index.to_i]
     @bet_id = session[:alr_bet_type_code]
   end
 
