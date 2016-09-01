@@ -21,18 +21,7 @@ class PmuAlrController < ApplicationController
   def bet_type
     @national = params[:national]
 
-    set_national
-  end
-
-  def set_national
-    case @national
-      when 'national1'
-        session[:alr_national] = 'Nationale 1'
-      when 'national2'
-        session[:alr_national] = 'Nationale 2'
-      when 'national3'
-        session[:alr_national] = 'Nationale 3'
-      end
+    session[:alr_national] = "Nationale #{@national[-1, 1]}"
   end
 
   def generic_formula_selection
@@ -44,22 +33,29 @@ class PmuAlrController < ApplicationController
   def multi_formula_selection
     @bet_type = params[:bet_type]
     session[:alr_bet_type] = 'Multi'
+    session[:alr_bet_type_code] = '13'
   end
 
   def set_bet_type
     case @bet_type
       when 'couple_place'
         session[:alr_bet_type] = 'Couplé placé'
+        session[:alr_bet_type_code] = '4'
       when 'couple_gagnant'
         session[:alr_bet_type] = 'Couplé gagnant'
+        session[:alr_bet_type_code] = '2'
       when 'tierce'
         session[:alr_bet_type] = 'Tiercé'
+        session[:alr_bet_type_code] = '7'
       when 'quarte'
         session[:alr_bet_type] = 'Quarté'
+        session[:alr_bet_type_code] = '8'
       when 'quinte'
         session[:alr_bet_type] = 'Quinté'
+        session[:alr_bet_type_code] = '10'
       when 'quinte_plus'
         session[:alr_bet_type] = 'Quinté +'
+        session[:alr_bet_type_code] = '10'
       end
   end
 
@@ -81,10 +77,10 @@ class PmuAlrController < ApplicationController
   end
 
   def stake
-    @horses_numbers = params[:horses]
+    @horses_numbers = params[:selection]
 
     if valid_horses_numbers
-      session[:alr_horses] = params[:horses].split.join(',')
+      session[:alr_selection] = @horses_numbers.split.join(',')
     else
       flash.now[:error] = "Veuillez entrer des numéros de chevaux valides"
       render :select_horses
@@ -99,7 +95,63 @@ class PmuAlrController < ApplicationController
       render :stake
     else
       session[:alr_stake] = @stake
+
+      url = Parameter.first.gateway_url + "/cm3/api/0cad36b144/game/evaluate/#{@program_id}/#{@race_id}"
+      bet = RestClient.get(url) rescue nil
+      request_body = %Q(
+                    {
+                      "games":[
+                        {
+                          "game_id":"1",
+                          "bet_id":"#{@bet_id}",
+                          "nb_units":"#{@stake}",
+                          "full_box":"FALSE",
+                          "items":[#{session[:alr_selection]}]
+                        }
+                      ]
+                    }
+                  )
+      request = Typhoeus::Request.new(
+        url,
+        method: :post,
+        body: request_body
+      )
+      request.run
+      response = request.response
+      body = response.body
+
+      json_object = JSON.parse(body) rescue nil
+      if json_object.blank?
+        flash.now[:error] = "Code: 0 -- Message: Le pari n'a pas pu être évalué"
+      else
+        if json_object["error"].blank?
+          status = true
+          flash.now[:success] = %Q[
+            Vous vous apprêtez à prendre un pari PMU ALR
+            #{session[:alr_national]} - #{session[:alr_bet_type]} - #{session[:alr_formula]}
+            #{session[:bet_type_value]} > #{session[:plr_formula_value]}
+            Base:
+            Sélection: #{session[:alr_selection]}
+            Votre pari est estimé à #{json_object["evaluations"]["evaluations"].first["amount"]} FCFA
+          ]
+        else
+          status = false
+          flash.now[:error] = "Code: #{json_object["error"]["code"]} -- Message: #{json_object["error"]["description"]}"
+        end
+      end
+
+      Log.create(msisdn: session[:msisdn], bet_request: request_body, bet_response: body, status: status)
     end
+  end
+
+  def place_bet
+
+  end
+
+  def set_bet_parameters
+    @program_id = session[:alr_program_id]
+    @race_id = session[:alr_race_ids][session[:alr_national][-1, 1]]
+    @bet_id = session[:alr_bet_type_code]
   end
 
   def valid_horses_numbers
@@ -109,7 +161,7 @@ class PmuAlrController < ApplicationController
       status = false
     else
       @horses_numbers.split.each do |horse_number|
-        if not_a_number?(horse_number)
+        if not_a_number?(horse_number) && horse_number.upcase != 'X'
           status = false
         end
       end

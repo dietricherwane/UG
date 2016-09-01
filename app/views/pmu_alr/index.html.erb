@@ -9,7 +9,7 @@
   <% session[:alr_race_ids].each do |race_id| %>
     <div class="row-form">
       <div class="span12">
-        <%= link_to "1- Nationale #{race_id[-1,1]}", pmu_alr_bet_type_path("national#{race_id[-1,1]}") %>
+        <%= link_to "#{race_id[-1,1]}- Nationale #{race_id[-1,1]}", pmu_alr_bet_type_path("national#{race_id[-1,1]}") %>
       </div>
     </div>
   <% end %>
