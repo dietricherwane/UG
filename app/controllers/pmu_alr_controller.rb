@@ -9,7 +9,7 @@ class PmuAlrController < ApplicationController
     session_data = JSON.parse(session_data) rescue nil
     session[:alr_program_id] = session_data["program_id"]
     session[:alr_program_date] = session_data["program_date"]
-    session[:alr_program_status] = session_data["program_status"]
+    session[:alr_program_status] = session_data["status"]
     session[:alr_race_ids] = session_data["race_ids"].split('-') rescue []
 
     if session[:alr_program_status] != 'ON' || session[:alr_race_ids].length == 0
