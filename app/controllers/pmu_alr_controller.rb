@@ -95,6 +95,7 @@ class PmuAlrController < ApplicationController
       render :stake
     else
       session[:alr_stake] = @stake
+      set_bet_parameters
 
       url = Parameter.first.gateway_url + "/cm3/api/0cad36b144/game/evaluate/#{@program_id}/#{@race_id}"
       bet = RestClient.get(url) rescue nil
