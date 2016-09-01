@@ -1,7 +1,21 @@
 class PmuAlrController < ApplicationController
 
   def index
+    url = Parameter.first.parionsdirect_url + "/ussd_pmu/get_alr_current_program"
+    session_data = RestClient.get(url) rescue nil
 
+    GenericLog.create(operation: "PMU ALR get session data", request_log: url, response_log: session_data)
+
+    session_data = JSON.parse(session_data) rescue nil
+    session[:alr_program_id] = session_data["program_id"]
+    session[:alr_program_date] = session_data["program_date"]
+    session[:alr_program_status] = session_data["program_status"]
+    session[:alr_race_ids] = session_data["race_ids"].split('-') rescue []
+
+    if session[:alr_program_status] != 'ON' || session[:alr_race_ids].length == 0
+      flash[:error] = "Il n'y a aucun programme disponible"
+      redirect_to list_games_path
+    end
   end
 
   def bet_type
