@@ -160,7 +160,7 @@ class PmuAlrController < ApplicationController
       @paymoney_account_number = session[:paymoney_account_number]
       set_bet_parameters
 
-      url = Parameter.first.gateway_url + "/cm3/api/98d24611fd/ticket/sell/#{@gamer_id}/#{@paymoney_account_number}/#{@paymoney_account_password}/#{session[:alr_program_date]}/#{session[:alr_program_date]}"
+      url = Parameter.first.gateway_url + "/cm3/api/98d24611fd/ticket/sell/#{@gamer_id}/#{@paymoney_account_number}/#{@paymoney_password}/#{session[:alr_program_date]}/#{session[:alr_program_date]}"
       bet = RestClient.get(url) rescue nil
       request_body = %Q(
                     {
