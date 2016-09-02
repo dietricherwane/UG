@@ -124,29 +124,96 @@ class PmuAlrController < ApplicationController
       json_object = JSON.parse(body) rescue nil
       if json_object.blank?
         flash.now[:error] = "Code: 0 -- Message: Le pari n'a pas pu être évalué"
+        render :stake
       else
         if json_object["error"].blank?
           status = true
+          session[:alr_scratched_list] = json_object["evaluations"]["scratched"]
+          session[:alr_amount] = json_object["evaluations"]["evaluations"].first["amount"]
           flash.now[:success] = %Q[
             Vous vous apprêtez à prendre un pari PMU ALR
             #{session[:alr_national]} - #{session[:alr_bet_type]} - #{session[:alr_formula]}
             #{session[:bet_type_value]} > #{session[:plr_formula_value]}
             Base:
             Sélection: #{session[:alr_selection]}
-            Votre pari est estimé à #{json_object["evaluations"]["evaluations"].first["amount"]} FCFA
+            Votre pari est estimé à #{session[:alr_amount]} FCFA
           ]
         else
           status = false
           flash.now[:error] = "Code: #{json_object["error"]["code"]} -- Message: #{json_object["error"]["description"]}"
+          render :stake
         end
       end
 
-      Log.create(msisdn: session[:msisdn], bet_request: request_body, bet_response: body, status: status)
+      GenericLog.create(operation: "Evaluate PMU ALR bet", request_log: url + request_body, response_log: body)
     end
   end
 
   def place_bet
+     @paymoney_password = params[:paymoney_account_password]
 
+    if @paymoney_password.blank?
+      flash.now[:error] = "Veuillez entrer un codesecret"
+      render :evaluate_bet
+    else
+      @gamer_id = RestClient.get(Parameter.first.gateway_url + "/8ba869a7a9c59f3a0/api/users/gamer_id/#{session[:msisdn]}") rescue ''
+      @paymoney_account_number = session[:paymoney_account_number]
+      set_bet_parameters
+
+      url = Parameter.first.gateway_url + "/cm3/api/98d24611fd/ticket/sell/#{@gamer_id}/#{@paymoney_account_number}/#{@paymoney_account_password}/#{session[:alr_program_date]}/#{session[:alr_program_date]}"
+      bet = RestClient.get(url) rescue nil
+      request_body = %Q(
+                    {
+                      "program_id":"#{@program_id}",
+                      "race_id":"#{@race_id}",
+                      "amount":"#{session[:alr_amount]}",
+                      "scratched_list":#{session[:alr_scratched_list]},
+                      "wagers":[
+                        {
+                          "bet_id":"#{@bet_id}",
+                          "nb_units":"#{session[:alr_stake]}",
+                          "nb_combinations":"5",
+                          "full_box":"false",
+                          "selection":[#{session[:alr_selection]}]
+                        }
+                      ]
+                    }
+                  )
+      request = Typhoeus::Request.new(
+        url,
+        method: :post,
+        body: request_body
+      )
+      request.run
+      response = request.response
+      body = response.body
+
+      json_object = JSON.parse(body) rescue nil
+      if json_object.blank?
+        flash.now[:error] = "Code: 0 -- Message: Le pari n'a pas pu être pris"
+        render :evaluate_bet
+      else
+        if json_object["error"].blank?
+          status = true
+          flash.now[:success] = %Q[
+            Votre ticket a été validé
+            #{session[:alr_national]} - #{session[:alr_bet_type]} - #{session[:alr_formula]}
+            #{session[:bet_type_value]} > #{session[:plr_formula_value]}
+            Base:
+            Sélection: #{session[:alr_selection]}
+            Numéro de ticket: #{json_object["bet"]["serial_number"]}
+          ]
+        else
+          status = false
+          flash.now[:error] = "Code: #{json_object["error"]["code"]} -- Message: #{json_object["error"]["description"]}"
+          render :evaluate_bet
+        end
+      end
+
+      GenericLog.create(operation: "Place PMU ALR bet", request_log: url + request_body, response_log: body)
+    end
+
+    render :index
   end
 
   def set_bet_parameters
