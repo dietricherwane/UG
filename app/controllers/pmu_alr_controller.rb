@@ -129,7 +129,7 @@ class PmuAlrController < ApplicationController
         if json_object["error"].blank?
           status = true
           session[:alr_scratched_list] = json_object["evaluations"]["scratched"]
-          session[:alr_combinations] = json_object["evaluations"]["nb_combinations"]
+          session[:alr_combinations] = json_object["evaluations"]["evaluations"].first["nb_combinations"]
           session[:alr_amount] = json_object["evaluations"]["evaluations"].first["amount"]
           flash.now[:success] = %Q[
             Vous vous apprêtez à prendre un pari PMU ALR
