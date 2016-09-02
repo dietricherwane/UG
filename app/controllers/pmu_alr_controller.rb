@@ -203,6 +203,7 @@ class PmuAlrController < ApplicationController
             Sélection: #{session[:alr_selection]}
             Numéro de ticket: #{json_object["bet"]["serial_number"]}
           ]
+          render :index
         else
           status = false
           flash.now[:error] = "Code: #{json_object["error"]["code"]} -- Message: #{json_object["error"]["description"]}"
@@ -213,7 +214,7 @@ class PmuAlrController < ApplicationController
       GenericLog.create(operation: "Place PMU ALR bet", request_log: url + request_body, response_log: body)
     end
 
-    render :index
+
   end
 
   def set_bet_parameters
