@@ -32,6 +32,7 @@ class PmuAlrController < ApplicationController
     @national = params[:national]
 
     session[:alr_national] = "Nationale #{@national[-1, 1]}"
+    session[:alr_national_index] = @national[-1, 1]
   end
 
   def generic_formula_selection
