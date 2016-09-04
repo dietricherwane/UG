@@ -60,6 +60,8 @@ Rails.application.routes.draw do
   get '/pmu_alr/validate_multi_formula_selection/:multi_type' => 'pmu_alr#validate_multi_formula_selection', as: :pmu_alr_validate_multi_formula_selection
   get '/pmu_alr/select_horses/:alr_formula' => 'pmu_alr#select_horses', as: :pmu_alr_select_horses
   get '/pmu_alr/select_base/:alr_formula' => 'pmu_alr#select_base', as: :pmu_alr_select_base
+  post '/pmu_alr/full_formula' => 'pmu_alr#full_formula', as: :pmu_alr_full_formula
+  get '/pmu_alr/full_formula/validate/:status' => 'pmu_alr#validate_full_formula', as: :pmu_alr_validate_full_formula
   post '/pmu_alr/validate_base' => 'pmu_alr#validate_base', as: :pmu_alr_validate_base
   post '/pmu_alr/stake' => 'pmu_alr#stake', as: :pmu_alr_stake
   post '/pmu_alr/evaluate_bet' => 'pmu_alr#evaluate_bet', as: :pmu_alr_evaluate_bet

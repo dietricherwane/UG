@@ -82,6 +82,23 @@ class PmuAlrController < ApplicationController
     set_formula
   end
 
+  def full_formula
+    @horses_numbers = params[:selection]
+
+    if valid_horses_numbers
+      session[:alr_selection] = @horses_numbers.split.join(',')
+    else
+      flash.now[:error] = "Veuillez entrer des numéros de chevaux valides"
+      render :select_horses
+    end
+  end
+
+  def validate_full_formula
+    session[:full_box] = (params[:status] == '1' ? 'TRUE' : 'FALSE')
+
+    render :stake
+  end
+
   def select_base
     @formula = params[:alr_formula]
 
