@@ -12,49 +12,49 @@
       <% if race_data["program_id"] == session[:alr_program_id] %>
         <% bet_ids = race_data["bet_ids"].gsub('-SALE', '').split(',') rescue [] %>
         <% custom_index = 0 %>
-        <% if bet_ids.include('4') %>
+        <% if bet_ids.include?('4') %>
           <div class="row-form">
             <div class="span12">
               <%= link_to "#{custom_index+=1}- Couplé placé", pmu_alr_generic_formula_selection_path('couple_place') %>
             </div>
           </div>
         <% end %>
-        <% if bet_ids.include('2') %>
+        <% if bet_ids.include?('2') %>
           <div class="row-form">
             <div class="span12">
               <%= link_to "#{custom_index+=1}- Couplé gagnant", pmu_alr_generic_formula_selection_path('couple_gagnant') %>
             </div>
           </div>
         <% end %>
-        <% if bet_ids.include('7') %>
+        <% if bet_ids.include?('7') %>
           <div class="row-form">
             <div class="span12">
               <%= link_to "#{custom_index+=1}- Tiercé", pmu_alr_generic_formula_selection_path('tierce') %>
             </div>
           </div>
         <% end %>
-        <% if bet_ids.include('8') %>
+        <% if bet_ids.include?('8') %>
           <div class="row-form">
             <div class="span12">
               <%= link_to "#{custom_index+=1}- Quarté", pmu_alr_generic_formula_selection_path('quarte') %>
             </div>
           </div>
         <% end %>
-        <% if bet_ids.include('10') %>
+        <% if bet_ids.include?('10') %>
           <div class="row-form">
             <div class="span12">
               <%= link_to "#{custom_index+=1}- Quinté", pmu_alr_generic_formula_selection_path('quinte') %>
             </div>
           </div>
         <% end %>
-        <% if bet_ids.include('10') %>
+        <% if bet_ids.include?('10') %>
           <div class="row-form">
             <div class="span12">
               <%= link_to "#{custom_index+=1}- Quinté +", pmu_alr_generic_formula_selection_path('quinte_plus') %>
             </div>
           </div>
         <% end %>
-        <% if bet_ids.include('13') %>
+        <% if bet_ids.include?('13') %>
           <div class="row-form">
             <div class="span12">
               <%= link_to '7- Multi', pmu_alr_multi_formula_selection_path %>
