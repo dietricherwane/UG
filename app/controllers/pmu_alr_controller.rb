@@ -33,9 +33,14 @@ class PmuAlrController < ApplicationController
   end
 
   def multi_formula_selection
-    @bet_type = params[:bet_type]
     session[:alr_bet_type] = 'Multi'
     session[:alr_bet_type_code] = '13'
+  end
+
+  def validate_multi_formula_selection
+    session[:alr_multi_type] = params[:multi_type]
+
+    render :select_horses
   end
 
   def set_bet_type
