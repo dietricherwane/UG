@@ -62,7 +62,7 @@ class PmuAlrController < ApplicationController
         session[:alr_bet_type_code] = '10'
       when 'quinte_plus'
         session[:alr_bet_type] = 'Quinté +'
-        session[:alr_bet_type_code] = '10'
+        session[:alr_bet_type_code] = '11'
       end
   end
 
