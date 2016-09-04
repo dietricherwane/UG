@@ -9,6 +9,7 @@
 
 <div class="row-fluid">
     <% session[:race_data].each do |race_data| %>
+      <%= 'RD' + race_data.to_s %>
       <% if race_data["program_id"] == session[:alr_program_id] %>
         <% bet_ids = race_data["bet_ids"].gsub('-SALE', '').split(',') rescue [] %>
         <% custom_index = 0 %>
