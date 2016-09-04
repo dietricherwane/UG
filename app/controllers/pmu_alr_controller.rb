@@ -61,8 +61,27 @@ class PmuAlrController < ApplicationController
 
   def select_horses
     @formula = params[:alr_formula]
+    session[:raw_alr_formula] = @formula
 
     set_formula
+  end
+
+  def select_base
+    @formula = params[:alr_formula]
+
+    set_formula
+  end
+
+  def validate_base
+    @base_numbers = params[:base]
+
+    if valid_base_numbers
+      session[:alr_base] = @base_numbers.split.join(',')
+      redirect_to pmu_alr_select_horses_path(session[:raw_alr_formula])
+    else
+      flash.now[:error] = "Veuillez entrer des numéros de chevaux valides"
+      render :select_base
+    end
   end
 
   def set_formula
@@ -232,6 +251,22 @@ class PmuAlrController < ApplicationController
       status = false
     else
       @horses_numbers.split.each do |horse_number|
+        if not_a_number?(horse_number) && horse_number.upcase != 'X'
+          status = false
+        end
+      end
+    end
+
+    return status
+  end
+
+  def valid_base_numbers
+    status = true
+
+    if @base_numbers.blank?
+      status = false
+    else
+      @base_numbers.split.each do |horse_number|
         if not_a_number?(horse_number) && horse_number.upcase != 'X'
           status = false
         end

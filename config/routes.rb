@@ -58,6 +58,8 @@ Rails.application.routes.draw do
   get '/pmu_alr/generic_formula_selection/:bet_type' => 'pmu_alr#generic_formula_selection', as: :pmu_alr_generic_formula_selection
   get '/pmu_alr/multi_formula_selection/:bet_type' => 'pmu_alr#multi_formula_selection', as: :pmu_alr_multi_formula_selection
   get '/pmu_alr/select_horses/:alr_formula' => 'pmu_alr#select_horses', as: :pmu_alr_select_horses
+  get '/pmu_alr/select_base/:alr_formula' => 'pmu_alr#select_base', as: :pmu_alr_select_base
+  post '/pmu_alr/validate_base' => 'pmu_alr#validate_base', as: :pmu_alr_validate_base
   post '/pmu_alr/stake' => 'pmu_alr#stake', as: :pmu_alr_stake
   post '/pmu_alr/evaluate_bet' => 'pmu_alr#evaluate_bet', as: :pmu_alr_evaluate_bet
   post '/pmu_alr/place_bet' => 'pmu_alr#place_bet', as: :pmu_alr_place_bet
