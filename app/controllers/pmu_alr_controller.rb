@@ -1,6 +1,7 @@
 class PmuAlrController < ApplicationController
 
   def index
+    session[:full_box] = 'FALSE'
     url = Parameter.first.parionsdirect_url + "/ussd_pmu/get_alr_current_program"
     session_data = RestClient.get(url) rescue nil
 
@@ -163,7 +164,7 @@ class PmuAlrController < ApplicationController
                           "game_id":"1",
                           "bet_id":"#{@bet_id}",
                           "nb_units":"#{@stake}",
-                          "full_box":"FALSE",
+                          "full_box":"#{session[:full_box]}",
                           "items":[#{session[:alr_base].blank? ? '' : session[:alr_base] + ','}#{session[:alr_selection]}]
                         }
                       ]
@@ -231,7 +232,7 @@ class PmuAlrController < ApplicationController
                           "bet_id":"#{@bet_id}",
                           "nb_units":"#{session[:alr_stake]}",
                           "nb_combinations":"#{session[:alr_combinations]}",
-                          "full_box":"false",
+                          "full_box":"#{session[:full_box]}",
                           "selection":[#{session[:alr_base].blank? ? '' : session[:alr_base] + ','}#{session[:alr_selection]}]
                         }
                       ]
