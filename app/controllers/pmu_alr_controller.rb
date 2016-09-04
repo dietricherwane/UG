@@ -14,7 +14,15 @@ class PmuAlrController < ApplicationController
     session[:alr_base] = nil
     session[:alr_selection] = nil
 
-    if session[:alr_program_status] != 'ON' || session[:alr_race_ids].length == 0
+    url = Parameter.first.parionsdirect_url + "/ussd_pmu/get_alr_race_list"
+    race_data = RestClient.get(url) rescue nil
+
+    GenericLog.create(operation: "PMU ALR get races data", request_log: url, response_log: race_data)
+
+    race_data = JSON.parse(race_data) rescue nil
+    session[:race_data] = race_data["alr_race_list"] rescue nil
+
+    if session[:alr_program_status] != 'ON' || session[:alr_race_ids].length == 0 || session[:race_data].blank?
       flash[:error] = "Il n'y a aucun programme disponible"
       redirect_to list_games_path
     end
@@ -28,6 +36,7 @@ class PmuAlrController < ApplicationController
 
   def generic_formula_selection
     @bet_type = params[:bet_type]
+    session[:alr_multi_type] = nil
 
     set_bet_type
   end
@@ -137,7 +146,7 @@ class PmuAlrController < ApplicationController
                           "bet_id":"#{@bet_id}",
                           "nb_units":"#{@stake}",
                           "full_box":"FALSE",
-                          "items":[#{session[:alr_selection]}]
+                          "items":[#{session[:alr_base].blank? ? '' : session[:alr_base] + ','}#{session[:alr_selection]}]
                         }
                       ]
                     }
@@ -184,7 +193,7 @@ class PmuAlrController < ApplicationController
      @paymoney_password = params[:paymoney_account_password]
 
     if @paymoney_password.blank?
-      flash.now[:error] = "Veuillez entrer un codesecret"
+      flash.now[:error] = "Veuillez entrer un code secret"
       render :evaluate_bet
     else
       @gamer_id = RestClient.get(Parameter.first.gateway_url + "/8ba869a7a9c59f3a0/api/users/gamer_id/#{session[:msisdn]}") rescue ''
@@ -205,7 +214,7 @@ class PmuAlrController < ApplicationController
                           "nb_units":"#{session[:alr_stake]}",
                           "nb_combinations":"#{session[:alr_combinations]}",
                           "full_box":"false",
-                          "selection":[#{session[:alr_selection]}]
+                          "selection":[#{session[:alr_base].blank? ? '' : session[:alr_base] + ','}#{session[:alr_selection]}]
                         }
                       ]
                     }
@@ -230,7 +239,7 @@ class PmuAlrController < ApplicationController
             Votre ticket a été validé
             #{session[:alr_national]} - #{session[:alr_bet_type]} - #{session[:alr_formula]}
             #{session[:bet_type_value]} > #{session[:plr_formula_value]}
-            Base:
+            #{session[:alr_base].blank? ? '' : 'Base: ' + session[:alr_base] + ','}
             Sélection: #{session[:alr_selection]}
             Numéro de ticket: #{json_object["bet"]["serial_number"]}
           ]
