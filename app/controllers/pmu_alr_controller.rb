@@ -11,6 +11,8 @@ class PmuAlrController < ApplicationController
     session[:alr_program_date] = session_data["program_date"]
     session[:alr_program_status] = session_data["status"]
     session[:alr_race_ids] = session_data["race_ids"].split('-') rescue []
+    session[:alr_base] = nil
+    session[:alr_selection] = nil
 
     if session[:alr_program_status] != 'ON' || session[:alr_race_ids].length == 0
       flash[:error] = "Il n'y a aucun programme disponible"
