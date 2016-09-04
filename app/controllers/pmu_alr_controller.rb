@@ -78,7 +78,7 @@ class PmuAlrController < ApplicationController
 
     if valid_base_numbers
       session[:alr_base] = @base_numbers.split.join(',')
-      if session[:raw_alr_formula] == 'champ_total'
+      if session[:raw_alr_formula] == 'champ_reduit'
         redirect_to pmu_alr_select_horses_path(session[:raw_alr_formula])
       else
         render :stake
