@@ -61,7 +61,6 @@ class PmuAlrController < ApplicationController
 
   def select_horses
     @formula = params[:alr_formula]
-    session[:raw_alr_formula] = @formula
 
     set_formula
   end
@@ -77,7 +76,11 @@ class PmuAlrController < ApplicationController
 
     if valid_base_numbers
       session[:alr_base] = @base_numbers.split.join(',')
-      redirect_to pmu_alr_select_horses_path(session[:raw_alr_formula])
+      if session[:raw_alr_formula] == 'champ_total'
+        redirect_to pmu_alr_select_horses_path(session[:raw_alr_formula])
+      else
+        render :stake
+      end
     else
       flash.now[:error] = "Veuillez entrer des numéros de chevaux valides"
       render :select_base
@@ -85,7 +88,8 @@ class PmuAlrController < ApplicationController
   end
 
   def set_formula
-     case @formula
+    session[:raw_alr_formula] = @formula
+    case @formula
       when 'longchamp'
         session[:alr_formula] = 'Long champ'
       when 'champ_reduit'
