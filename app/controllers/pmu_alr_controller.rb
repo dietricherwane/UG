@@ -169,7 +169,7 @@ class PmuAlrController < ApplicationController
                         }
                       ]
                     }
-                  )
+                  ).gsub(/x/i, %Q/"X"/)
       request = Typhoeus::Request.new(
         url,
         method: :post,
@@ -211,8 +211,8 @@ class PmuAlrController < ApplicationController
   def place_bet
      @paymoney_password = params[:paymoney_account_password]
 
-    if @paymoney_password.blank?
-      flash.now[:error] = "Veuillez entrer un code secret"
+    if @paymoney_account_password.to_s.length != 4 || not_a_number?(@paymoney_account_password)
+      flash.now[:error] = "Le format du mot de passe est incorrect. Le code secret doit être de 4 chiffres."
       render :evaluate_bet
     else
       @gamer_id = RestClient.get(Parameter.first.gateway_url + "/8ba869a7a9c59f3a0/api/users/gamer_id/#{session[:msisdn]}") rescue ''

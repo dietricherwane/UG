@@ -225,7 +225,7 @@ class PlrController < ApplicationController
     @paymoney_account_password = params[:paymoney_account_password]
     url = Parameter.first.gateway_url + "/ail/pmu/api/dik749742e/bet/place/#{@gamer_id}/#{@paymoney_account_number}/#{@paymoney_account_password}"
 
-    if valid_bet_params
+    if @paymoney_account_password.to_s.length == 4 && !not_a_number?(@paymoney_account_password)
       set_bet_code_and_modifier
       set_bet_params
 
@@ -272,6 +272,8 @@ class PlrController < ApplicationController
       end
 
       Log.create(msisdn: session[:msisdn], gamer_id: @gamer_id, paymoney_account_number: @paymoney_account_number, paymoney_password: @paymoney_account_password, bet_request: request_body, bet_response: body, status: status)
+    else
+      flash.now[:error] = "Le format du mot de passe est incorrect. Le code secret doit être de 4 chiffres."
     end
 
     render :index
