@@ -217,7 +217,7 @@ class PmuAlrController < ApplicationController
   def place_bet
      @paymoney_password = params[:paymoney_account_password]
 
-    if @paymoney_account_password.to_s.length != 4 || not_a_number?(@paymoney_account_password)
+    if @paymoney_password.to_s.length != 4 || not_a_number?(@paymoney_password)
       flash.now[:error] = "Le format du mot de passe est incorrect. Le code secret doit être de 4 chiffres."
       render :evaluate_bet
     else
