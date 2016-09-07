@@ -65,6 +65,9 @@ class PmuAlrController < ApplicationController
       when 'tierce'
         session[:alr_bet_type] = 'Tiercé'
         session[:alr_bet_type_code] = '7'
+      when 'tierce2'
+        session[:alr_bet_type] = 'Tiercé'
+        session[:alr_bet_type_code] = '14'
       when 'quarte'
         session[:alr_bet_type] = 'Quarté'
         session[:alr_bet_type_code] = '8'
@@ -264,7 +267,6 @@ class PmuAlrController < ApplicationController
           flash.now[:success] = %Q[
             Votre ticket a été validé
             #{session[:alr_national]} - #{session[:alr_bet_type]} - #{session[:alr_formula]}
-
             #{session[:alr_base].blank? ? '' : 'Base: ' + session[:alr_base] + ','}
             Sélection: #{session[:alr_selection]}
             Numéro de ticket: #{json_object["bet"]["serial_number"]}

@@ -4,6 +4,13 @@
   </div>
   <h1>PMU ALR<small>
 <%= session[:alr_national] %> > <%= session[:alr_bet_type] %> > <%= session[:alr_formula] %><br />
+<% session[:race_data].each do |race_data| %>
+  <% if race_data["race_id"] == session[:alr_program_id] + '0' + session[:alr_national_index] %>
+    <%= race_data["name"] %><br />
+    Nombre de partants: <%= race_data["max_runners"] %><br />
+    Non partants: <%= race_data["scratched_list"] %><br />
+  <% end %>
+<% end %>
 Base: <%= session[:alr_base] %><br />
 Sélection: <%= session[:alr_selection] %><br />
 Voulez-vous jouer en formule complète?</small></h1>

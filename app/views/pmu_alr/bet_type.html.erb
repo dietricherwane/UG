@@ -4,6 +4,13 @@
   </div>
   <h1>PMU ALR<small>
   <%= session[:alr_national] %><br />
+  <% session[:race_data].each do |race_data| %>
+    <% if race_data["race_id"] == session[:alr_program_id] + '0' + session[:alr_national_index] %>
+      <%= race_data["name"] %><br />
+      Nombre de partants: <%= race_data["max_runners"] %><br />
+      Non partants: <%= race_data["scratched_list"] %><br />
+    <% end %>
+  <% end %>
   Choisissez votre type de pari</small></h1>
 </div>
 
@@ -26,10 +33,17 @@
             </div>
           </div>
         <% end %>
-        <% if bet_ids.include?('7') || bet_ids.include?('14') %>
+        <% if bet_ids.include?('7') %>
           <div class="row-form">
             <div class="span12">
               <%= link_to "#{custom_index+=1}- Tiercé", pmu_alr_generic_formula_selection_path('tierce') %>
+            </div>
+          </div>
+        <% end %>
+        <% if bet_ids.include?('14') %>
+          <div class="row-form">
+            <div class="span12">
+              <%= link_to "#{custom_index+=1}- Tiercé", pmu_alr_generic_formula_selection_path('tierce2') %>
             </div>
           </div>
         <% end %>
