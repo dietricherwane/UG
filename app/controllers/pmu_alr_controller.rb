@@ -161,7 +161,7 @@ class PmuAlrController < ApplicationController
 
       url = Parameter.first.gateway_url + "/cm3/api/0cad36b144/game/evaluate/#{@program_id}/#{@race_id}"
       bet = RestClient.get(url) rescue nil
-      items = session[:alr_base].blank? ? '' : session[:alr_base] + ',' + session[:alr_selection]
+      items = session[:alr_base].blank? ? '' : (session[:alr_base].to_s + ',' + session[:alr_selection].to_s)
       request_body = %Q(
                     {
                       "games":[
