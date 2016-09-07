@@ -264,7 +264,7 @@ class PmuAlrController < ApplicationController
           flash.now[:success] = %Q[
             Votre ticket a été validé
             #{session[:alr_national]} - #{session[:alr_bet_type]} - #{session[:alr_formula]}
-            #{session[:bet_type_value]} > #{session[:plr_formula_value]}
+
             #{session[:alr_base].blank? ? '' : 'Base: ' + session[:alr_base] + ','}
             Sélection: #{session[:alr_selection]}
             Numéro de ticket: #{json_object["bet"]["serial_number"]}
