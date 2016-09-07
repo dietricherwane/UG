@@ -201,7 +201,7 @@ class PmuAlrController < ApplicationController
           flash.now[:success] = %Q[
             Vous vous apprêtez à prendre un pari PMU ALR
             #{session[:alr_national]} - #{session[:alr_bet_type]} - #{session[:alr_formula]}
-            Base:
+            Base: #{session[:alr_base]}
             Sélection: #{session[:alr_selection]}
             Votre pari est estimé à #{session[:alr_amount]} FCFA
           ]
