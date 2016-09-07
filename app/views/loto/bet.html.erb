@@ -7,12 +7,14 @@
 
 <div class="row-fluid">
   <%= form_tag loto_select_bet_path do %>
-    <div class="row-form">
-      <div class="span12">
-        <input type="text" name="numbers" placeholder="Numéros"/>
-        <span class="bottom">Numéros</span>
+    <% if session[:formula] == 'Simple' || session[:formula] == 'Perm' %>
+      <div class="row-form">
+        <div class="span12">
+          <input type="text" name="numbers" placeholder="Numéros"/>
+          <span class="bottom">Numéros</span>
+        </div>
       </div>
-    </div>
+    <% end %>
     <div class="row-form">
       <div class="span12">
         <input type="text" name="selection" placeholder="Sélection"/>

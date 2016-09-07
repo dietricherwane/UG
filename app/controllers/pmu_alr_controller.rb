@@ -227,6 +227,8 @@ class PmuAlrController < ApplicationController
 
       url = Parameter.first.gateway_url + "/cm3/api/98d24611fd/ticket/sell/#{@gamer_id}/#{@paymoney_account_number}/#{@paymoney_password}/#{session[:alr_program_date]}/#{session[:alr_program_date]}"
       bet = RestClient.get(url) rescue nil
+      comma = session[:alr_selection].to_s.blank? ? '' : ','
+      items = session[:alr_base].blank? ? '' : (session[:alr_base].to_s + comma + session[:alr_selection].to_s)
       request_body = %Q(
                     {
                       "program_id":"#{@program_id}",
@@ -239,7 +241,7 @@ class PmuAlrController < ApplicationController
                           "nb_units":"#{session[:alr_stake]}",
                           "nb_combinations":"#{session[:alr_combinations]}",
                           "full_box":"#{session[:full_box]}",
-                          "selection":[#{session[:alr_base].blank? ? '' : session[:alr_base] + ','}#{session[:alr_selection]}]
+                          "selection":[#{items.gsub(/x/i, %Q/"X"/)}]
                         }
                       ]
                     }
