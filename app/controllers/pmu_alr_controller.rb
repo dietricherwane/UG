@@ -114,7 +114,11 @@ class PmuAlrController < ApplicationController
       if session[:raw_alr_formula] == 'champ_reduit'
         redirect_to pmu_alr_select_horses_path(session[:raw_alr_formula])
       else
-        render :stake
+        if session[:raw_alr_formula] == 'champ_total'
+          render :full_formula
+        else
+          render :stake
+        end
       end
     else
       flash.now[:error] = "Veuillez entrer des numéros de chevaux valides"
@@ -157,6 +161,7 @@ class PmuAlrController < ApplicationController
 
       url = Parameter.first.gateway_url + "/cm3/api/0cad36b144/game/evaluate/#{@program_id}/#{@race_id}"
       bet = RestClient.get(url) rescue nil
+      items = session[:alr_base].blank? ? '' : session[:alr_base] + ',' + session[:alr_selection]
       request_body = %Q(
                     {
                       "games":[
@@ -165,11 +170,11 @@ class PmuAlrController < ApplicationController
                           "bet_id":"#{@bet_id}",
                           "nb_units":"#{@stake}",
                           "full_box":"#{session[:full_box]}",
-                          "items":[#{session[:alr_base].blank? ? '' : session[:alr_base] + ','}#{session[:alr_selection]}]
+                          "items":[#{items.gsub(/x/i, %Q/"X"/)}]
                         }
                       ]
                     }
-                  ).gsub(/x/i, %Q/"X"/)
+                  )
       request = Typhoeus::Request.new(
         url,
         method: :post,
