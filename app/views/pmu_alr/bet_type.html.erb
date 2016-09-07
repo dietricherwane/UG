@@ -26,7 +26,7 @@
             </div>
           </div>
         <% end %>
-        <% if bet_ids.include?('7') %>
+        <% if bet_ids.include?('7') || bet_ids.include?('14') %>
           <div class="row-form">
             <div class="span12">
               <%= link_to "#{custom_index+=1}- Tiercé", pmu_alr_generic_formula_selection_path('tierce') %>
@@ -47,7 +47,7 @@
             </div>
           </div>
         <% end %>
-        <% if bet_ids.include?('10') %>
+        <% if bet_ids.include?('11') %>
           <div class="row-form">
             <div class="span12">
               <%= link_to "#{custom_index+=1}- Quinté +", pmu_alr_generic_formula_selection_path('quinte_plus') %>
