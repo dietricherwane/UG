@@ -49,7 +49,7 @@ class PmuAlrController < ApplicationController
   end
 
   def validate_multi_formula_selection
-    session[:alr_formula] = params[:multi_type]
+    session[:alr_formula] = ' 4/' + params[:multi_type]
 
     render :select_horses
   end
