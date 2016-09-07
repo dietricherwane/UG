@@ -10,17 +10,19 @@
     <% if session[:formula] != 'Simple' && session[:formula] != 'Perm' %>
       <div class="row-form">
         <div class="span12">
-          <input type="text" name="numbers" placeholder="Numéros"/>
-          <span class="bottom">Numéros</span>
+          <input type="text" name="numbers" placeholder="Base"/>
+          <span class="bottom">Base</span>
         </div>
       </div>
     <% end %>
-    <div class="row-form">
-      <div class="span12">
-        <input type="text" name="selection" placeholder="Sélection"/>
-        <span class="bottom">Sélection</span>
+    <% if session[:formula] != 'Champ total' %>
+      <div class="row-form">
+        <div class="span12">
+          <input type="text" name="selection" placeholder="Sélection"/>
+          <span class="bottom">Sélection</span>
+        </div>
       </div>
-    </div>
+    <% end %>
     <div class="row-form">
       <div class="span12">
         <input type="text" name="stake" placeholder="Mise de base"/>
