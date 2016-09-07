@@ -7,7 +7,7 @@
 
 <div class="row-fluid">
   <%= form_tag loto_select_bet_path do %>
-    <% if session[:formula] == 'Simple' || session[:formula] == 'Perm' %>
+    <% if session[:formula] != 'Simple' && session[:formula] != 'Perm' %>
       <div class="row-form">
         <div class="span12">
           <input type="text" name="numbers" placeholder="Numéros"/>
