@@ -54,12 +54,12 @@ class LotoController < ApplicationController
   def numbers_overflow
     status = false
     # Simple
-    if session[:formula] == 'Simple' && (session[:selection].split.length rescue 0) > session[:bet].gsub('N', '').to_i
+    if session[:formula] == 'Simple' && (session[:selection].split.length rescue 0) != session[:bet].gsub('N', '').to_i
       status = true
       flash.now[:error] = "Vous avez selectionné le maximum de numero (s)"
     end
     # Perm
-    if session[:formula] == 'Perm' && (session[:selection].split.length rescue 0) > 10
+    if session[:formula] == 'Perm' && ((session[:selection].split.length rescue 0) > 10 || (session[:selection].split.length rescue 0) < session[:bet].gsub('N', '').to_i + 1)
       status = true
       flash.now[:error] = "Vous avez selectionné le maximum de numero (s)"
     end
