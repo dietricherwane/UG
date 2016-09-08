@@ -71,11 +71,25 @@ class PlrController < ApplicationController
     @horses_numbers = params[:plr_selection]
 
     if valid_horses_numbers
-      session[:plr_selection] = @horses_numbers.split.join(',')
+      if right_number_of_horses
+        session[:plr_selection] = @horses_numbers.split.join(',')
+      else
+        render :select_formula
+      end
     else
       flash.now[:error] = 'Veuillez entrer des numéros de chevaux valides'
       render :select_formula
     end
+  end
+
+  def right_number_of_horses
+    status = true
+    if session[:bet_type_value] == "Simple Gagnant" && @horses_numbers.split.length > 10
+      flash.now[:error] = "Vous pouvez sélectionner 10 numéros au maximum"
+      status = false
+    end
+
+    return status
   end
 
   def base_selection
