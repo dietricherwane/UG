@@ -40,7 +40,7 @@ class LotoController < ApplicationController
     numbers = session[:numbers].split rescue []
 
     numbers.each do |number|
-      if number < 1 || number > 90
+      if number.to_i < 1 || number.to_i > 90
         status = true
       end
     end
@@ -48,7 +48,7 @@ class LotoController < ApplicationController
     numbers = session[:selection].split rescue []
 
     numbers.each do |number|
-      if number < 1 || number > 90
+      if number.to_i < 1 || number.to_i > 90
         status = true
       end
     end
