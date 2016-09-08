@@ -21,9 +21,60 @@ class LotoController < ApplicationController
     session[:stake] = params[:stake]
     session[:selection] = params[:selection]
 
-    set_repeats
+    if numbers_overflow || invalid_numbers_range
+      render :bet
+    else
+      set_repeats
 
-    flash.now[:success] = "Le montant du pari est de: #{@repeats} FCFA veuillez entrer vos informations Paymoney pour confirmer."
+      if @repeats.to_i > 100000 || @repeats.to_i < 100
+        flash.now[:error] = "LE MONTANT DE VOTRE PARI DOIT ETRE COMPRIS ENTRE 100 F ET 100 000 F CFA !"
+      else
+        flash.now[:success] = "VOUS VOUS APPRETEZ A PRENDRE UN PARI Couple place LONG CHAMP : #{session[:bet]} #{session[:formula]} Montant debite: #{@repeats} F CFA. Confirmez en saisissant votre code secret PAYMONEY."
+      end
+    end
+  end
+
+  def invalid_numbers_range
+    status = false
+    numbers = session[:numbers].split rescue []
+
+    numbers.each do |number|
+      if !number.to_i.between?(1, 99)
+        status = true
+      end
+    end
+
+    if status
+      flash.now[:error] = "Veuillez choisir des numéros compris entre 1 et 99  pour parier."
+    end
+
+    return status
+  end
+
+  def numbers_overflow
+    status = false
+    # Simple
+    if session[:formula] == 'Simple' && (session[:selection].split.length rescue 0) > session[:bet].gsub('N', '').to_i
+      status = true
+      flash.now[:error] = "Vous avez selectionné le maximum de numero (s)"
+    end
+    # Perm
+    if session[:formula] == 'Perm' && (session[:selection].split.length rescue 0) > 10
+      status = true
+      flash.now[:error] = "Vous avez selectionné le maximum de numero (s)"
+    end
+    # Champ reduit
+    if session[:formula] == 'Champ reduit' && (session[:numbers].split.length rescue 0) > (session[:bet].gsub('N', '').to_i - 1)
+      status = true
+      flash.now[:error] = "Vous avez selectionné le maximum de numero (s)"
+    end
+    # Champ total
+    if session[:formula] == 'Champ total' && (session[:numbers].split.length rescue 0) > (session[:bet].gsub('N', '').to_i - 1)
+      status = true
+      flash.now[:error] = "Vous avez selectionné le maximum de numero (s)"
+    end
+
+    return status
   end
 
   def place_bet
@@ -117,6 +168,7 @@ Consultez les résultats le #{@end_date}.
           flash.now[:error] = "Veuillez miser uniquement des numéros"
           @status = false
         end
+
       end
 
       if session[:formula] == 'Champ reduit'
