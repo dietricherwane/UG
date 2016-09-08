@@ -45,6 +45,14 @@ class LotoController < ApplicationController
       end
     end
 
+    numbers = session[:selection].split rescue []
+
+    numbers.each do |number|
+      if number < 1 || number > 90
+        status = true
+      end
+    end
+
     if status
       flash.now[:error] = "Veuillez choisir des numéros compris entre 1 et 90  pour parier."
     end
