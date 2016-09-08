@@ -279,8 +279,8 @@ Consultez les résultats le #{@end_date}.
 
   def set_repeats
     @repeats = ''
-    @numbers = session[:numbers].split rescue 0
-    @selection = session[:selection].split rescue 0
+    @numbers = session[:numbers].split rescue []
+    @selection = session[:selection].split rescue []
 
     if session[:bet] != '1N'
       case session[:formula]
