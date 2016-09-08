@@ -40,13 +40,13 @@ class LotoController < ApplicationController
     numbers = session[:numbers].split rescue []
 
     numbers.each do |number|
-      if !number.to_i.between?(1, 99)
+      if number < 1 || number > 90
         status = true
       end
     end
 
     if status
-      flash.now[:error] = "Veuillez choisir des numéros compris entre 1 et 99  pour parier."
+      flash.now[:error] = "Veuillez choisir des numéros compris entre 1 et 90  pour parier."
     end
 
     return status
@@ -57,22 +57,22 @@ class LotoController < ApplicationController
     # Simple
     if session[:formula] == 'Simple' && (session[:selection].split.length rescue 0) != session[:bet].gsub('N', '').to_i
       status = true
-      flash.now[:error] = "Vous avez selectionné le maximum de numero (s)"
+      flash.now[:error] = "Vous devez sélectionner #{session[:bet].gsub('N', '').to_i} numéros"
     end
     # Perm
     if session[:formula] == 'Perm' && ((session[:selection].split.length rescue 0) > 10 || (session[:selection].split.length rescue 0) < session[:bet].gsub('N', '').to_i + 1)
       status = true
-      flash.now[:error] = "Vous avez selectionné le maximum de numero (s)"
+      flash.now[:error] = "Vous devez sélectionner entre #{session[:bet].gsub('N', '').to_i + 1} et 10 numéros"
     end
     # Champ reduit
     if session[:formula] == 'Champ reduit' && (session[:numbers].split.length rescue 0) > (session[:bet].gsub('N', '').to_i - 1)
       status = true
-      flash.now[:error] = "Vous avez selectionné le maximum de numero (s)"
+      flash.now[:error] = "Vous devez sélectionner au maximum #{(session[:bet].gsub('N', '').to_i - 1)} numéros"
     end
     # Champ total
     if session[:formula] == 'Champ total' && (session[:numbers].split.length rescue 0) > (session[:bet].gsub('N', '').to_i - 1)
       status = true
-      flash.now[:error] = "Vous avez selectionné le maximum de numero (s)"
+      flash.now[:error] = "Vous devez sélectionner au maximum #{(session[:bet].gsub('N', '').to_i - 1)}"
     end
 
     return status
