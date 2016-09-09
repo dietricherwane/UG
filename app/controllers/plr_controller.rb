@@ -96,7 +96,15 @@ class PlrController < ApplicationController
       flash.now[:error] = "Vous pouvez sélectionner entre 2 et 10 numéros"
       status = false
     end
+    if session[:bet_type_value] == "Jumelé Gagnant" && session[:plr_formula_value] == "Long champs" && (@horses_numbers.split.length > 10 || @horses_numbers.split.length < 2)
+      flash.now[:error] = "Vous pouvez sélectionner entre 2 et 10 numéros"
+      status = false
+    end
     if session[:bet_type_value] == "Jumelé Placé" && (@horses_numbers.split.length > 10 || @horses_numbers.split.length < 2)
+      flash.now[:error] = "Vous pouvez sélectionner entre 2 et 10 numéros"
+      status = false
+    end
+    if session[:bet_type_value] == "Jumelé Placé" && session[:plr_formula_value] == "Long champs" && (@horses_numbers.split.length > 10 || @horses_numbers.split.length < 2)
       flash.now[:error] = "Vous pouvez sélectionner entre 2 et 10 numéros"
       status = false
     end
@@ -104,7 +112,11 @@ class PlrController < ApplicationController
       flash.now[:error] = "Vous pouvez sélectionner entre 3 et 10 numéros"
       status = false
     end
-    if session[:plr_formula_value] = "Champ réduit"  && @horses_numbers.split.length < 5
+    if session[:bet_type_value] == "Trio" && session[:plr_formula_value] == "Long champs" && (@horses_numbers.split.length > 10 || @horses_numbers.split.length < 3)
+      flash.now[:error] = "Vous pouvez sélectionner entre 3 et 10 numéros"
+      status = false
+    end
+    if session[:plr_formula_value] == "Champ réduit"  && @horses_numbers.split.length < 5
       flash.now[:error] = "Vous pouvez devez sélectionner au moins 5 numéros"
       status = false
     end
@@ -129,27 +141,27 @@ class PlrController < ApplicationController
 
   def right_base
     status = true
-    if session[:bet_type_value] == "Jumelé Gagnant" && session[:plr_formula_value] = "Champ réduit" && @base.split.length != 1
+    if session[:bet_type_value] == "Jumelé Gagnant" && session[:plr_formula_value] == "Champ réduit" && @base.split.length != 1
       flash.now[:error] = "Vous pouvez sélectionner 1 cheval en base"
       status = false
     end
-    if session[:bet_type_value] == "Jumelé Gagnant" && session[:plr_formula_value] = "Champ total" && @base.split.length != 1
+    if session[:bet_type_value] == "Jumelé Gagnant" && session[:plr_formula_value] == "Champ total" && @base.split.length != 1
       flash.now[:error] = "Vous pouvez sélectionner 1 cheval en base"
       status = false
     end
-    if session[:bet_type_value] == "Jumelé Placé" && session[:plr_formula_value] = "Champ réduit" && @base.split.length != 1
+    if session[:bet_type_value] == "Jumelé Placé" && session[:plr_formula_value] == "Champ réduit" && @base.split.length != 1
       flash.now[:error] = "Vous pouvez sélectionner 1 cheval en base"
       status = false
     end
-    if session[:bet_type_value] == "Jumelé Placé" && session[:plr_formula_value] = "Champ total" && @base.split.length != 1
+    if session[:bet_type_value] == "Jumelé Placé" && session[:plr_formula_value] == "Champ total" && @base.split.length != 1
       flash.now[:error] = "Vous pouvez sélectionner 1 cheval en base"
       status = false
     end
-    if session[:bet_type_value] == "Trio" && session[:plr_formula_value] = "Champ réduit" && @base.split.length > 2
+    if session[:bet_type_value] == "Trio" && session[:plr_formula_value] == "Champ réduit" && @base.split.length > 2
       flash.now[:error] = "Vous pouvez sélectionner au plus 2 numéros"
       status = false
     end
-    if session[:bet_type_value] == "Trio" && session[:plr_formula_value] = "Champ total" && @base.split.length > 2
+    if session[:bet_type_value] == "Trio" && session[:plr_formula_value] == "Champ total" && @base.split.length > 2
       flash.now[:error] = "Vous pouvez sélectionner au plus 2 numéros"
       status = false
     end
@@ -177,8 +189,12 @@ class PlrController < ApplicationController
     @base = params[:plr_base]
 
     if valid_numbers
-      session[:plr_base] = @base.split.join(',')
-      render :stake_selection
+      if right_base
+        session[:plr_base] = @base.split.join(',')
+        render :stake_selection
+      else
+        render :formula_selection
+      end
     else
       flash.now[:error] = 'Veuillez entrer une base valide'
       render :formula_selection
