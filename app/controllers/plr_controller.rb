@@ -72,7 +72,11 @@ class PlrController < ApplicationController
 
     if valid_horses_numbers
       if right_selection
-        session[:plr_selection] = @horses_numbers.split.join(',')
+        if numbers_in_selection_not_in_base
+          session[:plr_selection] = @horses_numbers.split.join(',')
+        else
+          render :select_formula
+        end
       else
         render :select_formula
       end
@@ -80,6 +84,20 @@ class PlrController < ApplicationController
       flash.now[:error] = 'Veuillez entrer des numéros de chevaux valides'
       render :select_formula
     end
+  end
+
+  def numbers_in_selection_not_in_base
+    status = true
+    if !session[:plr_base].blank?
+      session[:plr_base].split(",").each do |base_number|
+        if @horses_numbers.split.include?(base_number)
+          flash.now[:error] = 'Veuillez choisir des numéros en sélection différents de ceux en base'
+          status = false
+        end
+      end
+    end
+
+    return status
   end
 
   def right_selection
