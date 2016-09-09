@@ -193,7 +193,12 @@ class PlrController < ApplicationController
     if valid_numbers
       @horses_numbers = @base
       if right_selection
-        session[:plr_selection] = @base.split.join(',')
+        @horses_number = @base
+        if numbers_in_selection_not_in_base
+          session[:plr_selection] = @base.split.join(',')
+        else
+          render :base_selection
+        end
       else
         render :base_selection
       end
