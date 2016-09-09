@@ -161,6 +161,7 @@ class PlrController < ApplicationController
     @base = params[:selection]
 
     if valid_numbers
+      @horses_numbers = @base
       if right_selection
         session[:plr_selection] = @base.split.join(',')
       else

@@ -90,7 +90,11 @@ class PmuAlrController < ApplicationController
     @horses_numbers = params[:selection]
 
     if valid_horses_numbers
-      session[:alr_selection] = @horses_numbers.split.join(',')
+      if valid_selection_numbers
+        session[:alr_selection] = @horses_numbers.split.join(',')
+      else
+        render :select_horses
+      end
     else
       flash.now[:error] = "Veuillez entrer des numéros de chevaux valides"
       render :select_horses
@@ -145,7 +149,7 @@ class PmuAlrController < ApplicationController
     @horses_numbers = params[:selection]
 
     if valid_horses_numbers
-      if valid_multi_number_of_horses
+      if valid_multi_number_of_horses && valid_selection_numbers
         session[:alr_selection] = @horses_numbers.split.join(',')
       else
         render :select_horses
@@ -153,6 +157,22 @@ class PmuAlrController < ApplicationController
     else
       flash.now[:error] = "Veuillez entrer des numéros de chevaux valides"
       render :select_horses
+    end
+  end
+
+  def valid_selection_numbers
+    status = true
+    if session[:alr_bet_type] == 'Couplé gagnant' && session[:alr_formula] == 'Champ réduit' && @horses_numbers.split.length < 1
+      flash.now[:error] = "Vous devez choisir au moins 1 numéro"
+      status = false
+    end
+    if session[:alr_bet_type] == 'Tiercé' && session[:alr_formula] == 'Champ réduit' && @horses_numbers.split.length < 2
+      flash.now[:error] = "Vous devez choisir au moins 2 numéros"
+      status = false
+    end
+    if session[:alr_bet_type] == 'Tiercé' && session[:alr_formula] == 'Champ réduit' && @horses_numbers.split.length < 2
+      flash.now[:error] = "Vous devez choisir au moins 2 numéros"
+      status = false
     end
   end
 
