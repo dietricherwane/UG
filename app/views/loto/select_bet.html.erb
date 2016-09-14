@@ -2,7 +2,7 @@
   <div class="icon">
     <span class="ico-arrow-right"></span>
   </div>
-  <h1>Loto bonheur - <%= session[:bet] %> <%= session[:formula] %><small>Veuillez entrer les informations liées à votre compte Paymoney</small></h1>
+  <h1>Loto bonheur - <%= session[:bet] == '1N' ? 'PN' : session[:bet] %> <%= session[:formula] %><small>Veuillez entrer les informations liées à votre compte Paymoney</small></h1>
 </div>
 
 <div class="row-fluid">

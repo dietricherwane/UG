@@ -2,7 +2,7 @@
   <div class="icon">
     <span class="ico-arrow-right"></span>
   </div>
-  <h1>Loto bonheur - <%= session[:bet] %> <%= session[:formula] %><small><%= session[:bet] == '1N' ? 'Saisissez votre numéro' : "Saisissez vos numéros séparés d'un espace" %> (Entre 1 et 90)</small></h1>
+  <h1>Loto bonheur - <%= session[:bet] == '1N' ? 'PN' : session[:bet] %> <%= session[:formula] %><small><%= session[:bet] == '1N' ? 'Saisissez votre numéro' : "Saisissez vos numéros séparés d'un espace" %> (Entre 1 et 90)</small></h1>
 </div>
 
 <div class="row-fluid">
