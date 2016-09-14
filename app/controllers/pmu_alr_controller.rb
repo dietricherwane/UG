@@ -427,6 +427,10 @@ class PmuAlrController < ApplicationController
     return status
   end
 
+  def race_details
+
+  end
+
   def list_bets
     url = Parameter.first.gateway_url + "/ail/pmu_alr/ussd/064582ec2/gamer/bets/list/#{session[:msisdn]}"
     bets = RestClient.get(url) rescue nil
