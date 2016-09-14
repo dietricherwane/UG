@@ -546,7 +546,6 @@ class PlrController < ApplicationController
 
   def list_races
     set_races_list
-    @races = session[:plr_races]
   end
 
   def set_races_list
@@ -560,7 +559,6 @@ class PlrController < ApplicationController
 
     unless races.blank?
       @races = races
-      session[:plr_races] = @races
     end
   end
 
