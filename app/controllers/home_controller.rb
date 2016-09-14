@@ -123,10 +123,10 @@ class HomeController < ApplicationController
   end
 
   def create_parionsdirect_account
-    @pseudo = 'parionsdirect'
+    @pseudo = "#{Digest::SHA1.hexdigest([DateTime.now.iso8601(6), rand].join).hex.to_s[0..8]}"
     @firstname = 'Parionsdirect'
     @lastname = 'Parionsdirect'
-    @email = 'parions@direct.ci'
+    @email = "ussd-#{Digest::SHA1.hexdigest([DateTime.now.iso8601(6), rand].join).hex.to_s[0..8]}@direct.ci"
     @password = params[:password]
     @password_confirmation = params[:password_confirmation]
     @birthdate = '12-12-1900'
