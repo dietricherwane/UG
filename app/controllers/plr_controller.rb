@@ -21,7 +21,7 @@ class PlrController < ApplicationController
     status = false
     set_races_list
     @races.each do |race|
-      if "R" + session[:plr_reunion_number] == race["reunion"]
+      if "R" + session[:plr_reunion_number] == race["reunion"] && ('C' + race_number.to_s) == race["course"]
         status = true
       end
     end
