@@ -30,7 +30,7 @@ class LotoController < ApplicationController
         flash.now[:error] = "LE MONTANT DE VOTRE PARI DOIT ETRE COMPRIS ENTRE 100 F ET 100 000 F CFA !"
         render :bet
       else
-        flash.now[:success] = "VOUS VOUS APPRETEZ A PRENDRE UN PARI: #{session[:bet]} #{session[:formula]} Montant débité: #{@repeats} F CFA. Confirmez en saisissant votre code secret PAYMONEY."
+        flash.now[:success] = "VOUS VOUS APPRETEZ A PRENDRE UN PARI: #{session[:bet] == '1N' ? 'PN' : session[:bet]} #{session[:formula]} Montant débité: #{@repeats} F CFA. Confirmez en saisissant votre code secret PAYMONEY."
       end
     end
   end
@@ -93,7 +93,7 @@ class LotoController < ApplicationController
     url = Parameter.first.gateway_url + "/ail/loto/api/96455396dc/bet/place/#{@gamer_id}/#{@paymoney_account_number}/#{@paymoney_account_password}"
 
     if @paymoney_account_password.to_s.length == 4 && !not_a_number?(@paymoney_account_password)
-      if valid_numbers
+      #if valid_numbers
         set_request_parameters
 
         request_body = %Q[
@@ -138,7 +138,7 @@ Consultez les résultats le #{@end_date}.
         end
 
         Log.create(msisdn: session[:msisdn], gamer_id: @gamer_id, paymoney_account_number: @paymoney_account_number, paymoney_password: @paymoney_account_password, drawing: session[:drawing], bet: session[:bet], formula: session[:formula], bet_request: request_body, bet_response: body, status: status)
-      end
+      #end
     else
       flash.now[:error] = "Le format du mot de passe est incorrect. Le code secret doit être de 4 chiffres."
     end
