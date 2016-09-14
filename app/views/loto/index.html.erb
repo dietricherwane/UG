@@ -8,7 +8,7 @@
 <div class="row-fluid">
   <div class="row-form">
     <div class="span12">
-      <%= link_to "1- Etoile" + -26 + DateTime.parse("01/01/#{Date.today.year} 17:00:00").upto(DateTime.now).count(&:monday?), loto_bet_selection_path('Etoile') %>
+      <%= link_to "1- Etoile" + (-26 + DateTime.parse("01/01/#{Date.today.year} 17:00:00").upto(DateTime.now).count(&:monday?)).to_s, loto_bet_selection_path('Etoile') %>
     </div>
   </div>
   <div class="row-form">
