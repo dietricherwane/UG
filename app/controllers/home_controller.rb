@@ -142,7 +142,7 @@ class HomeController < ApplicationController
         flash.now[:error] = "Une erreur s'est produite"
       else
         if parionsdirect_account["errors"].blank?
-          flash.now[:success] = "Votre compte a été correctement créé. Veuillez l'activer via le lien reçu par email"
+          flash.now[:success] = "Votre compte a été correctement créé."
         else
           flash.now[:error] = parionsdirect_account["errors"].first["message"] rescue nil
         end
