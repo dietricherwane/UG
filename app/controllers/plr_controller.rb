@@ -545,13 +545,13 @@ class PlrController < ApplicationController
   end
 
   def list_races
+    set_races_list
     @races = session[:plr_races]
   end
 
   def set_races_list
     url = Parameter.first.parionsdirect_url + "/ussd_pmu/get_plr_race_list"
     races = RestClient.get(url) rescue nil
-    @reunions = []
 
     GenericLog.create(operation: "List PMU PLR races", request_log: url, response_log: races)
 
