@@ -8,7 +8,7 @@ class PlrController < ApplicationController
     reunion_number = params[:reunion]
     set_reunions_list
 
-    if reunion_number.blank? || !session[:reunions].include?(reunion_number)
+    if reunion_number.blank? || !session[:reunions].include?('R' + reunion_number.to_s)
       flash.now[:error] = "Veuillez entrer un numéro de réunion valide"
       render :index
     else
@@ -515,7 +515,7 @@ class PlrController < ApplicationController
 
   def list_reunions
     @reunions = session[:reunions]
-    session[:reunions] = nim
+    session[:reunions] = nil
   end
 
   def set_reunions_list
