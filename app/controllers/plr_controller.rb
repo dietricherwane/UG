@@ -6,9 +6,10 @@ class PlrController < ApplicationController
 
   def race_selection
     reunion_number = params[:reunion]
+    set_reunions_list
 
-    if reunion_number.blank?
-      flash.now[:error] = "Veuillez entrer le numéro de réunion"
+    if reunion_number.blank? || !session[:reunions].include?(reunion_number)
+      flash.now[:error] = "Veuillez entrer un numéro de réunion valide"
       render :index
     else
       session[:plr_reunion_number] = reunion_number
@@ -513,6 +514,11 @@ class PlrController < ApplicationController
   end
 
   def list_reunions
+    @reunions = session[:reunions]
+    session[:reunions] = nim
+  end
+
+  def set_reunions_list
     url = Parameter.first.parionsdirect_url + "/ussd_pmu/get_plr_race_list"
     races = RestClient.get(url) rescue nil
     @reunions = []
@@ -528,6 +534,7 @@ class PlrController < ApplicationController
           @reunions << race["reunion"]
         end
       end
+      session[:reunions] = @reunions
     end
   end
 
