@@ -27,7 +27,7 @@ class LotoController < ApplicationController
       set_repeats
 
       if @repeats.to_i > 100000 || @repeats.to_i < 100
-        flash.now[:error] = "LE MONTANT DE VOTRE PARI DOIT ETRE COMPRIS ENTRE 100 F ET 100 000 F CFA !"
+        flash.now[:error] = "VOTRE PARI EST ESTIM2 A: #{@repeats}. LE MONTANT DE VOTRE PARI DOIT ETRE COMPRIS ENTRE 100 F ET 100 000 F CFA !"
         render :bet
       else
         flash.now[:success] = "VOUS VOUS APPRETEZ A PRENDRE UN PARI: #{session[:bet] == '1N' ? 'PN' : session[:bet]} #{session[:formula]} Montant débité: #{@repeats} F CFA. Confirmez en saisissant votre code secret PAYMONEY."
