@@ -152,6 +152,7 @@ class PmuAlrController < ApplicationController
       if valid_multi_number_of_horses && valid_selection_numbers
         session[:alr_selection] = @horses_numbers.split.join(',')
       else
+        flash.now[:error] = "Veuillez entrer des numéros de chevaux valides"
         render :select_horses
       end
     else
@@ -194,6 +195,7 @@ class PmuAlrController < ApplicationController
       flash.now[:error] = "Vous devez choisir au moins 5 numéros"
       status = false
     end
+    return status
   end
 
   def valid_multi_number_of_horses
