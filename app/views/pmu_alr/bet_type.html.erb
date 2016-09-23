@@ -15,10 +15,11 @@
 </div>
 
 <div class="row-fluid">
+    <% custom_index = 0 %>
     <% session[:race_data].each do |race_data| %>
       <% if race_data["race_id"] == session[:alr_program_id] + '0' + session[:alr_national_index] %>
         <% bet_ids = race_data["bet_ids"].gsub('-SALE', '').split(',') rescue [] %>
-        <% custom_index = 0 %>
+
         <% if bet_ids.include?('4') %>
           <div class="row-form">
             <div class="span12">
