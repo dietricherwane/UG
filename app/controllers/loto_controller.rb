@@ -103,8 +103,8 @@ class LotoController < ApplicationController
                     "selector1":"#{@selector1}",
                     "selector2":"#{@selector2}",
                     "repeats":"#{@repeats}",
-                    "special_entries":"",
-                    "normal_entries":"#{@numbers.join(',')}",
+                    "special_entries":"#{@numbers.join(',')}",
+                    "normal_entries":"#{@selection.join(',')}",
                     "draw_day":"",
                     "draw_number":"",
                     "begin_date":"#{@begin_date}",
@@ -288,8 +288,8 @@ Consultez les résultats le #{@end_date}.
 
   def set_repeats
     @repeats = ''
-    @numbers = session[:numbers].split rescue []
-    @selection = session[:selection].split rescue []
+    @numbers = session[:numbers].split rescue [] # base
+    @selection = session[:selection].split rescue [] # selection
 
     if session[:bet] != '1N'
       case session[:formula]
