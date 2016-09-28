@@ -133,7 +133,7 @@ Consultez les résultats le #{@end_date}.
             ]
           else
             status = false
-            flash.now[:error] = "Code: #{json_object["error"]["code"]} -- Message: #{json_object["error"]["description"]}"
+            flash.now[:error] = "Code: #{json_object["error"]["code"]} -- Message: #{json_object["error"]["description"]} -- #{request_body}"
           end
         end
 
