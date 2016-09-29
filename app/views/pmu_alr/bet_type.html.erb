@@ -16,6 +16,9 @@
 
 <div class="row-fluid">
     <% custom_index = 0 %>
+    <% if session[:race_data].blank? %>
+      Paris fermés pour cette course
+    <% end %>
     <% session[:race_data].each do |race_data| %>
       <% if race_data["race_id"] == session[:alr_program_id] + '0' + session[:alr_national_index] %>
         <% bet_ids = race_data["bet_ids"].gsub('-SALE', '').split(',') rescue [] %>

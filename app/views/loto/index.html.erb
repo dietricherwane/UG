@@ -8,12 +8,12 @@
 <div class="row-fluid">
   <div class="row-form">
     <div class="span12">
-      <%= link_to "1- Etoile " + (-26 + DateTime.parse("01/01/#{Date.today.year} 17:00:00").upto(DateTime.now).count(&:monday?)).to_s, loto_bet_selection_path('Etoile') %>
+      <%= link_to "1- Etoile " + (-16 + DateTime.parse("01/01/#{Date.today.year} 17:00:00").upto(DateTime.now).count(&:monday?)).to_s, loto_bet_selection_path('Etoile') %>
     </div>
   </div>
   <div class="row-form">
     <div class="span12">
-      <%= link_to "2- Emergence " + (-26 + DateTime.parse("01/01/#{Date.today.year} 17:00:00").upto(DateTime.now).count(&:tuesday?)).to_s, loto_bet_selection_path('Emergence') %>
+      <%= link_to "2- Emergence " + (-16 + DateTime.parse("01/01/#{Date.today.year} 17:00:00").upto(DateTime.now).count(&:tuesday?)).to_s, loto_bet_selection_path('Emergence') %>
     </div>
   </div>
   <div class="row-form">
@@ -23,12 +23,12 @@
   </div>
   <div class="row-form">
     <div class="span12">
-      <%= link_to "4- Privilège " + (-26 + DateTime.parse("01/01/#{Date.today.year} 17:00:00").upto(DateTime.now).count(&:thursday?)).to_s, loto_bet_selection_path('Privilege') %>
+      <%= link_to "4- Privilège " + (-16 + DateTime.parse("01/01/#{Date.today.year} 17:00:00").upto(DateTime.now).count(&:thursday?)).to_s, loto_bet_selection_path('Privilege') %>
     </div>
   </div>
   <div class="row-form">
     <div class="span12">
-      <%= link_to "5- Solution " + (-27 + DateTime.parse("01/01/#{Date.today.year} 17:00:00").upto(DateTime.now).count(&:friday?)).to_s, loto_bet_selection_path('Solution') %>
+      <%= link_to "5- Solution " + (-17 + DateTime.parse("01/01/#{Date.today.year} 17:00:00").upto(DateTime.now).count(&:friday?)).to_s, loto_bet_selection_path('Solution') %>
     </div>
   </div>
   <div class="row-form">

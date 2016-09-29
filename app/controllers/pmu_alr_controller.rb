@@ -128,7 +128,6 @@ class PmuAlrController < ApplicationController
         end
       end
     else
-      flash.now[:error] = "Veuillez entrer des numéros de chevaux valides"
       render :select_base
     end
   end
@@ -138,6 +137,7 @@ class PmuAlrController < ApplicationController
     case @formula
       when 'longchamp'
         session[:alr_formula] = 'Long champ'
+        session[:alr_base] = nil
       when 'champ_reduit'
         session[:alr_formula] = 'Champ réduit'
       when 'champ_total'
@@ -381,47 +381,49 @@ class PmuAlrController < ApplicationController
 
     if @base_numbers.blank?
       status = false
+      flash.now[:error] = "1-Veuillez entrer des numéros de chevaux valides"
     else
       @base_numbers.split.each do |horse_number|
         if not_a_number?(horse_number) && horse_number.upcase != 'X'
           status = false
+          flash.now[:error] = "Veuillez entrer des numéros de chevaux valides"
         end
       end
     end
 
-    if session[:alr_bet_type] == 'Couplé gagnant' && session[:alr_formula] == 'Champ réduit' && @base_numbers.split.length != 1
+    if session[:alr_bet_type] == 'Couplé gagnant' && session[:alr_formula] == 'Champ réduit' && @base_numbers.split.length != 2 && !@base_numbers.split.include?('X') && !@base_numbers.split.include?('x')
       flash.now[:error] = "Vous devez choisir 1 numéro"
       status = false
     end
-    if session[:alr_bet_type] == 'Couplé gagnant' && session[:alr_formula] == 'Champ total' && @base_numbers.split.length != 1
+    if session[:alr_bet_type] == 'Couplé gagnant' && session[:alr_formula] == 'Champ total' && @base_numbers.split.length != 2 && !@base_numbers.split.include?('X') && !@base_numbers.split.include?('x')
       flash.now[:error] = "Vous devez choisir 1 numéro"
       status = false
     end
-    if session[:alr_bet_type] == 'Couplé placé' && session[:alr_formula] == 'Champ réduit' && @base_numbers.split.length != 1
+    if session[:alr_bet_type] == 'Couplé placé' && session[:alr_formula] == 'Champ réduit' && @base_numbers.split.length != 2 && !@base_numbers.split.include?('X') && !@base_numbers.split.include?('x')
       flash.now[:error] = "Vous devez choisir 1 numéro"
       status = false
     end
-    if session[:alr_bet_type] == 'Tiercé' && session[:alr_formula] == 'Champ réduit' && @base_numbers.split.length > 2
+    if session[:alr_bet_type] == 'Tiercé' && session[:alr_formula] == 'Champ réduit' && @base_numbers.split.length > 3 && !@base_numbers.split.include?('X')
       flash.now[:error] = "Vous devez choisir au plus 2 numéros"
       status = false
     end
-    if session[:alr_bet_type] == 'Tiercé' && session[:alr_formula] == 'Champ total' && @base_numbers.split.length > 2
+    if session[:alr_bet_type] == 'Tiercé' && session[:alr_formula] == 'Champ total' && @base_numbers.split.length > 3 && !@base_numbers.split.include?('X')
       flash.now[:error] = "Vous devez choisir au plus 2 numéros"
       status = false
     end
-    if session[:alr_bet_type] == 'Quarté' && session[:alr_formula] == 'Champ réduit' && @base_numbers.split.length > 3
+    if session[:alr_bet_type] == 'Quarté' && session[:alr_formula] == 'Champ réduit' && @base_numbers.split.length > 4 && !@base_numbers.split.include?('X')
       flash.now[:error] = "Vous devez choisir au plus 3 numéros"
       status = false
     end
-    if session[:alr_bet_type] == 'Quarté' && session[:alr_formula] == 'Champ total' && @base_numbers.split.length > 3
+    if session[:alr_bet_type] == 'Quarté' && session[:alr_formula] == 'Champ total' && @base_numbers.split.length > 4 && !@base_numbers.split.include?('X')
       flash.now[:error] = "Vous devez choisir au plus 3 numéros"
       status = false
     end
-    if (session[:alr_bet_type] == 'Quinté' || session[:alr_bet_type] == 'Quinté +') && session[:alr_formula] == 'Champ réduit' && @base_numbers.split.length > 4
+    if (session[:alr_bet_type] == 'Quinté' || session[:alr_bet_type] == 'Quinté +') && session[:alr_formula] == 'Champ réduit' && @base_numbers.split.length > 5 && !@base_numbers.split.include?('X')
       flash.now[:error] = "Vous devez choisir au plus 4 numéros"
       status = false
     end
-    if (session[:alr_bet_type] == 'Quinté' || session[:alr_bet_type] == 'Quinté +') && @base_numbers.split.length > 4
+    if (session[:alr_bet_type] == 'Quinté' || session[:alr_bet_type] == 'Quinté +') && @base_numbers.split.length > 5 && !@base_numbers.split.include?('X')
       flash.now[:error] = "Vous devez choisir au plus 4 numéros"
       status = false
     end

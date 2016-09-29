@@ -142,7 +142,15 @@ class HomeController < ApplicationController
         flash.now[:error] = "Une erreur s'est produite"
       else
         if parionsdirect_account["errors"].blank?
-          flash.now[:success] = "Votre compte a été correctement créé."
+          url = Parameter.first.paymoney_url + "/PAYMONEY_WALLET/rest/ussd_create_compte/#{session[:msisdn]}"
+          paymoney_account = RestClient.get(url) rescue nil
+          GenericLog.create(operation: "Create paymoney account", request_log: url, response_log: paymoney_account)
+          paymoney_account = JSON.parse(paymoney_account) rescue nil
+          if paymoney_account["errors"].blank?
+            flash.now[:success] = "Votre compte a été correctement créé."
+          else
+            flash.now[:error] = paymoney_account["errors"].first["message"] rescue nil
+          end
         else
           flash.now[:error] = parionsdirect_account["errors"].first["message"] rescue nil
         end

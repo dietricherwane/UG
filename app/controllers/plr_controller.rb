@@ -143,7 +143,7 @@ class PlrController < ApplicationController
       status = false
     end
     if session[:plr_formula_value] == "Champ réduit"  && @horses_numbers.split.length < 5
-      flash.now[:error] = "Vous pouvez devez sélectionner au moins 5 numéros"
+      flash.now[:error] = "Vous devez sélectionner au moins 5 numéros"
       status = false
     end
 
