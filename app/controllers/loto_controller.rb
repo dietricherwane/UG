@@ -102,7 +102,7 @@ class LotoController < ApplicationController
                     "bet_modifier":"0",
                     "selector1":"#{@selector1}",
                     "selector2":"#{@selector2}",
-                    "repeats":"#{@repeats}",
+                    "repeats":"#{session[:stake]}",
                     "special_entries":"#{@numbers.join(',')}",
                     "normal_entries":"#{@selection.join(',')}",
                     "draw_day":"",
