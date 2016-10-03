@@ -1,5 +1,7 @@
 class UssdTestingController < ApplicationController
 
+  soap_service namespace: 'Ussd:MTN:wsdl'
+
 =begin
   def start_session
     client = Savon.client do
@@ -18,9 +20,10 @@ class UssdTestingController < ApplicationController
     password = 'bmeB500'
     timestamp = DateTime.now.strftime('%Y%m%d%H%M%S')
     sp_password = Digest::MD5.hexdigest(sp_id + password + timestamp)
-    endpoint_url = 'http://41.189.40.193:6564/mtn/ussd/main_menu'
+    endpoint_url = 'http://41.189.40.193:6564/ussd_testing/wsdl'
     correlator_id = Digest::SHA1.hexdigest([DateTime.now.iso8601(6), rand].join).hex.to_s[0..8]
-    shortcode = '*218#'
+    shortcode = '*218'
+    interface_name = 'MainMenu'
 
     request_body = %Q[
       <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:loc="http://www.csapi.org/schema/osg/ussd/notification_manager/v1_0/local">
@@ -36,7 +39,7 @@ class UssdTestingController < ApplicationController
           <loc:startUSSDNotification>
           <loc:reference>
             <endpoint>#{endpoint_url}</endpoint>
-            <interfaceName></interfaceName>
+            <interfaceName>#{interface_name}</interfaceName>
             <correlator>#{correlator_id}</correlator>
           </loc:reference>
           <loc:ussdServiceActivationNumber>#{shortcode}</loc:ussdServiceActivationNumber>
@@ -52,11 +55,15 @@ class UssdTestingController < ApplicationController
     render text: start_session_response.body
   end
 
+  # MainMenu
+  soap_action "MainMenu",
+              :args   => {},
+              :return => :xml
   def main_menu
     result = %Q[
             <?xml version="1.0" encoding="utf-8"?>
             <NGSER>
-              NGSER.
+              NGSER
             </NGSER>
           ]
 
