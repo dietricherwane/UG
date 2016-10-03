@@ -56,12 +56,10 @@ class UssdTestingController < ApplicationController
     render text: start_session_response.body
   end
 
-=begin
   # MainMenu
   soap_action "MainMenu",
-              :args   => {},
+              :args   => :string,
               :return => :xml
-=end
   def main_menu
     result = %Q[
             <?xml version="1.0" encoding="utf-8"?>
