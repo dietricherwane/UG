@@ -59,3 +59,5 @@ Get UUID
 ]
 
 /ail/loto/ussd/064482ec4/gamer/bets/list/:msisdn
+
+Please replace `include WashOut::SOAP` with `soap_service`
