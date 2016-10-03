@@ -20,7 +20,7 @@ class UssdTestingController < ApplicationController
     password = 'bmeB500'
     timestamp = DateTime.now.strftime('%Y%m%d%H%M%S')
     sp_password = Digest::MD5.hexdigest(sp_id + password + timestamp)
-    endpoint_url = 'http://195.14.0.128:6564/ussd_testing/wsdl'
+    endpoint_url = 'http://195.14.0.128:6564/mtn/ussd/main_menu'
     #endpoint_url = 'http://41.189.40.193:6564/ussd_testing/wsdl'
     correlator_id = Digest::SHA1.hexdigest([DateTime.now.iso8601(6), rand].join).hex.to_s[0..8]
     shortcode = '*218'
@@ -60,6 +60,7 @@ class UssdTestingController < ApplicationController
   soap_action "MainMenu",
               :args   => :string,
               :return => :xml
+=end
   def main_menu
     result = %Q[
             <?xml version="1.0" encoding="utf-8"?>
@@ -70,5 +71,5 @@ class UssdTestingController < ApplicationController
 
     render :xml => result
   end
-=end
+
 end
