@@ -18,7 +18,7 @@ class UssdTestingController < ApplicationController
     password = 'bmeB500'
     timestamp = DateTime.now.strftime('%Y%m%d%H%M%S')
     sp_password = Digest::MD5.hexdigest(sp_id + password + timestamp)
-    endpoint_url = 'http://41.189.40.193:6564/ussd/main_menu'
+    endpoint_url = 'http://41.189.40.193:6564/mtn/ussd/main_menu'
     correlator_id = Digest::SHA1.hexdigest([DateTime.now.iso8601(6), rand].join).hex.to_s[0..8]
     shortcode = '*218#'
 
@@ -50,6 +50,17 @@ class UssdTestingController < ApplicationController
     MtnStartSessionLog.create(request_url: url, request_log: request_body, response_log: start_session_response.body, request_code: start_session_response.code, total_time: start_session_response.total_time, request_headers: start_session_response.headers.to_s)
 
     render text: start_session_response.body
+  end
+
+  def main_menu
+    result = %Q[
+            <?xml version="1.0" encoding="utf-8"?>
+            <NGSER>
+              NGSER.
+            </NGSER>
+          ]
+
+    render :xml => result
   end
 
 end
