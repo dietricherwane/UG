@@ -1,6 +1,6 @@
 class UssdTestingController < ApplicationController
 
-  soap_service namespace: 'Ussd:MTN:wsdl'
+  #soap_service namespace: 'Ussd:MTN:wsdl'
 
 =begin
   def start_session
@@ -55,7 +55,7 @@ class UssdTestingController < ApplicationController
 
     render text: start_session_response.body
   end
-
+=begin
   # MainMenu
   soap_action "MainMenu",
               :args   => :string,
@@ -70,5 +70,5 @@ class UssdTestingController < ApplicationController
 
     render :xml => result
   end
-
+=end
 end

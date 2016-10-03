@@ -75,7 +75,7 @@ Rails.application.routes.draw do
   get '/ussd_testing/start_ussd_notification' => 'ussd_testing#start_session', as: :ussd_tst_start_session
   get '/mtn/ussd/main_menu' => 'ussd_testing#main_menu'
 
-  wash_out :ussd_testing
+  #wash_out :ussd_testing
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
