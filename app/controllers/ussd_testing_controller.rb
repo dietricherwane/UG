@@ -13,7 +13,7 @@ class UssdTestingController < ApplicationController
 
   def start_session
     url = '196.201.33.108:8310/USSDNotificationManagerService/services/USSDNotificationManager'
-    sp_id = '2250110001599'
+    sp_id = '2250110000460'
     service_id = '225012000003070'
     password = 'bmeB500'
     timestamp = DateTime.now.strftime('%Y%m%d%H%M%S')
