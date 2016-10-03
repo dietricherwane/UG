@@ -71,6 +71,12 @@ Rails.application.routes.draw do
   # SPORTCASH
   get '/sportcash/list_bets' => 'sportcash#list_bets', as: :sportcash_bets
 
+  # Ussd testing
+  get '/ussd_testing/start_ussd_notification' => 'ussd_testing#start_session', as: :ussd_tst_start_session
+
+  # MTN ussd
+  #wash_out :rumbas
+
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160820195509) do
+ActiveRecord::Schema.define(version: 20161003081913) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -44,6 +44,17 @@ ActiveRecord::Schema.define(version: 20160820195509) do
     t.string   "drawing"
     t.string   "bet"
     t.string   "formula"
+  end
+
+  create_table "mtn_start_session_logs", force: true do |t|
+    t.text     "request_log"
+    t.text     "response_log"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.string   "request_code"
+    t.string   "total_time"
+    t.text     "request_headers"
+    t.string   "request_url"
   end
 
   create_table "parameters", force: true do |t|
