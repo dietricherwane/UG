@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161004164917) do
+ActiveRecord::Schema.define(version: 20161004173640) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -81,6 +81,7 @@ ActiveRecord::Schema.define(version: 20161004164917) do
     t.string   "received_parmeters"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.text     "received_parameters"
   end
 
 end
