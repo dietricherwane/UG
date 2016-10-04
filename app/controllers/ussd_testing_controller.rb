@@ -126,8 +126,9 @@ class UssdTestingController < ApplicationController
               :return => :xml
 =end
   def main_menu
+    UssdReceptionLog.create(received_parameters: params)
     result = %Q[
-            <?xml version="1.0" encoding="utf-8" ?><soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><soapenv:Body><ns1:startUSSDNotificationResponse xmlns:ns1="http://www.csapi.org/schema/osg/ussd/notification_manager/v1_0/local"></ns1:startUSSDNotificationResponse></soapenv:Body></soapenv:Envelope>
+            <?xml version="1.0" encoding="utf-8" ?><soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><soapenv:Body></soapenv:Body></soapenv:Envelope>
           ]
 
     render :xml => result
