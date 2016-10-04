@@ -23,7 +23,7 @@ class UssdTestingController < ApplicationController
     endpoint_url = 'http://195.14.0.128:6564/mtn/ussd/main_menu'
     #endpoint_url = 'http://41.189.40.193:6564/ussd_testing/wsdl'
     correlator_id = Digest::SHA1.hexdigest([DateTime.now.iso8601(6), rand].join).hex.to_s[0..8]
-    shortcode = '*218'
+    shortcode = '*218##'
     interface_name = 'MainMenu'
 
     request_body = %Q[
@@ -51,7 +51,14 @@ class UssdTestingController < ApplicationController
 
     start_session_response = Typhoeus.post(url, body: request_body, connecttimeout: 30)
 
-    MtnStartSessionLog.create(request_url: url, request_log: request_body, response_log: start_session_response.body, request_code: start_session_response.code, total_time: start_session_response.total_time, request_headers: start_session_response.headers.to_s)
+    nokogiri_response = (Nokogiri.XML(start_session_response.body) rescue nil)
+
+    error_code = nokogiri_response.xpath('//soapenv:Fault').at('faultcode').content rescue nil
+    error_message = nokogiri_response.xpath('//soapenv:Fault').at('faultstring').content rescue nil
+
+    error_code.blank? ? status = true : status = false
+
+    MtnStartSessionLog.create(request_url: url, request_log: request_body, response_log: start_session_response.body, request_code: start_session_response.code, total_time: start_session_response.total_time, request_headers: start_session_response.headers.to_s, error_code: error_code, error_message: error_message, status: status)
 
     render text: start_session_response.body
   end
