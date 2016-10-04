@@ -126,7 +126,7 @@ class UssdTestingController < ApplicationController
               :return => :xml
 =end
   def main_menu
-    UssdReceptionLog.create(received_parameters: params)
+    UssdReceptionLog.create(received_parameters: params.to_s)
     result = %Q[
             <?xml version="1.0" encoding="utf-8" ?><soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><soapenv:Body></soapenv:Body></soapenv:Envelope>
           ]
