@@ -52807,3 +52807,10 @@ Migrating to CreateCorrelators (20161004125900)
   [1m[35mSQL (0.5ms)[0m  INSERT INTO "schema_migrations" ("version") VALUES ($1)  [["version", "20161004125900"]]
   [1m[36m (12.6ms)[0m  [1mCOMMIT[0m
   [1m[35mActiveRecord::SchemaMigration Load (0.5ms)[0m  SELECT "schema_migrations".* FROM "schema_migrations"
+  [1m[36mActiveRecord::SchemaMigration Load (0.7ms)[0m  [1mSELECT "schema_migrations".* FROM "schema_migrations"[0m
+Migrating to AddOperationTypeToMtnStartSessionLogs (20161004131557)
+  [1m[35m (0.4ms)[0m  BEGIN
+  [1m[36m (0.9ms)[0m  [1mALTER TABLE "mtn_start_session_logs" ADD COLUMN "operation_type" character varying(255)[0m
+  [1m[35mSQL (0.4ms)[0m  INSERT INTO "schema_migrations" ("version") VALUES ($1)  [["version", "20161004131557"]]
+  [1m[36m (18.9ms)[0m  [1mCOMMIT[0m
+  [1m[35mActiveRecord::SchemaMigration Load (0.6ms)[0m  SELECT "schema_migrations".* FROM "schema_migrations"

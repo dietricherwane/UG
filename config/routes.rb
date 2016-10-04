@@ -72,6 +72,7 @@ Rails.application.routes.draw do
 
   # Ussd testing
   get '/ussd_testing/start_ussd_notification' => 'ussd_testing#start_session', as: :ussd_tst_start_session
+  get '/ussd_testing/stop_ussd_notification' => 'ussd_testing#stop_session', as: :ussd_tst_stop_session
   get '/mtn/ussd/main_menu' => 'ussd_testing#main_menu'
 
   #wash_out :ussd_testing
