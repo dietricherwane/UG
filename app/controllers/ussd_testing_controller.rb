@@ -56,9 +56,14 @@ class UssdTestingController < ApplicationController
     error_code = nokogiri_response.xpath('//soapenv:Fault').at('faultcode').content rescue nil
     error_message = nokogiri_response.xpath('//soapenv:Fault').at('faultstring').content rescue nil
 
-    error_code.blank? ? status = true : status = false
+    if error_code.blank?
+      status = true
+      Correlator.first.update_attributes(correlator_id: correlator_id) || Correlator.create(correlator_id: correlator_id)
+    else
+      status = false
+    end
 
-    MtnStartSessionLog.create(request_url: url, request_log: request_body, response_log: start_session_response.body, request_code: start_session_response.code, total_time: start_session_response.total_time, request_headers: start_session_response.headers.to_s, error_code: error_code, error_message: error_message, status: status)
+    MtnStartSessionLog.create(request_url: url, request_log: request_body, response_log: start_session_response.body, request_code: start_session_response.code, total_time: start_session_response.total_time, request_headers: start_session_response.headers.to_s, error_code: error_code, error_message: error_message, status: status, correlator_id: correlator_id)
 
     render text: start_session_response.body
   end

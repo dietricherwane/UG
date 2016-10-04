@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161004090034) do
+ActiveRecord::Schema.define(version: 20161004125900) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -19,6 +19,12 @@ ActiveRecord::Schema.define(version: 20161004090034) do
   create_table "account_profiles", force: true do |t|
     t.string   "msisdn"
     t.string   "paymoney_account_number"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "correlators", force: true do |t|
+    t.string   "correlator_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -58,6 +64,7 @@ ActiveRecord::Schema.define(version: 20161004090034) do
     t.string   "error_code"
     t.text     "error_message"
     t.boolean  "status"
+    t.string   "correlator_id"
   end
 
   create_table "parameters", force: true do |t|
