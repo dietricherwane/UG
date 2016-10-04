@@ -1,7 +1,4 @@
 Rails.application.routes.draw do
-
-  get 'add_status_to_mtn_start_session_logs/status:boolean'
-
   root 'home#get_msisdn'
 
   post '/main_menu' => 'home#index', as: :main_menu
