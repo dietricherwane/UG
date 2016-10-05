@@ -157,7 +157,7 @@ class UssdTestingController < ApplicationController
   end
 
   def c_main_menu_parse_xml
-    if @received_body.blank?
+    if @raw_body.blank? || @received_body.blank?
       @error_code = 'NURR_1'
       @error_message = "Le document XML fourni n'est pas valide"
     end
