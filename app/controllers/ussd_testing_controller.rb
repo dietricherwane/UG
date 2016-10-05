@@ -118,27 +118,137 @@ class UssdTestingController < ApplicationController
     render text: stop_session_response.body
   end
 
-
-=begin
-  # MainMenu
-  soap_action "MainMenu",
-              :args   => :string,
-              :return => :xml
-=end
   def main_menu
-    UssdReceptionLog.create(received_parameters: request.body.read rescue nil)
+    @raw_body = request.body.read rescue nil
+    @received_body = (Nokogiri.XML(@raw_body) rescue nil)
+    @error_code = '0'
+    @error_message = ''
+
+    c_main_menu_parse_xml
+
+    if @error_code.blank?
+      main_menu_parse_xml
+
+      c_main_menu_check_sp_id
+      c_main_menu_check_service_id
+      c_main_menu_check_unique_id
+      c_main_menu_check_msg_type
+      c_main_menu_check_sender_cb
+      c_main_menu_check_receive_cb
+      c_main_menu_check_ussd_op_type
+      c_main_menu_check_msisdn
+      c_main_menu_check_service_code
+      c_main_menu_check_ussd_string
+    end
+
+    UssdReceptionLog.create(received_parameters: @raw_body)
     result = %Q[
             <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:loc="http://www.csapi.org/schema/parlayx/ussd/notification/v1_0/local">
               <soapenv:Header/>
               <soapenv:Body>
                 <loc:notifyUssdReceptionResponse>
-                  <loc:result>0</loc:result>
+                  <loc:result>#{@error_code}</loc:result>
                 </loc:notifyUssdReceptionResponse>
               </soapenv:Body>
             </soapenv:Envelope>
           ]
 
     render :xml => result
+  end
+
+  def c_main_menu_parse_xml
+    if @received_body.blank?
+      @error_code = 'NURR_1'
+      @error_message = "Le document XML fourni n'est pas valide"
+    end
+  end
+
+  def c_main_menu_check_sp_id
+    if @sp_id != '2250110000460'
+      @error_code = 'NURR_2'
+      @error_message = "Le spId n'est pas valide"
+    end
+  end
+
+  def c_main_menu_check_service_id
+    if @service_id != '225012000003070'
+      @error_code = 'NURR_3'
+      @error_message = "Le serviceId n'est pas valide"
+    end
+  end
+
+  def c_main_menu_check_unique_id
+    if @unique_id.blank?
+      @error_code = 'NURR_4'
+      @error_message = "Le traceUniqueID est vide"
+    end
+  end
+
+  def c_main_menu_check_msg_type
+    if !['0', '1', '2'].include?(@msg_type)
+      @error_code = 'NURR_5'
+      @error_message = "Le msgType n'est pas valide"
+    end
+  end
+
+  def c_main_menu_check_sender_cb
+    if @sender_cb.blank?
+      @error_code = 'NURR_6'
+      @error_message = "Le senderCB est vide"
+    end
+  end
+
+  def c_main_menu_check_receive_cb
+    if @sender_cb.blank?
+      @error_code = 'NURR_7'
+      @error_message = "Le receiveCB est vide"
+    end
+  end
+
+  def c_main_menu_check_ussd_op_type
+    if !['1', '2', '3', '4'].include?(@ussd_op_type)
+      @error_code = 'NURR_8'
+      @error_message = "Le ussdOpType n'est pas valide"
+    end
+  end
+
+  def c_main_menu_check_msisdn
+    if @msisdn.blank?
+      @error_code = 'NURR_9'
+      @error_message = "Le msIsdn est vide"
+    end
+  end
+
+  def c_main_menu_check_service_code
+    if @service_code.blank?
+      @error_code = 'NURR_10'
+      @error_message = "Le serviceCode est vide"
+    end
+  end
+
+  def c_main_menu_check_ussd_string
+    if @ussd_string.blank?
+      @error_code = 'NURR_11'
+      @error_message = "Le serviceCode est vide"
+    end
+  end
+
+  def main_menu_parse_xml
+    @rev_id = nokogiri_response.xpath('//ns1:NotifySOAPHeader').at('ns1:spRevId').content rescue nil
+    @rev_password = nokogiri_response.xpath('//ns1:NotifySOAPHeader').at('ns1:spRevpassword').content rescue nil
+    @sp_id = nokogiri_response.xpath('//ns1:NotifySOAPHeader').at('ns1:spId').content rescue nil
+    @service_id = nokogiri_response.xpath('//ns1:NotifySOAPHeader').at('ns1:serviceId').content rescue nil
+    @timestamp = nokogiri_response.xpath('//ns1:NotifySOAPHeader').at('ns1:timeStamp').content rescue nil
+    @unique_id = nokogiri_response.xpath('//ns1:NotifySOAPHeader').at('ns1:traceUniqueID').content rescue nil
+
+    @msg_type = nokogiri_response.xpath('//ns2:notifyUssdReception').at('ns2:msgType').content rescue nil
+    @sender_cb = nokogiri_response.xpath('//ns2:notifyUssdReception').at('ns2:senderCB').content rescue nil
+    @receive_cb = nokogiri_response.xpath('//ns2:notifyUssdReception').at('ns2:receiveCB').content rescue nil
+    @ussd_op_type = nokogiri_response.xpath('//ns2:notifyUssdReception').at('ns2:ussdOpType').content rescue nil
+    @msisdn = nokogiri_response.xpath('//ns2:notifyUssdReception').at('ns2:msIsdn').content rescue nil
+    @service_code = nokogiri_response.xpath('//ns2:notifyUssdReception').at('ns2:serviceCode').content rescue nil
+    @code_scheme = nokogiri_response.xpath('//ns2:notifyUssdReception').at('ns2:codeScheme').content rescue nil
+    @ussd_string = nokogiri_response.xpath('//ns2:notifyUssdReception').at('ns2:ussdString').content rescue nil
   end
 
 end

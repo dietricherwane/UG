@@ -52828,3 +52828,27 @@ Migrating to AddReceivedParametersToUssdReceptionLogs (20161004173640)
   [1m[35mSQL (0.9ms)[0m  INSERT INTO "schema_migrations" ("version") VALUES ($1)  [["version", "20161004173640"]]
   [1m[36m (21.9ms)[0m  [1mCOMMIT[0m
   [1m[35mActiveRecord::SchemaMigration Load (0.7ms)[0m  SELECT "schema_migrations".* FROM "schema_migrations"
+  [1m[36mActiveRecord::SchemaMigration Load (30.4ms)[0m  [1mSELECT "schema_migrations".* FROM "schema_migrations"[0m
+Migrating to AddFieldsToUssdReceptionLogs (20161005023339)
+  [1m[35m (0.5ms)[0m  BEGIN
+  [1m[36m (93.3ms)[0m  [1mALTER TABLE "ussd_reception_logs" ADD COLUMN "rev_id" character varying(255)[0m
+  [1m[35m (1.1ms)[0m  ALTER TABLE "ussd_reception_logs" ADD COLUMN "rev_password" character varying(255)
+  [1m[36m (0.7ms)[0m  [1mALTER TABLE "ussd_reception_logs" ADD COLUMN "sp_id" character varying(255)[0m
+  [1m[35m (0.7ms)[0m  ALTER TABLE "ussd_reception_logs" ADD COLUMN "service_id" character varying(255)
+  [1m[36m (0.7ms)[0m  [1mALTER TABLE "ussd_reception_logs" ADD COLUMN "timestamp" character varying(255)[0m
+  [1m[35m (0.7ms)[0m  ALTER TABLE "ussd_reception_logs" ADD COLUMN "trace_unique_id" character varying(255)
+  [1m[36m (0.7ms)[0m  [1mALTER TABLE "ussd_reception_logs" ADD COLUMN "msg_type" character varying(255)[0m
+  [1m[35m (0.7ms)[0m  ALTER TABLE "ussd_reception_logs" ADD COLUMN "sender_cb" character varying(255)
+  [1m[36m (0.7ms)[0m  [1mALTER TABLE "ussd_reception_logs" ADD COLUMN "receiver_cb" character varying(255)[0m
+  [1m[35m (0.8ms)[0m  ALTER TABLE "ussd_reception_logs" ADD COLUMN "ussd_of_type" character varying(255)
+  [1m[36m (0.8ms)[0m  [1mALTER TABLE "ussd_reception_logs" ADD COLUMN "msisdn" character varying(255)[0m
+  [1m[35m (0.8ms)[0m  ALTER TABLE "ussd_reception_logs" ADD COLUMN "service_code" character varying(255)
+  [1m[36m (0.6ms)[0m  [1mALTER TABLE "ussd_reception_logs" ADD COLUMN "code_scheme" character varying(255)[0m
+  [1m[35m (0.7ms)[0m  ALTER TABLE "ussd_reception_logs" ADD COLUMN "ussd_string" character varying(255)
+  [1m[36m (0.8ms)[0m  [1mALTER TABLE "ussd_reception_logs" ADD COLUMN "error_code" character varying(255)[0m
+  [1m[35m (0.7ms)[0m  ALTER TABLE "ussd_reception_logs" ADD COLUMN "error_message" character varying(255)
+  [1m[36m (0.6ms)[0m  [1mALTER TABLE "ussd_reception_logs" ADD COLUMN "status" boolean[0m
+  [1m[35m (0.6ms)[0m  ALTER TABLE "ussd_reception_logs" ADD COLUMN "remote_ip" character varying(255)
+  [1m[36mSQL (0.7ms)[0m  [1mINSERT INTO "schema_migrations" ("version") VALUES ($1)[0m  [["version", "20161005023339"]]
+  [1m[35m (23.3ms)[0m  COMMIT
+  [1m[36mActiveRecord::SchemaMigration Load (0.7ms)[0m  [1mSELECT "schema_migrations".* FROM "schema_migrations"[0m

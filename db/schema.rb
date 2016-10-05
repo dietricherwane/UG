@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161004173640) do
+ActiveRecord::Schema.define(version: 20161005023339) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -82,6 +82,24 @@ ActiveRecord::Schema.define(version: 20161004173640) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.text     "received_parameters"
+    t.string   "rev_id"
+    t.string   "rev_password"
+    t.string   "sp_id"
+    t.string   "service_id"
+    t.string   "timestamp"
+    t.string   "trace_unique_id"
+    t.string   "msg_type"
+    t.string   "sender_cb"
+    t.string   "receiver_cb"
+    t.string   "ussd_of_type"
+    t.string   "msisdn"
+    t.string   "service_code"
+    t.string   "code_scheme"
+    t.string   "ussd_string"
+    t.string   "error_code"
+    t.string   "error_message"
+    t.boolean  "status"
+    t.string   "remote_ip"
   end
 
 end
