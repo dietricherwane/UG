@@ -126,7 +126,7 @@ class UssdTestingController < ApplicationController
               :return => :xml
 =end
   def main_menu
-    UssdReceptionLog.create(received_parameters: params.to_s)
+    UssdReceptionLog.create(received_parameters: request.body.read rescue nil)
     result = %Q[
             <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:loc="http://www.csapi.org/schema/parlayx/ussd/notification/v1_0/local">
               <soapenv:Header/>
