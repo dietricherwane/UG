@@ -1,7 +1,7 @@
 class ApplicationController < ActionController::Base
   # Prevent CSRF attacks by raising an exception.
   # For APIs, you may want to use :null_session instead.
-  protect_from_forgery with: :exception
+  protect_from_forgery with: :null_session
 
   def not_a_phone_number?(n)
   	(n.to_s.match(/\A[+-]?\d+?(\.\d+)?\Z/) == nil || n.to_s.length != 8) ? true : false
