@@ -153,6 +153,8 @@ class UssdTestingController < ApplicationController
             </soapenv:Envelope>
           ]
 
+    send_ussd
+
     render :xml => result
   end
 
@@ -249,6 +251,79 @@ class UssdTestingController < ApplicationController
     @service_code = nokogiri_response.xpath('//ns2:notifyUssdReception').at('ns2:serviceCode').content rescue nil
     @code_scheme = nokogiri_response.xpath('//ns2:notifyUssdReception').at('ns2:codeScheme').content rescue nil
     @ussd_string = nokogiri_response.xpath('//ns2:notifyUssdReception').at('ns2:ussdString').content rescue nil
+  end
+
+  def send_ussd
+    url = '196.201.33.108:8310/SendUssdService/services/SendUssd'
+    sp_id = '2250110000460'
+    service_id = '225012000003070'
+    password = 'bmeB500'
+    timestamp = DateTime.now.strftime('%Y%m%d%H%M%S')
+    sp_password = Digest::MD5.hexdigest(sp_id + password + timestamp)
+    oa = @msisdn
+    fa = @msisdn
+    link_id = ''
+    present_id = ''
+    msg_type = '0'
+    receive_cb = '0XFFFFFFFF'
+    sender_cb = Digest::SHA1.hexdigest([DateTime.now.iso8601(6), rand].join).hex.to_s[0..7]
+    ussd_op_type = '1'
+    msisdn = @msisdn
+    service_code = '218'
+    code_scheme = '15'
+    ussd_string = %Q[
+      1- Jeux
+      2- Mes paris
+      3- Mon solde
+      4- Rechargement
+      5- Votre service SMS
+      6- Mes OTP - codes retraits
+      7- Mes comptes
+    ]
+    endpoint = ''
+    extenionInfo = ''
+
+    request_body = %Q[
+      <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:loc="http://www.csapi.org/schema/parlayx/ussd/send/v1_0/local">
+        <soapenv:Header>
+          <tns:RequestSOAPHeader xmlns:tns="http://www.huawei.com.cn/schema/common/v2_1">
+            <tns:spId>#{sp_id}</tns:spId>
+            <tns:spPassword>#{password}</tns:spPassword>
+            <tns:bundleID>256000039</tns:bundleID>
+            <tns:timeStamp>#{timestamp}</tns:timeStamp>
+            <tns:OA>#{oa}</tns:OA>
+            <tns:FA>#{fa}</tns:FA>
+          </tns:RequestSOAPHeader>
+        </soapenv:Header>
+        <soapenv:Body>
+          <loc:sendUssd>
+          <loc:msgType>0</loc:msgType>
+          <loc:senderCB>306909975</loc:senderCB>
+          <loc:receiveCB/>
+          <loc:ussdOpType>1</loc:ussdOpType>
+          <loc:msIsdn>#{@msisdn}</loc:msIsdn>
+          <loc:serviceCode>#{service_code}</loc:serviceCode>
+          <loc:codeScheme>#{code_scheme}</loc:codeScheme>
+          <loc:ussdString>#{ussd_string}</loc:ussdString>
+          </loc:sendUssd>
+        </soapenv:Body>
+      </soapenv:Envelope>
+    ]
+
+    send_ussd_response = Typhoeus.post(url, body: request_body, connecttimeout: 30)
+
+    nokogiri_response = (Nokogiri.XML(send_ussd_response.body) rescue nil)
+
+    error_code = nokogiri_response.xpath('//soapenv:Fault').at('faultcode').content rescue nil
+    error_message = nokogiri_response.xpath('//soapenv:Fault').at('faultstring').content rescue nil
+
+    if error_code.blank?
+      status = true
+    else
+      status = false
+    end
+
+    MtnStartSessionLog.create(operation_type: "Send ussd", request_url: url, request_log: request_body, response_log: send_ussd_response.body, request_code: send_ussd_response.code, total_time: send_ussd_response.total_time, request_headers: send_ussd_response.headers.to_s, error_code: error_code, error_message: error_message, status: status)
   end
 
 end
