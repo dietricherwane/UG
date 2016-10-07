@@ -288,11 +288,11 @@ class UssdTestingController < ApplicationController
         <soapenv:Header>
           <tns:RequestSOAPHeader xmlns:tns="http://www.huawei.com.cn/schema/common/v2_1">
             <tns:spId>#{sp_id}</tns:spId>
-            <tns:spPassword>#{password}</tns:spPassword>
-            <tns:bundleID>256000039</tns:bundleID>
+            <tns:spPassword>#{sp_password}</tns:spPassword>
+            <tns:bundleID></tns:bundleID>
             <tns:timeStamp>#{timestamp}</tns:timeStamp>
-            <tns:OA>#{oa}</tns:OA>
-            <tns:FA>#{fa}</tns:FA>
+            <tns:OA>#{@msisdn}</tns:OA>
+            <tns:FA>#{@msisdn}</tns:FA>
           </tns:RequestSOAPHeader>
         </soapenv:Header>
         <soapenv:Body>
