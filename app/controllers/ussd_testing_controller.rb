@@ -236,21 +236,21 @@ class UssdTestingController < ApplicationController
   end
 
   def main_menu_parse_xml
-    @rev_id = nokogiri_response.xpath('//ns1:NotifySOAPHeader').at('ns1:spRevId').content rescue nil
-    @rev_password = nokogiri_response.xpath('//ns1:NotifySOAPHeader').at('ns1:spRevpassword').content rescue nil
-    @sp_id = nokogiri_response.xpath('//ns1:NotifySOAPHeader').at('ns1:spId').content rescue nil
-    @service_id = nokogiri_response.xpath('//ns1:NotifySOAPHeader').at('ns1:serviceId').content rescue nil
-    @timestamp = nokogiri_response.xpath('//ns1:NotifySOAPHeader').at('ns1:timeStamp').content rescue nil
-    @unique_id = nokogiri_response.xpath('//ns1:NotifySOAPHeader').at('ns1:traceUniqueID').content rescue nil
+    @rev_id = @received_body.xpath('//ns1:NotifySOAPHeader').at('ns1:spRevId').content rescue nil
+    @rev_password = @received_body.xpath('//ns1:NotifySOAPHeader').at('ns1:spRevpassword').content rescue nil
+    @sp_id = @received_body.xpath('//ns1:NotifySOAPHeader').at('ns1:spId').content rescue nil
+    @service_id = @received_body.xpath('//ns1:NotifySOAPHeader').at('ns1:serviceId').content rescue nil
+    @timestamp = @received_body.xpath('//ns1:NotifySOAPHeader').at('ns1:timeStamp').content rescue nil
+    @unique_id = @received_body.xpath('//ns1:NotifySOAPHeader').at('ns1:traceUniqueID').content rescue nil
 
-    @msg_type = nokogiri_response.xpath('//ns2:notifyUssdReception').at('ns2:msgType').content rescue nil
-    @sender_cb = nokogiri_response.xpath('//ns2:notifyUssdReception').at('ns2:senderCB').content rescue nil
-    @receive_cb = nokogiri_response.xpath('//ns2:notifyUssdReception').at('ns2:receiveCB').content rescue nil
-    @ussd_op_type = nokogiri_response.xpath('//ns2:notifyUssdReception').at('ns2:ussdOpType').content rescue nil
-    @msisdn = nokogiri_response.xpath('//ns2:notifyUssdReception').at('ns2:msIsdn').content rescue nil
-    @service_code = nokogiri_response.xpath('//ns2:notifyUssdReception').at('ns2:serviceCode').content rescue nil
-    @code_scheme = nokogiri_response.xpath('//ns2:notifyUssdReception').at('ns2:codeScheme').content rescue nil
-    @ussd_string = nokogiri_response.xpath('//ns2:notifyUssdReception').at('ns2:ussdString').content rescue nil
+    @msg_type = @received_body.xpath('//ns2:notifyUssdReception').at('ns2:msgType').content rescue nil
+    @sender_cb = @received_body.xpath('//ns2:notifyUssdReception').at('ns2:senderCB').content rescue nil
+    @receive_cb = @received_body.xpath('//ns2:notifyUssdReception').at('ns2:receiveCB').content rescue nil
+    @ussd_op_type = @received_body.xpath('//ns2:notifyUssdReception').at('ns2:ussdOpType').content rescue nil
+    @msisdn = @received_body.xpath('//ns2:notifyUssdReception').at('ns2:msIsdn').content rescue nil
+    @service_code = @received_body.xpath('//ns2:notifyUssdReception').at('ns2:serviceCode').content rescue nil
+    @code_scheme = @received_body.xpath('//ns2:notifyUssdReception').at('ns2:codeScheme').content rescue nil
+    @ussd_string = @received_body.xpath('//ns2:notifyUssdReception').at('ns2:ussdString').content rescue nil
   end
 
   def send_ussd
@@ -297,14 +297,14 @@ class UssdTestingController < ApplicationController
         </soapenv:Header>
         <soapenv:Body>
           <loc:sendUssd>
-          <loc:msgType>0</loc:msgType>
-          <loc:senderCB>306909975</loc:senderCB>
-          <loc:receiveCB/>
-          <loc:ussdOpType>1</loc:ussdOpType>
-          <loc:msIsdn>#{@msisdn}</loc:msIsdn>
-          <loc:serviceCode>#{service_code}</loc:serviceCode>
-          <loc:codeScheme>#{code_scheme}</loc:codeScheme>
-          <loc:ussdString>#{ussd_string}</loc:ussdString>
+            <loc:msgType>0</loc:msgType>
+            <loc:senderCB>306909975</loc:senderCB>
+            <loc:receiveCB/>
+            <loc:ussdOpType>1</loc:ussdOpType>
+            <loc:msIsdn>#{@msisdn}</loc:msIsdn>
+            <loc:serviceCode>#{service_code}</loc:serviceCode>
+            <loc:codeScheme>#{code_scheme}</loc:codeScheme>
+            <loc:ussdString>#{ussd_string}</loc:ussdString>
           </loc:sendUssd>
         </soapenv:Body>
       </soapenv:Envelope>
