@@ -155,7 +155,7 @@ class UssdTestingController < ApplicationController
             </soapenv:Envelope>
           ]
 
-    send_ussd(@msisdn)
+    send_ussd(@msisdn, @sender_cb)
 
     render :xml => result
   end
@@ -299,8 +299,8 @@ class UssdTestingController < ApplicationController
         <soapenv:Body>
           <loc:sendUssd>
             <loc:msgType>0</loc:msgType>
-            <loc:senderCB>#{@sender_cb}</loc:senderCB>
-            <loc:receiveCB>#{@receive_cb}<loc:receiveCB/>
+            <loc:senderCB>#{sender_cb}</loc:senderCB>
+            <loc:receiveCB>#{@sender_cb}</loc:receiveCB>
             <loc:ussdOpType>1</loc:ussdOpType>
             <loc:msIsdn>#{msisdn}</loc:msIsdn>
             <loc:serviceCode>#{service_code}</loc:serviceCode>
