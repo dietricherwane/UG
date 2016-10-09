@@ -299,8 +299,8 @@ class UssdTestingController < ApplicationController
         <soapenv:Body>
           <loc:sendUssd>
             <loc:msgType>0</loc:msgType>
-            <loc:senderCB>306909975</loc:senderCB>
-            <loc:receiveCB/>
+            <loc:senderCB>#{@sender_cb}</loc:senderCB>
+            <loc:receiveCB>#{@receive_cb}<loc:receiveCB/>
             <loc:ussdOpType>1</loc:ussdOpType>
             <loc:msIsdn>#{msisdn}</loc:msIsdn>
             <loc:serviceCode>#{service_code}</loc:serviceCode>
