@@ -255,7 +255,7 @@ class UssdTestingController < ApplicationController
     end
   end
 
-  def send_ussd(msisdn)
+  def send_ussd(msisdn, receive_cb)
     url = '196.201.33.108:8310/SendUssdService/services/SendUssd'
     sp_id = '2250110000460'
     service_id = '225012000003070'
@@ -267,7 +267,6 @@ class UssdTestingController < ApplicationController
     link_id = ''
     present_id = ''
     msg_type = '0'
-    receive_cb = '0XFFFFFFFF'
     sender_cb = Digest::SHA1.hexdigest([DateTime.now.iso8601(6), rand].join).hex.to_s[0..7]
     ussd_op_type = '1'
     service_code = '218'
@@ -300,7 +299,7 @@ class UssdTestingController < ApplicationController
           <loc:sendUssd>
             <loc:msgType>0</loc:msgType>
             <loc:senderCB>#{sender_cb}</loc:senderCB>
-            <loc:receiveCB>#{@sender_cb}</loc:receiveCB>
+            <loc:receiveCB>#{receive_cb}</loc:receiveCB>
             <loc:ussdOpType>1</loc:ussdOpType>
             <loc:msIsdn>#{msisdn}</loc:msIsdn>
             <loc:serviceCode>#{service_code}</loc:serviceCode>
