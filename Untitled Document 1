@@ -61,3 +61,63 @@ Get UUID
 /ail/loto/ussd/064482ec4/gamer/bets/list/:msisdn
 
 Please replace `include WashOut::SOAP` with `soap_service`
+
+
+<?xml version="1.0" encoding="utf-8" ?><soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <soapenv:Header>
+    <ns1:NotifySOAPHeader xmlns:ns1="http://www.huawei.com.cn/schema/common/v2_1">
+    <ns1:spId>2250110000460</ns1:spId>
+    <ns1:serviceId>225012000003070</ns1:serviceId>
+    <ns1:timeStamp>20161008183634</ns1:timeStamp>
+    <ns1:linkid>08183632075504144321</ns1:linkid>
+    <ns1:traceUniqueID>404092404991610081836324180004</ns1:traceUniqueID>
+    <ns1:OperatorID>22501</ns1:OperatorID>
+    </ns1:NotifySOAPHeader>
+  </soapenv:Header>
+  <soapenv:Body>
+    <ns2:notifyUssdReception xmlns:ns2="http://www.csapi.org/schema/parlayx/ussd/notification/v1_0/local">
+      <ns2:msgType>0</ns2:msgType>
+      <ns2:senderCB>350842918</ns2:senderCB>
+      <ns2:receiveCB>FFFFFFFF</ns2:receiveCB>
+      <ns2:ussdOpType>1</ns2:ussdOpType>
+      <ns2:msIsdn>22544447310</ns2:msIsdn>
+      <ns2:serviceCode>218</ns2:serviceCode>
+      <ns2:codeScheme>15</ns2:codeScheme>
+      <ns2:ussdString>*218#612051430126481#22544447310#22505987003#</ns2:ussdString>
+    </ns2:notifyUssdReception>
+  </soapenv:Body>
+</soapenv:Envelope>
+
+
+      <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:loc="http://www.csapi.org/schema/parlayx/ussd/send/v1_0/local">
+        <soapenv:Header>
+          <tns:RequestSOAPHeader xmlns:tns="http://www.huawei.com.cn/schema/common/v2_1">
+            <tns:spId>2250110000460</tns:spId>
+            <tns:spPassword>3a53e8f0f2ea20a859c7db842061dbb2</tns:spPassword>
+            <tns:bundleID></tns:bundleID>
+            <tns:timeStamp>20161008183657</tns:timeStamp>
+            <tns:OA></tns:OA>
+            <tns:FA></tns:FA>
+          </tns:RequestSOAPHeader>
+        </soapenv:Header>
+        <soapenv:Body>
+          <loc:sendUssd>
+            <loc:msgType>0</loc:msgType>
+            <loc:senderCB>306909975</loc:senderCB>
+            <loc:receiveCB/>
+            <loc:ussdOpType>1</loc:ussdOpType>
+            <loc:msIsdn></loc:msIsdn>
+            <loc:serviceCode>218</loc:serviceCode>
+            <loc:codeScheme>15</loc:codeScheme>
+            <loc:ussdString>
+      1- Jeux
+      2- Mes paris
+      3- Mon solde
+      4- Rechargement
+      5- Votre service SMS
+      6- Mes OTP - codes retraits
+      7- Mes comptes
+    </loc:ussdString>
+          </loc:sendUssd>
+        </soapenv:Body>
+      </soapenv:Envelope>

@@ -119,14 +119,14 @@ class UssdTestingController < ApplicationController
   end
 
   def main_menu
-    @raw_body = request.body.read rescue nil
+    @raw_body = request.body.read.gsub("ns1:", "").gsub("ns2:", "") rescue nil
     @received_body = (Nokogiri.XML(@raw_body) rescue nil)
     @error_code = '0'
     @error_message = ''
 
     c_main_menu_parse_xml
 
-    if @error_code.blank?
+    if @error_code == '0'
       main_menu_parse_xml
 
       c_main_menu_check_sp_id
@@ -156,6 +156,24 @@ class UssdTestingController < ApplicationController
     send_ussd(@msisdn)
 
     render :xml => result
+  end
+
+  def main_menu_parse_xml
+    @rev_id = @received_body.xpath('//NotifySOAPHeader/spRevId').text rescue nil
+    @rev_password = @received_body.xpath('//NotifySOAPHeader/spRevpassword').text rescue nil
+    @sp_id = @received_body.xpath('//NotifySOAPHeader/spId').text rescue nil
+    @service_id = @received_body.xpath('//NotifySOAPHeader/serviceId').text rescue nil
+    @timestamp = @received_body.xpath('//NotifySOAPHeader/timeStamp').text rescue nil
+    @unique_id = @received_body.xpath('//NotifySOAPHeader/traceUniqueID').text  rescue nil
+
+    @msg_type = @received_body.xpath('//notifyUssdReception/msgType').text rescue nil
+    @sender_cb = @received_body.xpath('//notifyUssdReception/senderCB').text rescue nil
+    @receive_cb = @received_body.xpath('//notifyUssdReception/receiveCB').text rescue nil
+    @ussd_op_type = @received_body.xpath('//notifyUssdReception/ussdOpType').text rescue nil
+    @msisdn = @received_body.xpath('//notifyUssdReception/msIsdn').text rescue nil
+    @service_code = @received_body.xpath('//notifyUssdReception/serviceCode').text rescue nil
+    @code_scheme = @received_body.xpath('//notifyUssdReception/codeScheme').text rescue nil
+    @ussd_string = @received_body.xpath('//notifyUssdReception/ussdString').text rescue nil
   end
 
   def c_main_menu_parse_xml
@@ -231,26 +249,8 @@ class UssdTestingController < ApplicationController
   def c_main_menu_check_ussd_string
     if @ussd_string.blank?
       @error_code = 'NURR_11'
-      @error_message = "Le serviceCode est vide"
+      @error_message = "L'ussdString est vide"
     end
-  end
-
-  def main_menu_parse_xml
-    @rev_id = @received_body.xpath('//ns1:NotifySOAPHeader').at('ns1:spRevId').content rescue nil
-    @rev_password = @received_body.xpath('//ns1:NotifySOAPHeader').at('ns1:spRevpassword').content rescue nil
-    @sp_id = @received_body.xpath('//ns1:NotifySOAPHeader').at('ns1:spId').content rescue nil
-    @service_id = @received_body.xpath('//ns1:NotifySOAPHeader').at('ns1:serviceId').content rescue nil
-    @timestamp = @received_body.xpath('//ns1:NotifySOAPHeader').at('ns1:timeStamp').content rescue nil
-    @unique_id = @received_body.xpath('//ns1:NotifySOAPHeader').at('ns1:traceUniqueID').content rescue nil
-
-    @msg_type = @received_body.xpath('//ns2:notifyUssdReception').at('ns2:msgType').content rescue nil
-    @sender_cb = @received_body.xpath('//ns2:notifyUssdReception').at('ns2:senderCB').content rescue nil
-    @receive_cb = @received_body.xpath('//ns2:notifyUssdReception').at('ns2:receiveCB').content rescue nil
-    @ussd_op_type = @received_body.xpath('//ns2:notifyUssdReception').at('ns2:ussdOpType').content rescue nil
-    @msisdn = @received_body.xpath('//ns2:notifyUssdReception').at('ns2:msIsdn').content rescue nil
-    @service_code = @received_body.xpath('//ns2:notifyUssdReception').at('ns2:serviceCode').content rescue nil
-    @code_scheme = @received_body.xpath('//ns2:notifyUssdReception').at('ns2:codeScheme').content rescue nil
-    @ussd_string = @received_body.xpath('//ns2:notifyUssdReception').at('ns2:ussdString').content rescue nil
   end
 
   def send_ussd(msisdn)
