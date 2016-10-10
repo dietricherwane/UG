@@ -278,7 +278,7 @@ class UssdTestingController < ApplicationController
     sender_cb = Digest::SHA1.hexdigest([DateTime.now.iso8601(6), rand].join).hex.to_s[0..7]
     ussd_op_type = '1'
     service_code = '218'
-    code_scheme = '68'
+    code_scheme = '15'
     ussd_string = %Q[
       1- Jeux
       2- Mes paris
@@ -292,6 +292,7 @@ class UssdTestingController < ApplicationController
     extenionInfo = ''
 
     request_body = %Q[
+      <?xml version = "1.0" encoding = "utf-8">
       <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:loc="http://www.csapi.org/schema/parlayx/ussd/send/v1_0/local">
         <soapenv:Header>
           <tns:RequestSOAPHeader xmlns:tns="http://www.huawei.com.cn/schema/common/v2_1">
@@ -319,7 +320,7 @@ class UssdTestingController < ApplicationController
       </soapenv:Envelope>
     ]
 
-    send_ussd_response = Typhoeus.post(url, body: request_body, connecttimeout: 30)
+    send_ussd_response = Typhoeus.post(url, body: request_body, connecttimeout: 30, headers: { Charset: "UTF-8" })
 
     nokogiri_response = (Nokogiri.XML(send_ussd_response.body) rescue nil)
 
