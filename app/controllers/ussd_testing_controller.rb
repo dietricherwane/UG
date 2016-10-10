@@ -1,5 +1,5 @@
 class UssdTestingController < ApplicationController
-  after_filter :session_exists?, :except => [:ipn, :transaction_acknowledgement]
+  after_filter :send_ussd, :only => :main_menu
 
   #soap_service namespace: 'Ussd:MTN:wsdl'
 
