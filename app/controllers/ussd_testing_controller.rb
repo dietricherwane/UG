@@ -141,7 +141,7 @@ class UssdTestingController < ApplicationController
       c_main_menu_check_service_code
       c_main_menu_check_ussd_string
 
-      send_ussd(@msisdn, @sender_cb)
+      send_ussd(@msisdn, @sender_cb, @linkid)
 
       UssdReceptionLog.create(received_parameters: @raw_body, rev_id: @rev_id, rev_password: @rev_password, sp_id: @sp_id, service_id: @service_id, timestamp: @timestamp, trace_unique_id: @unique_id, msg_type: @msg_type, sender_cb: @sender_cb, receiver_cb: @receive_cb, ussd_of_type: @ussd_op_type, msisdn: @msisdn, service_code: @service_code, code_scheme: @code_scheme, ussd_string: @ussd_string, error_code: @error_code, error_message: @error_message, remote_ip: remote_ip_address)
     end
@@ -164,6 +164,7 @@ class UssdTestingController < ApplicationController
     @rev_id = @received_body.xpath('//NotifySOAPHeader/spRevId').text rescue nil
     @rev_password = @received_body.xpath('//NotifySOAPHeader/spRevpassword').text rescue nil
     @sp_id = @received_body.xpath('//NotifySOAPHeader/spId').text rescue nil
+    @linkid = @received_body.xpath('//NotifySOAPHeader/linkid').text rescue nil
     @service_id = @received_body.xpath('//NotifySOAPHeader/serviceId').text rescue nil
     @timestamp = @received_body.xpath('//NotifySOAPHeader/timeStamp').text rescue nil
     @unique_id = @received_body.xpath('//NotifySOAPHeader/traceUniqueID').text  rescue nil
@@ -255,7 +256,14 @@ class UssdTestingController < ApplicationController
     end
   end
 
-  def send_ussd(msisdn, receive_cb)
+  def c_main_menu_check_linkid
+    if @linkid.blank?
+      @error_code = 'NURR_12'
+      @error_message = "Le linkid est vide"
+    end
+  end
+
+  def send_ussd(msisdn, receive_cb, linkid)
     url = '196.201.33.108:8310/SendUssdService/services/SendUssd'
     sp_id = '2250110000460'
     service_id = '225012000003070'
@@ -289,11 +297,11 @@ class UssdTestingController < ApplicationController
           <tns:RequestSOAPHeader xmlns:tns="http://www.huawei.com.cn/schema/common/v2_1">
             <tns:spId>#{sp_id}</tns:spId>
             <tns:spPassword>#{sp_password}</tns:spPassword>
-            <tns:bundleID></tns:bundleID>
             <tns:serviceId>#{service_id}</tns:serviceId>
             <tns:timeStamp>#{timestamp}</tns:timeStamp>
             <tns:OA>#{msisdn}</tns:OA>
             <tns:FA>#{msisdn}</tns:FA>
+            <tns:linkid>#{linkid}</tns:linkid>
           </tns:RequestSOAPHeader>
         </soapenv:Header>
         <soapenv:Body>
