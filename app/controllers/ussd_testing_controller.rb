@@ -292,7 +292,7 @@ class UssdTestingController < ApplicationController
     extenionInfo = ''
 
     request_body = %Q[
-      <?xml version = "1.0" encoding = "utf-8">
+      <?xml version = "1.0" encoding = "utf-8" ?>
       <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:loc="http://www.csapi.org/schema/parlayx/ussd/send/v1_0/local">
         <soapenv:Header>
           <tns:RequestSOAPHeader xmlns:tns="http://www.huawei.com.cn/schema/common/v2_1">
