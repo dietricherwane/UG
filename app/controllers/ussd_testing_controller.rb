@@ -320,7 +320,7 @@ class UssdTestingController < ApplicationController
       </soapenv:Envelope>
     ]
 
-    send_ussd_response = Typhoeus.post(url, body: request_body, connecttimeout: 30, headers: { Charset: "UTF-8" })
+    send_ussd_response = Typhoeus.post(url, body: request_body, connecttimeout: 30, headers: { 'charset'=> "UTF-8", 'Content-Type'=> "text/xml" })
 
     nokogiri_response = (Nokogiri.XML(send_ussd_response.body) rescue nil)
 
