@@ -158,6 +158,7 @@ class UssdTestingController < ApplicationController
     render :xml => result
 
     if @error_code == '0'
+      sleep(0.1)
       send_ussd(@msisdn, @sender_cb, @linkid)
     end
   end
