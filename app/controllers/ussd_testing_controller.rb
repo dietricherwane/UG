@@ -266,7 +266,7 @@ class UssdTestingController < ApplicationController
     fa = msisdn
     link_id = ''
     present_id = ''
-    msg_type = '0'
+    msg_type = '1'
     sender_cb = Digest::SHA1.hexdigest([DateTime.now.iso8601(6), rand].join).hex.to_s[0..7]
     ussd_op_type = '1'
     service_code = '218'
@@ -290,6 +290,7 @@ class UssdTestingController < ApplicationController
             <tns:spId>#{sp_id}</tns:spId>
             <tns:spPassword>#{sp_password}</tns:spPassword>
             <tns:bundleID></tns:bundleID>
+            <tns:serviceId>#{service_id}</tns:serviceId>
             <tns:timeStamp>#{timestamp}</tns:timeStamp>
             <tns:OA>#{msisdn}</tns:OA>
             <tns:FA>#{msisdn}</tns:FA>
@@ -297,7 +298,7 @@ class UssdTestingController < ApplicationController
         </soapenv:Header>
         <soapenv:Body>
           <loc:sendUssd>
-            <loc:msgType>0</loc:msgType>
+            <loc:msgType>#{msg_type}</loc:msgType>
             <loc:senderCB>#{sender_cb}</loc:senderCB>
             <loc:receiveCB>#{receive_cb}</loc:receiveCB>
             <loc:ussdOpType>1</loc:ussdOpType>
