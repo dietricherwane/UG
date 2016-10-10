@@ -278,7 +278,7 @@ class UssdTestingController < ApplicationController
     sender_cb = Digest::SHA1.hexdigest([DateTime.now.iso8601(6), rand].join).hex.to_s[0..7]
     ussd_op_type = '1'
     service_code = '218'
-    code_scheme = '15'
+    code_scheme = '68'
     ussd_string = %Q[
       1- Jeux
       2- Mes paris
