@@ -141,8 +141,6 @@ class UssdTestingController < ApplicationController
       c_main_menu_check_service_code
       c_main_menu_check_ussd_string
 
-      send_ussd(@msisdn, @sender_cb, @linkid)
-
       UssdReceptionLog.create(received_parameters: @raw_body, rev_id: @rev_id, rev_password: @rev_password, sp_id: @sp_id, service_id: @service_id, timestamp: @timestamp, trace_unique_id: @unique_id, msg_type: @msg_type, sender_cb: @sender_cb, receiver_cb: @receive_cb, ussd_of_type: @ussd_op_type, msisdn: @msisdn, service_code: @service_code, code_scheme: @code_scheme, ussd_string: @ussd_string, error_code: @error_code, error_message: @error_message, remote_ip: remote_ip_address)
     end
 
@@ -158,6 +156,10 @@ class UssdTestingController < ApplicationController
           ]
 
     render :xml => result
+
+    if @error_code == '0'
+      send_ussd(@msisdn, @sender_cb, @linkid)
+    end
   end
 
   def main_menu_parse_xml
