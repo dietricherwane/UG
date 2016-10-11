@@ -1,5 +1,5 @@
 class UssdTestingController < ApplicationController
-  after_filter :send_ussd, :only => :main_menu
+  #after_filter :send_ussd, :only => :main_menu
 
   #soap_service namespace: 'Ussd:MTN:wsdl'
 
@@ -172,10 +172,10 @@ class UssdTestingController < ApplicationController
 
     render :xml => result
 
-    #if @error_code == '0'
+    if @error_code == '0'
       #sleep(0.1)
-      #send_ussd(@msisdn, @sender_cb, @linkid)
-    #end
+      send_ussd(@msisdn, @sender_cb, @linkid)
+    end
   end
 
   def main_menu_parse_xml
@@ -281,16 +281,13 @@ class UssdTestingController < ApplicationController
     end
   end
 
-  def send_ussd#(msisdn, receive_cb, linkid)
+  def send_ussd(msisdn, receive_cb, linkid)
     url = '196.201.33.108:8310/SendUssdService/services/SendUssd'
     sp_id = '2250110000460'
     service_id = '225012000003070'
     password = 'bmeB500'
     timestamp = DateTime.now.strftime('%Y%m%d%H%M%S')
     sp_password = Digest::MD5.hexdigest(sp_id + password + timestamp)
-    oa = @msisdn
-    fa = @msisdn
-    link_id = ''
     present_id = ''
     msg_type = '1'
     sender_cb = Digest::SHA1.hexdigest([DateTime.now.iso8601(6), rand].join).hex.to_s[0..7]
@@ -318,18 +315,18 @@ class UssdTestingController < ApplicationController
             <tns:spPassword>#{sp_password}</tns:spPassword>
             <tns:serviceId>#{service_id}</tns:serviceId>
             <tns:timeStamp>#{timestamp}</tns:timeStamp>
-            <tns:OA>#{oa}</tns:OA>
-            <tns:FA>#{fa}</tns:FA>
-            <tns:linkid>#{@linkid}</tns:linkid>
+            <tns:OA>#{msisdn}</tns:OA>
+            <tns:FA>#{msisdn}</tns:FA>
+            <tns:linkid>#{linkid}</tns:linkid>
           </tns:RequestSOAPHeader>
         </soapenv:Header>
         <soapenv:Body>
           <loc:sendUssd>
             <loc:msgType>#{msg_type}</loc:msgType>
             <loc:senderCB>#{sender_cb}</loc:senderCB>
-            <loc:receiveCB>#{@receive_cb}</loc:receiveCB>
+            <loc:receiveCB>#{receive_cb}</loc:receiveCB>
             <loc:ussdOpType>1</loc:ussdOpType>
-            <loc:msIsdn>#{@msisdn}</loc:msIsdn>
+            <loc:msIsdn>#{msisdn}</loc:msIsdn>
             <loc:serviceCode>#{service_code}</loc:serviceCode>
             <loc:codeScheme>#{code_scheme}</loc:codeScheme>
             <loc:ussdString>#{ussd_string}</loc:ussdString>
