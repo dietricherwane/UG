@@ -53535,3 +53535,147 @@ ETHON: performed EASY effective_url=HTTP://196.201.33.108:8310/SendUssdService/s
   [1m[35mSQL (40.2ms)[0m  INSERT INTO "mtn_start_session_logs" ("created_at", "operation_type", "request_code", "request_headers", "request_log", "request_url", "response_log", "status", "total_time", "updated_at") VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING "id"  [["created_at", "2016-10-10 16:02:50.527593"], ["operation_type", "Send ussd"], ["request_code", 0], ["request_headers", "{}"], ["request_log", "\n      <?xml version = \"1.0\" encoding = \"utf-8\" ?>\n      <soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:loc=\"http://www.csapi.org/schema/parlayx/ussd/send/v1_0/local\">\n        <soapenv:Header>\n          <tns:RequestSOAPHeader xmlns:tns=\"http://www.huawei.com.cn/schema/common/v2_1\">\n            <tns:spId>2250110000460</tns:spId>\n            <tns:spPassword>d5f8935d8812354323ca505f4ae0df67</tns:spPassword>\n            <tns:serviceId>225012000003070</tns:serviceId>\n            <tns:timeStamp>20161010160220</tns:timeStamp>\n            <tns:OA>22544447310</tns:OA>\n            <tns:FA>22544447310</tns:FA>\n            <tns:linkid>08183632075504144321</tns:linkid>\n          </tns:RequestSOAPHeader>\n        </soapenv:Header>\n        <soapenv:Body>\n          <loc:sendUssd>\n            <loc:msgType>1</loc:msgType>\n            <loc:senderCB>91273111</loc:senderCB>\n            <loc:receiveCB>350842918</loc:receiveCB>\n            <loc:ussdOpType>1</loc:ussdOpType>\n            <loc:msIsdn>22544447310</loc:msIsdn>\n            <loc:serviceCode>218</loc:serviceCode>\n            <loc:codeScheme>15</loc:codeScheme>\n            <loc:ussdString>\n      1- Jeux\n      2- Mes paris\n      3- Mon solde\n      4- Rechargement\n      5- Votre service SMS\n      6- Mes OTP - codes retraits\n      7- Mes comptes\n    </loc:ussdString>\n          </loc:sendUssd>\n        </soapenv:Body>\n      </soapenv:Envelope>\n    "], ["request_url", "196.201.33.108:8310/SendUssdService/services/SendUssd"], ["response_log", ""], ["status", "t"], ["total_time", 30.001312], ["updated_at", "2016-10-10 16:02:50.527593"]]
   [1m[36m (18.4ms)[0m  [1mCOMMIT[0m
 Completed 200 OK in 30422ms (Views: 0.3ms | ActiveRecord: 245.4ms)
+  [1m[36mMtnStartSessionLog Load (72.9ms)[0m  [1mSELECT  "mtn_start_session_logs".* FROM "mtn_start_session_logs"   ORDER BY "mtn_start_session_logs"."id" DESC LIMIT 1[0m
+  [1m[35mMtnStartSessionLog Load (1.5ms)[0m  SELECT  "mtn_start_session_logs".* FROM "mtn_start_session_logs"   ORDER BY "mtn_start_session_logs"."id" DESC LIMIT 1
+
+
+Started POST "/mtn/ussd/main_menu" for 127.0.0.1 at 2016-10-11 06:58:10 +0000
+  [1m[36mActiveRecord::SchemaMigration Load (30.5ms)[0m  [1mSELECT "schema_migrations".* FROM "schema_migrations"[0m
+Processing by UssdTestingController#main_menu as */*
+Can't verify CSRF token authenticity
+  [1m[35m (0.7ms)[0m  BEGIN
+  [1m[36mSQL (75.2ms)[0m  [1mINSERT INTO "ussd_reception_logs" ("code_scheme", "created_at", "error_code", "error_message", "msg_type", "msisdn", "received_parameters", "receiver_cb", "remote_ip", "rev_id", "rev_password", "sender_cb", "service_code", "service_id", "sp_id", "timestamp", "trace_unique_id", "updated_at", "ussd_of_type", "ussd_string") VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20) RETURNING "id"[0m  [["code_scheme", "15"], ["created_at", "2016-10-11 06:58:10.973708"], ["error_code", "0"], ["error_message", ""], ["msg_type", "0"], ["msisdn", "22544447310"], ["received_parameters", "<?xml version=\"1.0\" encoding=\"utf-8\" ?><soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n  <soapenv:Header>\n    <NotifySOAPHeader xmlns:ns1=\"http://www.huawei.com.cn/schema/common/v2_1\">\n      <spId>2250110000460</spId>\n      <serviceId>225012000003070</serviceId>\n      <timeStamp>20161008183634</timeStamp>\n      <linkid>08183632075504144321</linkid>\n      <traceUniqueID>404092404991610081836324180004</traceUniqueID>\n      <OperatorID>22501</OperatorID>\n    </NotifySOAPHeader>\n  </soapenv:Header>\n  <soapenv:Body>\n    <notifyUssdReception xmlns:ns2=\"http://www.csapi.org/schema/parlayx/ussd/notification/v1_0/local\">\n      <msgType>0</msgType>\n      <senderCB>350842918</senderCB>\n      <receiveCB>FFFFFFFF</receiveCB>\n      <ussdOpType>1</ussdOpType>\n      <msIsdn>22544447310</msIsdn>\n      <serviceCode>218</serviceCode>\n      <codeScheme>15</codeScheme>\n      <ussdString>*218#612051430126481#22544447310#22505987003#</ussdString>\n    </notifyUssdReception>\n  </soapenv:Body>\n</soapenv:Envelope>"], ["receiver_cb", "FFFFFFFF"], ["remote_ip", "127.0.0.1"], ["rev_id", ""], ["rev_password", ""], ["sender_cb", "350842918"], ["service_code", "218"], ["service_id", "225012000003070"], ["sp_id", "2250110000460"], ["timestamp", "20161008183634"], ["trace_unique_id", "404092404991610081836324180004"], ["updated_at", "2016-10-11 06:58:10.973708"], ["ussd_of_type", "1"], ["ussd_string", "*218#612051430126481#22544447310#22505987003#"]]
+  [1m[35m (24.5ms)[0m  COMMIT
+Completed 500 Internal Server Error in 234ms
+
+NameError (undefined local variable or method `msisdn' for #<UssdTestingController:0x000000038c2b90>):
+  app/controllers/ussd_testing_controller.rb:322:in `send_ussd'
+
+
+  Rendered /home/dietrich/.rvm/gems/ruby-2.0.0-p195@rails4.0.7/gems/actionpack-4.1.8/lib/action_dispatch/middleware/templates/rescues/_source.erb (1.0ms)
+  Rendered /home/dietrich/.rvm/gems/ruby-2.0.0-p195@rails4.0.7/gems/actionpack-4.1.8/lib/action_dispatch/middleware/templates/rescues/_trace.html.erb (2.9ms)
+  Rendered /home/dietrich/.rvm/gems/ruby-2.0.0-p195@rails4.0.7/gems/actionpack-4.1.8/lib/action_dispatch/middleware/templates/rescues/_request_and_response.html.erb (1.4ms)
+  Rendered /home/dietrich/.rvm/gems/ruby-2.0.0-p195@rails4.0.7/gems/actionpack-4.1.8/lib/action_dispatch/middleware/templates/rescues/diagnostics.erb within rescues/layout (89.1ms)
+
+
+Started POST "/mtn/ussd/main_menu" for 127.0.0.1 at 2016-10-11 06:58:50 +0000
+Processing by UssdTestingController#main_menu as */*
+Can't verify CSRF token authenticity
+  [1m[36m (0.4ms)[0m  [1mBEGIN[0m
+  [1m[35mSQL (0.7ms)[0m  INSERT INTO "ussd_reception_logs" ("code_scheme", "created_at", "error_code", "error_message", "msg_type", "msisdn", "received_parameters", "receiver_cb", "remote_ip", "rev_id", "rev_password", "sender_cb", "service_code", "service_id", "sp_id", "timestamp", "trace_unique_id", "updated_at", "ussd_of_type", "ussd_string") VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20) RETURNING "id"  [["code_scheme", "15"], ["created_at", "2016-10-11 06:58:50.286011"], ["error_code", "0"], ["error_message", ""], ["msg_type", "0"], ["msisdn", "22544447310"], ["received_parameters", "<?xml version=\"1.0\" encoding=\"utf-8\" ?><soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n  <soapenv:Header>\n    <NotifySOAPHeader xmlns:ns1=\"http://www.huawei.com.cn/schema/common/v2_1\">\n      <spId>2250110000460</spId>\n      <serviceId>225012000003070</serviceId>\n      <timeStamp>20161008183634</timeStamp>\n      <linkid>08183632075504144321</linkid>\n      <traceUniqueID>404092404991610081836324180004</traceUniqueID>\n      <OperatorID>22501</OperatorID>\n    </NotifySOAPHeader>\n  </soapenv:Header>\n  <soapenv:Body>\n    <notifyUssdReception xmlns:ns2=\"http://www.csapi.org/schema/parlayx/ussd/notification/v1_0/local\">\n      <msgType>0</msgType>\n      <senderCB>350842918</senderCB>\n      <receiveCB>FFFFFFFF</receiveCB>\n      <ussdOpType>1</ussdOpType>\n      <msIsdn>22544447310</msIsdn>\n      <serviceCode>218</serviceCode>\n      <codeScheme>15</codeScheme>\n      <ussdString>*218#612051430126481#22544447310#22505987003#</ussdString>\n    </notifyUssdReception>\n  </soapenv:Body>\n</soapenv:Envelope>"], ["receiver_cb", "FFFFFFFF"], ["remote_ip", "127.0.0.1"], ["rev_id", ""], ["rev_password", ""], ["sender_cb", "350842918"], ["service_code", "218"], ["service_id", "225012000003070"], ["sp_id", "2250110000460"], ["timestamp", "20161008183634"], ["trace_unique_id", "404092404991610081836324180004"], ["updated_at", "2016-10-11 06:58:50.286011"], ["ussd_of_type", "1"], ["ussd_string", "*218#612051430126481#22544447310#22505987003#"]]
+  [1m[36m (19.9ms)[0m  [1mCOMMIT[0m
+ETHON: Libcurl initialized
+ETHON: performed EASY effective_url=HTTP://196.201.33.108:8310/SendUssdService/services/SendUssd response_code=0 return_code=operation_timedout total_time=30.000898
+  [1m[35m (0.6ms)[0m  BEGIN
+  [1m[36mSQL (18.7ms)[0m  [1mINSERT INTO "mtn_start_session_logs" ("created_at", "operation_type", "request_code", "request_headers", "request_log", "request_url", "response_log", "status", "total_time", "updated_at") VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING "id"[0m  [["created_at", "2016-10-11 06:59:20.416291"], ["operation_type", "Send ussd"], ["request_code", 0], ["request_headers", "{}"], ["request_log", "\n      <?xml version = \"1.0\" encoding = \"utf-8\" ?>\n      <soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:loc=\"http://www.csapi.org/schema/parlayx/ussd/send/v1_0/local\">\n        <soapenv:Header>\n          <tns:RequestSOAPHeader xmlns:tns=\"http://www.huawei.com.cn/schema/common/v2_1\">\n            <tns:spId>2250110000460</tns:spId>\n            <tns:spPassword>1cae94615def1a91570ead88bbe2a339</tns:spPassword>\n            <tns:serviceId>225012000003070</tns:serviceId>\n            <tns:timeStamp>20161011065850</tns:timeStamp>\n            <tns:OA>22544447310</tns:OA>\n            <tns:FA>22544447310</tns:FA>\n            <tns:linkid>08183632075504144321</tns:linkid>\n          </tns:RequestSOAPHeader>\n        </soapenv:Header>\n        <soapenv:Body>\n          <loc:sendUssd>\n            <loc:msgType>1</loc:msgType>\n            <loc:senderCB>64583436</loc:senderCB>\n            <loc:receiveCB>FFFFFFFF</loc:receiveCB>\n            <loc:ussdOpType>1</loc:ussdOpType>\n            <loc:msIsdn>22544447310</loc:msIsdn>\n            <loc:serviceCode>218</loc:serviceCode>\n            <loc:codeScheme>15</loc:codeScheme>\n            <loc:ussdString>\n      1- Jeux\n      2- Mes paris\n      3- Mon solde\n      4- Rechargement\n      5- Votre service SMS\n      6- Mes OTP - codes retraits\n      7- Mes comptes\n    </loc:ussdString>\n          </loc:sendUssd>\n        </soapenv:Body>\n      </soapenv:Envelope>\n    "], ["request_url", "196.201.33.108:8310/SendUssdService/services/SendUssd"], ["response_log", ""], ["status", "t"], ["total_time", 30.000898], ["updated_at", "2016-10-11 06:59:20.416291"]]
+  [1m[35m (51.6ms)[0m  COMMIT
+Completed 200 OK in 30238ms (Views: 0.3ms | ActiveRecord: 100.7ms)
+  [1m[36mActiveRecord::SchemaMigration Load (1.1ms)[0m  [1mSELECT "schema_migrations".* FROM "schema_migrations"[0m
+Migrating to AddTimeTrailToUssdReceptionLogs (20161011070228)
+  [1m[35m (0.5ms)[0m  BEGIN
+  [1m[36m (28.6ms)[0m  [1mALTER TABLE "ussd_reception_logs" ADD COLUMN "time_trail" character varying(255)[0m
+  [1m[35mSQL (0.5ms)[0m  INSERT INTO "schema_migrations" ("version") VALUES ($1)  [["version", "20161011070228"]]
+  [1m[36m (11.5ms)[0m  [1mCOMMIT[0m
+  [1m[35mActiveRecord::SchemaMigration Load (0.8ms)[0m  SELECT "schema_migrations".* FROM "schema_migrations"
+  [1m[36mActiveRecord::SchemaMigration Load (1.2ms)[0m  [1mSELECT "schema_migrations".* FROM "schema_migrations"[0m
+Migrating to AddTimeTrailToMtnStartSessionLogs (20161011070319)
+  [1m[35m (0.6ms)[0m  BEGIN
+  [1m[36m (8.4ms)[0m  [1mALTER TABLE "mtn_start_session_logs" ADD COLUMN "time_trail" character varying(255)[0m
+  [1m[35mSQL (0.7ms)[0m  INSERT INTO "schema_migrations" ("version") VALUES ($1)  [["version", "20161011070319"]]
+  [1m[36m (17.7ms)[0m  [1mCOMMIT[0m
+  [1m[35mActiveRecord::SchemaMigration Load (0.8ms)[0m  SELECT "schema_migrations".* FROM "schema_migrations"
+  [1m[36mActiveRecord::SchemaMigration Load (1.1ms)[0m  [1mSELECT "schema_migrations".* FROM "schema_migrations"[0m
+  [1m[35mActiveRecord::SchemaMigration Load (0.7ms)[0m  SELECT "schema_migrations".* FROM "schema_migrations"
+Migrating to AddTimeTrailToMtnStartSessionLogs (20161011070319)
+  [1m[36m (0.5ms)[0m  [1mBEGIN[0m
+  [1m[35m (18.7ms)[0m  ALTER TABLE "mtn_start_session_logs" DROP "time_trail"
+  [1m[36mSQL (17.4ms)[0m  [1mDELETE FROM "schema_migrations" WHERE "schema_migrations"."version" = '20161011070319'[0m
+  [1m[35m (26.0ms)[0m  COMMIT
+  [1m[36mActiveRecord::SchemaMigration Load (0.5ms)[0m  [1mSELECT "schema_migrations".* FROM "schema_migrations"[0m
+  [1m[36mActiveRecord::SchemaMigration Load (1.1ms)[0m  [1mSELECT "schema_migrations".* FROM "schema_migrations"[0m
+Migrating to AddTimeTrailToMtnStartSessionLogs (20161011070319)
+  [1m[35m (0.5ms)[0m  BEGIN
+  [1m[36m (1.3ms)[0m  [1mALTER TABLE "mtn_start_session_logs" ADD COLUMN "time_trail" text[0m
+  [1m[35mSQL (0.8ms)[0m  INSERT INTO "schema_migrations" ("version") VALUES ($1)  [["version", "20161011070319"]]
+  [1m[36m (38.2ms)[0m  [1mCOMMIT[0m
+  [1m[35mActiveRecord::SchemaMigration Load (0.8ms)[0m  SELECT "schema_migrations".* FROM "schema_migrations"
+
+
+Started POST "/mtn/ussd/main_menu" for 127.0.0.1 at 2016-10-11 07:52:45 +0000
+  [1m[36mActiveRecord::SchemaMigration Load (0.9ms)[0m  [1mSELECT "schema_migrations".* FROM "schema_migrations"[0m
+Processing by UssdTestingController#main_menu as */*
+Can't verify CSRF token authenticity
+WARNING: Can't mass-assign protected attributes for UssdReceptionLog: time_trail
+	app/controllers/ussd_testing_controller.rb:171:in `main_menu'
+  [1m[35m (0.4ms)[0m  BEGIN
+  [1m[36mSQL (1.1ms)[0m  [1mINSERT INTO "ussd_reception_logs" ("code_scheme", "created_at", "error_code", "error_message", "msg_type", "msisdn", "received_parameters", "receiver_cb", "remote_ip", "rev_id", "rev_password", "sender_cb", "service_code", "service_id", "sp_id", "timestamp", "trace_unique_id", "updated_at", "ussd_of_type", "ussd_string") VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20) RETURNING "id"[0m  [["code_scheme", "15"], ["created_at", "2016-10-11 07:52:45.238560"], ["error_code", "0"], ["error_message", ""], ["msg_type", "0"], ["msisdn", "22544447310"], ["received_parameters", "<?xml version=\"1.0\" encoding=\"utf-8\" ?><soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n  <soapenv:Header>\n    <NotifySOAPHeader xmlns:ns1=\"http://www.huawei.com.cn/schema/common/v2_1\">\n      <spId>2250110000460</spId>\n      <serviceId>225012000003070</serviceId>\n      <timeStamp>20161008183634</timeStamp>\n      <linkid>08183632075504144321</linkid>\n      <traceUniqueID>404092404991610081836324180004</traceUniqueID>\n      <OperatorID>22501</OperatorID>\n    </NotifySOAPHeader>\n  </soapenv:Header>\n  <soapenv:Body>\n    <notifyUssdReception xmlns:ns2=\"http://www.csapi.org/schema/parlayx/ussd/notification/v1_0/local\">\n      <msgType>0</msgType>\n      <senderCB>350842918</senderCB>\n      <receiveCB>FFFFFFFF</receiveCB>\n      <ussdOpType>1</ussdOpType>\n      <msIsdn>22544447310</msIsdn>\n      <serviceCode>218</serviceCode>\n      <codeScheme>15</codeScheme>\n      <ussdString>*218#612051430126481#22544447310#22505987003#</ussdString>\n    </notifyUssdReception>\n  </soapenv:Body>\n</soapenv:Envelope>"], ["receiver_cb", "FFFFFFFF"], ["remote_ip", "127.0.0.1"], ["rev_id", ""], ["rev_password", ""], ["sender_cb", "350842918"], ["service_code", "218"], ["service_id", "225012000003070"], ["sp_id", "2250110000460"], ["timestamp", "20161008183634"], ["trace_unique_id", "404092404991610081836324180004"], ["updated_at", "2016-10-11 07:52:45.238560"], ["ussd_of_type", "1"], ["ussd_string", "*218#612051430126481#22544447310#22505987003#"]]
+  [1m[35m (14.8ms)[0m  COMMIT
+ETHON: Libcurl initialized
+ETHON: performed EASY effective_url=HTTP://196.201.33.108:8310/SendUssdService/services/SendUssd response_code=0 return_code=operation_timedout total_time=30.000081
+  [1m[36m (0.7ms)[0m  [1mBEGIN[0m
+  [1m[35mSQL (1.5ms)[0m  INSERT INTO "mtn_start_session_logs" ("created_at", "operation_type", "request_code", "request_headers", "request_log", "request_url", "response_log", "status", "time_trail", "total_time", "updated_at") VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING "id"  [["created_at", "2016-10-11 07:53:15.301517"], ["operation_type", "Send ussd"], ["request_code", 0], ["request_headers", "{}"], ["request_log", "\n      <?xml version = \"1.0\" encoding = \"utf-8\" ?>\n      <soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:loc=\"http://www.csapi.org/schema/parlayx/ussd/send/v1_0/local\">\n        <soapenv:Header>\n          <tns:RequestSOAPHeader xmlns:tns=\"http://www.huawei.com.cn/schema/common/v2_1\">\n            <tns:spId>2250110000460</tns:spId>\n            <tns:spPassword>9d33700d7599676a708d207cb0f86076</tns:spPassword>\n            <tns:serviceId>225012000003070</tns:serviceId>\n            <tns:timeStamp>20161011075245</tns:timeStamp>\n            <tns:OA>22544447310</tns:OA>\n            <tns:FA>22544447310</tns:FA>\n            <tns:linkid>08183632075504144321</tns:linkid>\n          </tns:RequestSOAPHeader>\n        </soapenv:Header>\n        <soapenv:Body>\n          <loc:sendUssd>\n            <loc:msgType>1</loc:msgType>\n            <loc:senderCB>32392110</loc:senderCB>\n            <loc:receiveCB>FFFFFFFF</loc:receiveCB>\n            <loc:ussdOpType>1</loc:ussdOpType>\n            <loc:msIsdn>22544447310</loc:msIsdn>\n            <loc:serviceCode>218</loc:serviceCode>\n            <loc:codeScheme>15</loc:codeScheme>\n            <loc:ussdString>\n      1- Jeux\n      2- Mes paris\n      3- Mon solde\n      4- Rechargement\n      5- Votre service SMS\n      6- Mes OTP - codes retraits\n      7- Mes comptes\n    </loc:ussdString>\n          </loc:sendUssd>\n        </soapenv:Body>\n      </soapenv:Envelope>\n    "], ["request_url", "196.201.33.108:8310/SendUssdService/services/SendUssd"], ["response_log", ""], ["status", "t"], ["time_trail", "\n      Notification request received at: 2016-10-11T07:52:45+00:00\n\n    \n      Notification response sent at: 2016-10-11T07:52:45+00:00\n\n    \n      SendUssdRequest request sent at: 2016-10-11T07:52:45+00:00\n\n    \n      SendUssdRequest response received at: 2016-10-11T07:53:15+00:00\n\n    "], ["total_time", 30.000081], ["updated_at", "2016-10-11 07:53:15.301517"]]
+  [1m[36m (30.0ms)[0m  [1mCOMMIT[0m
+Completed 200 OK in 30158ms (Views: 0.4ms | ActiveRecord: 57.9ms)
+
+
+Started POST "/mtn/ussd/main_menu" for 127.0.0.1 at 2016-10-11 07:58:52 +0000
+Processing by UssdTestingController#main_menu as */*
+Can't verify CSRF token authenticity
+WARNING: Can't mass-assign protected attributes for UssdReceptionLog: time_trail
+	app/controllers/ussd_testing_controller.rb:171:in `main_menu'
+  [1m[35m (0.5ms)[0m  BEGIN
+  [1m[36mSQL (55.8ms)[0m  [1mINSERT INTO "ussd_reception_logs" ("code_scheme", "created_at", "error_code", "error_message", "msg_type", "msisdn", "received_parameters", "receiver_cb", "remote_ip", "rev_id", "rev_password", "sender_cb", "service_code", "service_id", "sp_id", "timestamp", "trace_unique_id", "updated_at", "ussd_of_type", "ussd_string") VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20) RETURNING "id"[0m  [["code_scheme", "15"], ["created_at", "2016-10-11 07:58:52.659620"], ["error_code", "0"], ["error_message", ""], ["msg_type", "0"], ["msisdn", "22544447310"], ["received_parameters", "<?xml version=\"1.0\" encoding=\"utf-8\" ?><soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n  <soapenv:Header>\n    <NotifySOAPHeader xmlns:ns1=\"http://www.huawei.com.cn/schema/common/v2_1\">\n      <spId>2250110000460</spId>\n      <serviceId>225012000003070</serviceId>\n      <timeStamp>20161008183634</timeStamp>\n      <linkid>08183632075504144321</linkid>\n      <traceUniqueID>404092404991610081836324180004</traceUniqueID>\n      <OperatorID>22501</OperatorID>\n    </NotifySOAPHeader>\n  </soapenv:Header>\n  <soapenv:Body>\n    <notifyUssdReception xmlns:ns2=\"http://www.csapi.org/schema/parlayx/ussd/notification/v1_0/local\">\n      <msgType>0</msgType>\n      <senderCB>350842918</senderCB>\n      <receiveCB>FFFFFFFF</receiveCB>\n      <ussdOpType>1</ussdOpType>\n      <msIsdn>22544447310</msIsdn>\n      <serviceCode>218</serviceCode>\n      <codeScheme>15</codeScheme>\n      <ussdString>*218#612051430126481#22544447310#22505987003#</ussdString>\n    </notifyUssdReception>\n  </soapenv:Body>\n</soapenv:Envelope>"], ["receiver_cb", "FFFFFFFF"], ["remote_ip", "127.0.0.1"], ["rev_id", ""], ["rev_password", ""], ["sender_cb", "350842918"], ["service_code", "218"], ["service_id", "225012000003070"], ["sp_id", "2250110000460"], ["timestamp", "20161008183634"], ["trace_unique_id", "404092404991610081836324180004"], ["updated_at", "2016-10-11 07:58:52.659620"], ["ussd_of_type", "1"], ["ussd_string", "*218#612051430126481#22544447310#22505987003#"]]
+  [1m[35m (27.6ms)[0m  COMMIT
+ETHON: performed EASY effective_url=HTTP://196.201.33.108:8310/SendUssdService/services/SendUssd response_code=0 return_code=operation_timedout total_time=30.001438
+  [1m[36m (0.6ms)[0m  [1mBEGIN[0m
+  [1m[35mSQL (1.0ms)[0m  INSERT INTO "mtn_start_session_logs" ("created_at", "operation_type", "request_code", "request_headers", "request_log", "request_url", "response_log", "status", "time_trail", "total_time", "updated_at") VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING "id"  [["created_at", "2016-10-11 07:59:22.784521"], ["operation_type", "Send ussd"], ["request_code", 0], ["request_headers", "{}"], ["request_log", "\n      <?xml version = \"1.0\" encoding = \"utf-8\" ?>\n      <soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:loc=\"http://www.csapi.org/schema/parlayx/ussd/send/v1_0/local\">\n        <soapenv:Header>\n          <tns:RequestSOAPHeader xmlns:tns=\"http://www.huawei.com.cn/schema/common/v2_1\">\n            <tns:spId>2250110000460</tns:spId>\n            <tns:spPassword>d50ef65cd21340d4778b0a999831176b</tns:spPassword>\n            <tns:serviceId>225012000003070</tns:serviceId>\n            <tns:timeStamp>20161011075852</tns:timeStamp>\n            <tns:OA>22544447310</tns:OA>\n            <tns:FA>22544447310</tns:FA>\n            <tns:linkid>08183632075504144321</tns:linkid>\n          </tns:RequestSOAPHeader>\n        </soapenv:Header>\n        <soapenv:Body>\n          <loc:sendUssd>\n            <loc:msgType>1</loc:msgType>\n            <loc:senderCB>13543166</loc:senderCB>\n            <loc:receiveCB>FFFFFFFF</loc:receiveCB>\n            <loc:ussdOpType>1</loc:ussdOpType>\n            <loc:msIsdn>22544447310</loc:msIsdn>\n            <loc:serviceCode>218</loc:serviceCode>\n            <loc:codeScheme>15</loc:codeScheme>\n            <loc:ussdString>\n      1- Jeux\n      2- Mes paris\n      3- Mon solde\n      4- Rechargement\n      5- Votre service SMS\n      6- Mes OTP - codes retraits\n      7- Mes comptes\n    </loc:ussdString>\n          </loc:sendUssd>\n        </soapenv:Body>\n      </soapenv:Envelope>\n    "], ["request_url", "196.201.33.108:8310/SendUssdService/services/SendUssd"], ["response_log", ""], ["status", "t"], ["time_trail", "\n      Notification request received at: 11-10-2016 07:58:52.606\n\n    \n      Notification response sent at: 11-10-2016 07:58:52.609\n\n    \n      SendUssdRequest request sent at: 11-10-2016 07:58:52.747\n\n    \n      SendUssdRequest response received at: 11-10-2016 07:59:22.750\n\n    "], ["total_time", 30.001438], ["updated_at", "2016-10-11 07:59:22.784521"]]
+  [1m[36m (14.4ms)[0m  [1mCOMMIT[0m
+Completed 200 OK in 30198ms (Views: 0.5ms | ActiveRecord: 108.5ms)
+
+
+Started GET "/start_ussd_log" for 127.0.0.1 at 2016-10-11 08:02:09 +0000
+
+ActionController::RoutingError (No route matches [GET] "/start_ussd_log"):
+  actionpack (4.1.8) lib/action_dispatch/middleware/debug_exceptions.rb:21:in `call'
+  actionpack (4.1.8) lib/action_dispatch/middleware/show_exceptions.rb:30:in `call'
+  railties (4.1.8) lib/rails/rack/logger.rb:38:in `call_app'
+  railties (4.1.8) lib/rails/rack/logger.rb:20:in `block in call'
+  activesupport (4.1.8) lib/active_support/tagged_logging.rb:68:in `block in tagged'
+  activesupport (4.1.8) lib/active_support/tagged_logging.rb:26:in `tagged'
+  activesupport (4.1.8) lib/active_support/tagged_logging.rb:68:in `tagged'
+  railties (4.1.8) lib/rails/rack/logger.rb:20:in `call'
+  actionpack (4.1.8) lib/action_dispatch/middleware/request_id.rb:21:in `call'
+  rack (1.5.5) lib/rack/methodoverride.rb:21:in `call'
+  rack (1.5.5) lib/rack/runtime.rb:17:in `call'
+  activesupport (4.1.8) lib/active_support/cache/strategy/local_cache_middleware.rb:26:in `call'
+  rack (1.5.5) lib/rack/lock.rb:17:in `call'
+  actionpack (4.1.8) lib/action_dispatch/middleware/static.rb:84:in `call'
+  rack (1.5.5) lib/rack/sendfile.rb:112:in `call'
+  railties (4.1.8) lib/rails/engine.rb:514:in `call'
+  railties (4.1.8) lib/rails/application.rb:144:in `call'
+  rack (1.5.5) lib/rack/lock.rb:17:in `call'
+  rack (1.5.5) lib/rack/content_length.rb:14:in `call'
+  rack (1.5.5) lib/rack/handler/webrick.rb:60:in `service'
+  /home/dietrich/.rvm/rubies/ruby-2.0.0-p195/lib/ruby/2.0.0/webrick/httpserver.rb:138:in `service'
+  /home/dietrich/.rvm/rubies/ruby-2.0.0-p195/lib/ruby/2.0.0/webrick/httpserver.rb:94:in `run'
+  /home/dietrich/.rvm/rubies/ruby-2.0.0-p195/lib/ruby/2.0.0/webrick/server.rb:295:in `block in start_thread'
+
+
+  Rendered /home/dietrich/.rvm/gems/ruby-2.0.0-p195@rails4.0.7/gems/actionpack-4.1.8/lib/action_dispatch/middleware/templates/rescues/_trace.html.erb (2.3ms)
+  Rendered /home/dietrich/.rvm/gems/ruby-2.0.0-p195@rails4.0.7/gems/actionpack-4.1.8/lib/action_dispatch/middleware/templates/routes/_route.html.erb (6.9ms)
+  Rendered /home/dietrich/.rvm/gems/ruby-2.0.0-p195@rails4.0.7/gems/actionpack-4.1.8/lib/action_dispatch/middleware/templates/routes/_table.html.erb (22.7ms)
+  Rendered /home/dietrich/.rvm/gems/ruby-2.0.0-p195@rails4.0.7/gems/actionpack-4.1.8/lib/action_dispatch/middleware/templates/rescues/routing_error.html.erb within rescues/layout (211.9ms)
+
+
+Started GET "/ussd_testing/start_ussd_log" for 127.0.0.1 at 2016-10-11 08:02:42 +0000
+Processing by UssdTestingController#start_ussd_log as */*
+  [1m[35mMtnStartSessionLog Load (1.3ms)[0m  SELECT  "mtn_start_session_logs".* FROM "mtn_start_session_logs"   ORDER BY "mtn_start_session_logs"."id" DESC LIMIT 1
+  Rendered text template (0.1ms)
+Completed 200 OK in 48ms (Views: 19.0ms | ActiveRecord: 4.5ms)
+
+
+Started GET "/ussd_testing/start_ussd_log" for 127.0.0.1 at 2016-10-11 08:03:16 +0000
+Processing by UssdTestingController#start_ussd_log as HTML
+  [1m[36mMtnStartSessionLog Load (1.1ms)[0m  [1mSELECT  "mtn_start_session_logs".* FROM "mtn_start_session_logs"   ORDER BY "mtn_start_session_logs"."id" DESC LIMIT 1[0m
+  Rendered text template (0.0ms)
+Completed 200 OK in 7ms (Views: 0.6ms | ActiveRecord: 1.1ms)

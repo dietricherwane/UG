@@ -120,6 +120,10 @@ class UssdTestingController < ApplicationController
   end
 
   def main_menu
+    @time_trail = %Q[
+      Notification request received at: #{DateTime.now.strftime('%d-%m-%Y %H:%M:%S.%L')}
+
+    ]
     @raw_body = request.body.read.gsub("ns1:", "").gsub("ns2:", "") rescue nil
     @received_body = (Nokogiri.XML(@raw_body) rescue nil)
     remote_ip_address = request.remote_ip
@@ -142,7 +146,7 @@ class UssdTestingController < ApplicationController
       c_main_menu_check_service_code
       c_main_menu_check_ussd_string
 
-      UssdReceptionLog.create(received_parameters: @raw_body, rev_id: @rev_id, rev_password: @rev_password, sp_id: @sp_id, service_id: @service_id, timestamp: @timestamp, trace_unique_id: @unique_id, msg_type: @msg_type, sender_cb: @sender_cb, receiver_cb: @receive_cb, ussd_of_type: @ussd_op_type, msisdn: @msisdn, service_code: @service_code, code_scheme: @code_scheme, ussd_string: @ussd_string, error_code: @error_code, error_message: @error_message, remote_ip: remote_ip_address)
+
     end
 
     result = %Q[
@@ -159,6 +163,12 @@ class UssdTestingController < ApplicationController
     @msisdn = @msisdn
     @sender_cb = @sender_cb
     @linkid = @linkid
+
+    @time_trail << %Q[
+      Notification response sent at: #{DateTime.now.strftime('%d-%m-%Y %H:%M:%S.%L')}
+
+    ]
+    UssdReceptionLog.create(received_parameters: @raw_body, rev_id: @rev_id, rev_password: @rev_password, sp_id: @sp_id, service_id: @service_id, timestamp: @timestamp, trace_unique_id: @unique_id, msg_type: @msg_type, sender_cb: @sender_cb, receiver_cb: @receive_cb, ussd_of_type: @ussd_op_type, msisdn: @msisdn, service_code: @service_code, code_scheme: @code_scheme, ussd_string: @ussd_string, error_code: @error_code, error_message: @error_message, remote_ip: remote_ip_address, time_trail: @time_trail)
 
     render :xml => result
 
@@ -319,7 +329,7 @@ class UssdTestingController < ApplicationController
             <loc:senderCB>#{sender_cb}</loc:senderCB>
             <loc:receiveCB>#{@receive_cb}</loc:receiveCB>
             <loc:ussdOpType>1</loc:ussdOpType>
-            <loc:msIsdn>#{msisdn}</loc:msIsdn>
+            <loc:msIsdn>#{@msisdn}</loc:msIsdn>
             <loc:serviceCode>#{service_code}</loc:serviceCode>
             <loc:codeScheme>#{code_scheme}</loc:codeScheme>
             <loc:ussdString>#{ussd_string}</loc:ussdString>
@@ -328,7 +338,16 @@ class UssdTestingController < ApplicationController
       </soapenv:Envelope>
     ]
 
+    @time_trail << %Q[
+      SendUssdRequest request sent at: #{DateTime.now.strftime('%d-%m-%Y %H:%M:%S.%L')}
+
+    ]
+
     send_ussd_response = Typhoeus.post(url, body: request_body, connecttimeout: 30, headers: { 'Content-Type'=> "text/xml;charset=UTF-8" })
+    @time_trail << %Q[
+      SendUssdRequest response received at: #{DateTime.now.strftime('%d-%m-%Y %H:%M:%S.%L')}
+
+    ]
 
     nokogiri_response = (Nokogiri.XML(send_ussd_response.body) rescue nil)
 
@@ -341,6 +360,10 @@ class UssdTestingController < ApplicationController
       status = false
     end
 
-    MtnStartSessionLog.create(operation_type: "Send ussd", request_url: url, request_log: request_body, response_log: send_ussd_response.body, request_code: send_ussd_response.code, total_time: send_ussd_response.total_time, request_headers: send_ussd_response.headers.to_s, error_code: error_code, error_message: error_message, status: status)
+    MtnStartSessionLog.create(operation_type: "Send ussd", request_url: url, request_log: request_body, response_log: send_ussd_response.body, request_code: send_ussd_response.code, total_time: send_ussd_response.total_time, request_headers: send_ussd_response.headers.to_s, error_code: error_code, error_message: error_message, status: status, time_trail: @time_trail)
+  end
+
+  def start_ussd_log
+    render text: MtnStartSessionLog.last.to_yaml
   end
 end

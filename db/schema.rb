@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161005023339) do
+ActiveRecord::Schema.define(version: 20161011070319) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -66,6 +66,7 @@ ActiveRecord::Schema.define(version: 20161005023339) do
     t.boolean  "status"
     t.string   "correlator_id"
     t.string   "operation_type"
+    t.text     "time_trail"
   end
 
   create_table "parameters", force: true do |t|
@@ -100,6 +101,7 @@ ActiveRecord::Schema.define(version: 20161005023339) do
     t.string   "error_message"
     t.boolean  "status"
     t.string   "remote_ip"
+    t.string   "time_trail"
   end
 
 end
