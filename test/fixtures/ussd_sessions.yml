@@ -1,0 +1,17 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  session_identifier: MyString
+  sender_cb: MyString
+  parionsdirect_password_url: MyString
+  parionsdirect_password_response: MyText
+  parionsdirect_password: MyString
+  parionsdirect_salt: MyString
+
+two:
+  session_identifier: MyString
+  sender_cb: MyString
+  parionsdirect_password_url: MyString
+  parionsdirect_password_response: MyText
+  parionsdirect_password: MyString
+  parionsdirect_salt: MyString

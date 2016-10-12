@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161011153245) do
+ActiveRecord::Schema.define(version: 20161012183317) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -118,6 +118,17 @@ ActiveRecord::Schema.define(version: 20161011153245) do
     t.boolean  "status"
     t.string   "remote_ip"
     t.string   "time_trail"
+  end
+
+  create_table "ussd_sessions", force: true do |t|
+    t.string   "session_identifier"
+    t.string   "sender_cb"
+    t.string   "parionsdirect_password_url"
+    t.text     "parionsdirect_password_response"
+    t.string   "parionsdirect_password"
+    t.string   "parionsdirect_salt"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
 end

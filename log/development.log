@@ -53735,3 +53735,10 @@ Migrating to CreateDelayedJobs (20161011153245)
   [1m[36mSQL (0.9ms)[0m  [1mINSERT INTO "schema_migrations" ("version") VALUES ($1)[0m  [["version", "20161011153245"]]
   [1m[35m (19.4ms)[0m  COMMIT
   [1m[36mActiveRecord::SchemaMigration Load (0.7ms)[0m  [1mSELECT "schema_migrations".* FROM "schema_migrations"[0m
+  [1m[36mActiveRecord::SchemaMigration Load (30.6ms)[0m  [1mSELECT "schema_migrations".* FROM "schema_migrations"[0m
+Migrating to CreateUssdSessions (20161012183317)
+  [1m[35m (0.6ms)[0m  BEGIN
+  [1m[36m (408.1ms)[0m  [1mCREATE TABLE "ussd_sessions" ("id" serial primary key, "session_identifier" character varying(255), "sender_cb" character varying(255), "parionsdirect_password_url" character varying(255), "parionsdirect_password_response" text, "parionsdirect_password" character varying(255), "parionsdirect_salt" character varying(255), "created_at" timestamp, "updated_at" timestamp) [0m
+  [1m[35mSQL (0.7ms)[0m  INSERT INTO "schema_migrations" ("version") VALUES ($1)  [["version", "20161012183317"]]
+  [1m[36m (69.6ms)[0m  [1mCOMMIT[0m
+  [1m[35mActiveRecord::SchemaMigration Load (0.7ms)[0m  SELECT "schema_migrations".* FROM "schema_migrations"
