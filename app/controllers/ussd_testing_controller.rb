@@ -121,10 +121,6 @@ class UssdTestingController < ApplicationController
   end
 
   def main_menu
-    @time_trail = %Q[
-      Notification request received at: #{DateTime.now.strftime('%d-%m-%Y %H:%M:%S.%L')}
-
-    ]
     @raw_body = request.body.read.gsub("ns1:", "").gsub("ns2:", "") rescue nil
     @received_body = (Nokogiri.XML(@raw_body) rescue nil)
     remote_ip_address = request.remote_ip
@@ -134,8 +130,10 @@ class UssdTestingController < ApplicationController
     c_main_menu_parse_xml
 
     if @error_code == '0'
+      # Découpage des paramètres reçus dans la requête et attribution à des variables
       main_menu_parse_xml
 
+      # Contrôles sur les paramètres transmis
       c_main_menu_check_sp_id
       c_main_menu_check_service_id
       c_main_menu_check_unique_id
@@ -147,37 +145,45 @@ class UssdTestingController < ApplicationController
       c_main_menu_check_service_code
       c_main_menu_check_ussd_string
 
-
+      # Détermination du type de message à transmettre (sendussd ou abort response)
+      c_main_menu_abort_message?(@abort_reason)
     end
 
-    result = %Q[
-            <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:loc="http://www.csapi.org/schema/parlayx/ussd/notification/v1_0/local">
-              <soapenv:Header/>
-              <soapenv:Body>
-                <loc:notifyUssdReceptionResponse>
-                  <loc:result>#{@error_code}</loc:result>
-                </loc:notifyUssdReceptionResponse>
-              </soapenv:Body>
-            </soapenv:Envelope>
-          ]
+    # Responds to the SDP depending on the message type (sendussd or abort response)
+    set_main_menu_result_text(@abort_reason, @error_code)
 
-    @msisdn = @msisdn
-    @sender_cb = @sender_cb
-    @linkid = @linkid
+    UssdReceptionLog.create(received_parameters: @raw_body, rev_id: @rev_id, rev_password: @rev_password, sp_id: @sp_id, service_id: @service_id, timestamp: @timestamp, trace_unique_id: @unique_id, msg_type: @msg_type, sender_cb: @sender_cb, receiver_cb: @receive_cb, ussd_of_type: @ussd_op_type, msisdn: @msisdn, service_code: @service_code, code_scheme: @code_scheme, ussd_string: @ussd_string, error_code: @error_code, error_message: @error_message, remote_ip: remote_ip_address)
 
-    @time_trail << %Q[
-      Notification response sent at: #{DateTime.now.strftime('%d-%m-%Y %H:%M:%S.%L')}
-
-    ]
-    UssdReceptionLog.create(received_parameters: @raw_body, rev_id: @rev_id, rev_password: @rev_password, sp_id: @sp_id, service_id: @service_id, timestamp: @timestamp, trace_unique_id: @unique_id, msg_type: @msg_type, sender_cb: @sender_cb, receiver_cb: @receive_cb, ussd_of_type: @ussd_op_type, msisdn: @msisdn, service_code: @service_code, code_scheme: @code_scheme, ussd_string: @ussd_string, error_code: @error_code, error_message: @error_message, remote_ip: remote_ip_address, time_trail: @time_trail)
-
-    render :xml => result
+    render :xml => @result
 
     Thread.new do
       if @error_code == '0'
-        #sleep(0.1)
-        send_ussd(@msisdn, @sender_cb, @linkid)
+        send_ussd(@operation_type, @msisdn, @sender_cb, @linkid)
       end
+    end
+  end
+
+  def set_main_menu_result_text(abort_reason, error_code)
+    if abort_reason.blank?
+      @result = %Q[
+              <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:loc="http://www.csapi.org/schema/parlayx/ussd/notification/v1_0/local">
+                <soapenv:Header/>
+                <soapenv:Body>
+                  <loc:notifyUssdReceptionResponse>
+                    <loc:result>#{error_code}</loc:result>
+                  </loc:notifyUssdReceptionResponse>
+                </soapenv:Body>
+              </soapenv:Envelope>
+            ]
+    else
+      @result = %Q[
+              <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:loc="http://www.csapi.org/schema/parlayx/ussd/notification/v1_0/local">
+                <soapenv:Header><soapenv:Header/>
+                <soapenv:Body>
+                  <loc:notifyUssdAbortResponse><loc:notifyUssdAbortResponse/>
+                </soapenv:Body>
+              </soapenv:Envelope>
+            ]
     end
   end
 
@@ -191,8 +197,9 @@ class UssdTestingController < ApplicationController
     @unique_id = @received_body.xpath('//NotifySOAPHeader/traceUniqueID').text  rescue nil
 
     @msg_type = @received_body.xpath('//notifyUssdReception/msgType').text rescue nil
-    @sender_cb = @received_body.xpath('//notifyUssdReception/senderCB').text rescue nil
-    @receive_cb = @received_body.xpath('//notifyUssdReception/receiveCB').text rescue nil
+    @sender_cb = @received_body.xpath('//notifyUssdReception/senderCB').text rescue @received_body.xpath('//notifyUssdAbort/senderCB').text rescue nil
+    @receive_cb = @received_body.xpath('//notifyUssdReception/receiveCB').text rescue @received_body.xpath('//notifyUssdAbort/receiveCB').text rescue nil
+    @abort_reason = @received_body.xpath('//notifyUssdAbort/abortReason').text rescue nil
     @ussd_op_type = @received_body.xpath('//notifyUssdReception/ussdOpType').text rescue nil
     @msisdn = @received_body.xpath('//notifyUssdReception/msIsdn').text rescue nil
     @service_code = @received_body.xpath('//notifyUssdReception/serviceCode').text rescue nil
@@ -284,7 +291,17 @@ class UssdTestingController < ApplicationController
     end
   end
 
-  def send_ussd(msisdn, receive_cb, linkid)
+  def c_main_menu_abort_message?(abort_reason)
+    if abort_reason.blank?
+      @operation_type = "Send ussd"
+    else
+      @operation_type = "USSD abort"
+      @error_code = 'NURR_13'
+      @error_message = abort_reason
+    end
+  end
+
+  def send_ussd(operation_type, msisdn, receive_cb, linkid)
     url = '196.201.33.108:8310/SendUssdService/services/SendUssd'
     sp_id = '2250110000460'
     service_id = '225012000003070'
@@ -338,16 +355,7 @@ class UssdTestingController < ApplicationController
       </soapenv:Envelope>
     ]
 
-    @time_trail << %Q[
-      SendUssdRequest request sent at: #{DateTime.now.strftime('%d-%m-%Y %H:%M:%S.%L')}
-
-    ]
-
     send_ussd_response = Typhoeus.post(url, body: request_body, connecttimeout: 30, headers: { 'Content-Type'=> "text/xml;charset=UTF-8" })
-    @time_trail << %Q[
-      SendUssdRequest response received at: #{DateTime.now.strftime('%d-%m-%Y %H:%M:%S.%L')}
-
-    ]
 
     nokogiri_response = (Nokogiri.XML(send_ussd_response.body) rescue nil)
 
@@ -360,7 +368,7 @@ class UssdTestingController < ApplicationController
       status = false
     end
 
-    MtnStartSessionLog.create(operation_type: "Send ussd", request_url: url, request_log: request_body, response_log: send_ussd_response.body, request_code: send_ussd_response.code, total_time: send_ussd_response.total_time, request_headers: send_ussd_response.headers.to_s, error_code: error_code, error_message: error_message, status: status, time_trail: @time_trail)
+    MtnStartSessionLog.create(operation_type: operation_type, request_url: url, request_log: request_body, response_log: send_ussd_response.body, request_code: send_ussd_response.code, total_time: send_ussd_response.total_time, request_headers: send_ussd_response.headers.to_s, error_code: error_code, error_message: error_message, status: status)
   end
 
   def start_ussd_log
