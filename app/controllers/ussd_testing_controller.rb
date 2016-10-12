@@ -198,8 +198,8 @@ class UssdTestingController < ApplicationController
 
     @msg_type = @received_body.xpath('//notifyUssdReception/msgType').text rescue nil
     @abort_reason = @received_body.xpath('//notifyUssdAbort/abortReason').text rescue nil
-    @abort_reason.blank? ? @sender_cb = (@received_body.xpath('//notifyUssdReception/senderCB').text  rescue nil) : @sender_cb = (@received_body.xpath('//notifyUssdAbort/senderCB').text rescue nil)
-    @abort_reason.blank? ? ? (@receive_cb = @received_body.xpath('//notifyUssdReception/receiveCB').text rescue nil) : (@receive_cb = @received_body.xpath('//notifyUssdAbort/receiveCB').text rescue nil)
+    @abort_reason.blank? ? (@sender_cb = @received_body.xpath('//notifyUssdReception/senderCB').text  rescue nil) : (@sender_cb = @received_body.xpath('//notifyUssdAbort/senderCB').text rescue nil)
+    @abort_reason.blank? ? (@receive_cb = @received_body.xpath('//notifyUssdReception/receiveCB').text rescue nil) : (@receive_cb = @received_body.xpath('//notifyUssdAbort/receiveCB').text rescue nil)
     @ussd_op_type = @received_body.xpath('//notifyUssdReception/ussdOpType').text rescue nil
     @msisdn = @received_body.xpath('//notifyUssdReception/msIsdn').text rescue nil
     @service_code = @received_body.xpath('//notifyUssdReception/serviceCode').text rescue nil
