@@ -78,6 +78,7 @@ class UssdTestingController < ApplicationController
     sp_password = Digest::MD5.hexdigest(sp_id + password + timestamp)
     endpoint_url = 'http://195.14.0.128:6564/mtn/ussd/main_menu'
     #endpoint_url = 'http://41.189.40.193:6564/ussd_testing/wsdl'
+    #endpoint_url = 'http://41.189.40.193:6564/ussd_testing/wsdl'
     correlator_id = Correlator.first.correlator_id
     shortcode = '*218'
     interface_name = 'MainMenu'
@@ -114,7 +115,7 @@ class UssdTestingController < ApplicationController
       status = false
     end
 
-    MtnStartSessionLog.create(operation_type: "Stop session", request_url: url, request_log: request_body, response_log: start_session_response.body, request_code: start_session_response.code, total_time: start_session_response.total_time, request_headers: start_session_response.headers.to_s, error_code: error_code, error_message: error_message, status: status)
+    MtnStartSessionLog.create(operation_type: "Stop session", request_url: url, request_log: request_body, response_log: stop_session_response.body, request_code: stop_session_response.code, total_time: stop_session_response.total_time, request_headers: stop_session_response.headers.to_s, error_code: error_code, error_message: error_message, status: status)
 
     render text: stop_session_response.body
   end
