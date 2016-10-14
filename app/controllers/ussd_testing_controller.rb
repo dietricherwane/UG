@@ -150,8 +150,6 @@ class UssdTestingController < ApplicationController
       c_main_menu_abort_message?(@abort_reason)
     end
 
-
-
     # Responds to the SDP depending on the message type (sendussd or abort response)
     set_main_menu_result_text(@abort_reason, @error_code)
 
@@ -159,7 +157,7 @@ class UssdTestingController < ApplicationController
 
     render :xml => @result
 
-    Thread.new do
+    #Thread.new do
       if @error_code == '0'
         # Récupération d'une session existante
         @current_ussd_session = UssdSession.find_by_sender_cb(@sender_cb)
@@ -173,7 +171,7 @@ class UssdTestingController < ApplicationController
 
         send_ussd(@operation_type, @msisdn, @sender_cb, @linkid, @rendered_text)
       end
-    end
+    #end
   end
 
   def send_ussd(operation_type, msisdn, receive_cb, linkid, ussd_string)
