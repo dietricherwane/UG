@@ -245,7 +245,7 @@ class UssdTestingController < ApplicationController
   end
 
   def authenticate_or_create_parionsdirect_account(msisdn)
-    @parionsdirect_password_url = Parameter.first.gateway_url + "/85fg69a7a9c59f3a0/api/users/password/#{msisdn}"
+    @parionsdirect_password_url = Parameter.first.gateway_url + "/85fg69a7a9c59f3a0/api/users/password/#{msisdn[-8,8] rescue 0}"
     @parionsdirect_password_response = Typhoeus.get(@parionsdirect_password_url, connecttimeout: 30)
     password = @parionsdirect_password_response.body.split('-') rescue nil
     @password = password[0] rescue nil
