@@ -162,12 +162,12 @@ class UssdTestingController < ApplicationController
         # Récupération d'une session existante
         @current_ussd_session = UssdSession.find_by_sender_cb(@sender_cb)
 
-        if @current_ussd_session.blank?
+        #if @current_ussd_session.blank?
           authenticate_or_create_parionsdirect_account(@msisdn)
           UssdSession.create(session_identifier: @session_identifier, sender_cb: @sender_cb, parionsdirect_password_url: @parionsdirect_password_url, parionsdirect_password_response: @parionsdirect_password_response.body, parionsdirect_password: @password, parionsdirect_salt: @salt)
-        else
+        #else
 
-        end
+        #end
 
         send_ussd(@operation_type, @msisdn, @sender_cb, @linkid, @rendered_text)
       end
@@ -253,15 +253,11 @@ class UssdTestingController < ApplicationController
 
     if password.blank?
       # Le client n'a pas de compte parionsdirect et doit en créer un
-      @rendered_text = %Q[
-        Veuillez entrer un mot de passe.
-      ]
+      @rendered_text = %Q[Veuillez entrer un mot de passe.]
       @session_identifier = '1'
     else
       # Le client a un compte parionsdirect et doit s'authentifier
-      @rendered_text = %Q[
-        Veuillez entrer votre mot de passe parionsdirect.
-      ]
+      @rendered_text = %Q[Veuillez entrer votre mot de passe parionsdirect.]
       @session_identifier = '2'
     end
   end
