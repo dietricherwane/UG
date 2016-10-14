@@ -246,10 +246,10 @@ class UssdTestingController < ApplicationController
 
   def authenticate_or_create_parionsdirect_account(msisdn)
     @parionsdirect_password_url = Parameter.first.gateway_url + "/85fg69a7a9c59f3a0/api/users/password/#{msisdn}"
-    @parionsdirect_password_response = Typhoeus.get(url, connecttimeout: 30)
+    @parionsdirect_password_response = Typhoeus.get(@parionsdirect_password_url, connecttimeout: 30)
     password = @parionsdirect_password_response.body.split('-') rescue nil
-    @password = password[0]
-    @salt = password_salt[1]
+    @password = password[0] rescue nil
+    @salt = password_salt[1] rescue nil
 
     if password.blank?
       # Le client n'a pas de compte parionsdirect et doit en créer un
