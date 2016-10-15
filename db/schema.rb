@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161012183317) do
+ActiveRecord::Schema.define(version: 20161015124226) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -129,6 +129,13 @@ ActiveRecord::Schema.define(version: 20161012183317) do
     t.string   "parionsdirect_salt"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "creation_pd_password"
+    t.string   "creation_pd_password_confirmation"
+    t.text     "creation_pd_request"
+    t.text     "creation_pd_response"
+    t.text     "creation_pw_request"
+    t.text     "creation_pw_response"
+    t.string   "connection_pd_pasword"
   end
 
 end
