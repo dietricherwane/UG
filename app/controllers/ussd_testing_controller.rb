@@ -157,7 +157,7 @@ class UssdTestingController < ApplicationController
 
     render :xml => @result
 
-    #Thread.new do
+    Thread.new do
       if @error_code == '0'
         # Récupération d'une session existante
         @current_ussd_session = UssdSession.find_by_sender_cb(@sender_cb)
@@ -184,7 +184,7 @@ class UssdTestingController < ApplicationController
 
         send_ussd(@operation_type, @msisdn, @sender_cb, @linkid, @rendered_text)
       end
-    #end
+    end
   end
 
   def authenticate_or_create_parionsdirect_account(msisdn)
@@ -439,7 +439,7 @@ class UssdTestingController < ApplicationController
     end
   end
 
-  def send_ussd(operation_type, msisdn, receive_cb, linkid, ussd_string)
+  def send_ussd(operation_type, msisdn, sender_cb, linkid, ussd_string)
     url = '196.201.33.108:8310/SendUssdService/services/SendUssd'
     sp_id = '2250110000460'
     service_id = '225012000003070'
@@ -448,7 +448,7 @@ class UssdTestingController < ApplicationController
     sp_password = Digest::MD5.hexdigest(sp_id + password + timestamp)
     present_id = ''
     msg_type = '1'
-    sender_cb = Digest::SHA1.hexdigest([DateTime.now.iso8601(6), rand].join).hex.to_s[0..7]
+    sender_cb = sender_cb#Digest::SHA1.hexdigest([DateTime.now.iso8601(6), rand].join).hex.to_s[0..7]
     ussd_op_type = '1'
     service_code = '218'
     code_scheme = '15'
@@ -482,7 +482,7 @@ class UssdTestingController < ApplicationController
           <loc:sendUssd>
             <loc:msgType>#{msg_type}</loc:msgType>
             <loc:senderCB>#{sender_cb}</loc:senderCB>
-            <loc:receiveCB>#{receive_cb}</loc:receiveCB>
+            <loc:receiveCB>#{sender_cb}</loc:receiveCB>
             <loc:ussdOpType>1</loc:ussdOpType>
             <loc:msIsdn>#{msisdn}</loc:msIsdn>
             <loc:serviceCode>#{service_code}</loc:serviceCode>
