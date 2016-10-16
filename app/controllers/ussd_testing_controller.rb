@@ -217,10 +217,24 @@ class UssdTestingController < ApplicationController
     else
       password = Digest::SHA2.hexdigest(@current_ussd_session.parionsdirect_salt + @ussd_string)
       if password == @current_ussd_session.parionsdirect_password
-        @rendered_text = %Q[
-          Veuillez saisir votre numéro de compte Paymoney.
+        existing_paymoney_account = AccountProfile.find_by_msisdn(@msisdn[-8,8])
+        if existing_paymoney_account.blank?
+          @rendered_text = %Q[
+            Veuillez saisir votre numéro de compte Paymoney.
+            ]
+          @session_identifier = '4'
+        else
+          @rendered_text = %Q[
+          1- Jeux
+          2- Mes paris
+          3- Mon solde
+          4- Rechargement
+          5- Votre service SMS
+          6- Mes OTP - codes retraits
+          7- Mes comptes
           ]
-        @session_identifier = '4'
+          @session_identifier = '5'
+        end
       else
         @rendered_text = %Q[
           Le mot de passe saisi n'est pas valide
