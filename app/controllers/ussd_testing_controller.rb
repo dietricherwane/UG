@@ -218,6 +218,7 @@ class UssdTestingController < ApplicationController
       password = Digest::SHA2.hexdigest(@current_ussd_session.parionsdirect_salt + @ussd_string)
       if password == @current_ussd_session.parionsdirect_password
         existing_paymoney_account = AccountProfile.find_by_msisdn(@msisdn[-8,8])
+        # On vérifie que le client n'a pas déjà de compte Paymoney associé à son numéro
         if existing_paymoney_account.blank?
           @rendered_text = %Q[
             Veuillez saisir votre numéro de compte Paymoney.
@@ -257,6 +258,8 @@ class UssdTestingController < ApplicationController
       if !@check_pw_account_response.body.blank? && @check_pw_account_response.body != 'null'
         @pw_account_number = @ussd_string
         @pw_account_token = @check_pw_account_response.body
+        # On associe le compte Paymoney du client à son numéro
+        AccountProfile.create(msisdn: @msisdn[-8,8], paymoney_account_number: @pw_account_number) rescue nil
         @rendered_text = %Q[
           1- Jeux
           2- Mes paris
