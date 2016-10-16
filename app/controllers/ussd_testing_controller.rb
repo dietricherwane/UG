@@ -171,14 +171,18 @@ class UssdTestingController < ApplicationController
             set_parionsdirect_password
             @current_ussd_session.update_attributes(session_identifier: @session_identifier, creation_pd_password: @creation_pd_password)
           end
-          if @current_ussd_session.session_identifier == '2'
-            check_parionsdirect_password
-            @current_ussd_session.update_attributes(session_identifier: @session_identifier, connection_pd_pasword: @ussd_string)
-          end
           # Saisie de la confirmation du mot de passe de création de compte parionsdirect
           if @current_ussd_session.session_identifier == '3'
             create_parionsdirect_and_paymoney_account
             @current_ussd_session.update_attributes(session_identifier: @session_identifier, creation_pd_password: @creation_pd_password, creation_pd_password_confirmation: @creation_pd_password_confirmation, creation_pd_request: @creation_pd_request, creation_pd_response: @creation_pd_response.body, pd_account_created: @pd_account_created, creation_pw_request: @creation_pw_request, creation_pw_response: @creation_pw_response.body, pw_account_created: @pw_account_created)
+          end
+          if @current_ussd_session.session_identifier == '2'
+            check_parionsdirect_password
+            @current_ussd_session.update_attributes(session_identifier: @session_identifier, connection_pd_pasword: @ussd_string)
+          end
+          if @current_ussd_session.session_identifier == '4'
+            check_paymoney_account_number
+            @current_ussd_session.update_attributes(session_identifier: @session_identifier, check_pw_account_url: @check_pw_account_url, check_pw_account_response: @check_pw_account_response, pw_account_number: @pw_account_number, pw_account_token: @pw_account_token)
           end
         end
 
@@ -223,6 +227,38 @@ class UssdTestingController < ApplicationController
           Veuillez entrer votre mot de passe parionsdirect.
           ]
         @session_identifier = '2'
+      end
+    end
+  end
+
+  def check_paymoney_account_number
+    if @ussd_string.blank?
+      # Le client n'a pas de compte parionsdirect et entrer un mot de passe pour en créer un
+      @rendered_text = %Q[Veuillez saisir votre numéro de compte Paymoney.]
+      @session_identifier = '4'
+    else
+      @check_pw_account_url = Parameter.first.paymoney_url + "/PAYMONEY_WALLET/rest/check2_compte/#{@ussd_string}"
+      @check_pw_account_response = Typhoeus.get(@check_pw_account_url, connecttimeout: 30)
+
+      if !@check_pw_account_response.body.blank? && @check_pw_account_response.body != 'null'
+        @pw_account_number = @ussd_string
+        @pw_account_token = @check_pw_account_response.body
+        @rendered_text = %Q[
+          1- Jeux
+          2- Mes paris
+          3- Mon solde
+          4- Rechargement
+          5- Votre service SMS
+          6- Mes OTP - codes retraits
+          7- Mes comptes
+          ]
+        @session_identifier = '5'
+      else
+        @rendered_text = %Q[
+          Le compte Paymoney fourni n'a pas été trouvé.
+          Veuillez saisir votre numéro de compte Paymoney.
+          ]
+        @session_identifier = '4'
       end
     end
   end
