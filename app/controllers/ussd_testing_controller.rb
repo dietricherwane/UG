@@ -164,7 +164,7 @@ class UssdTestingController < ApplicationController
 
         if @current_ussd_session.blank?
           authenticate_or_create_parionsdirect_account(@msisdn)
-          UssdSession.create(session_identifier: @session_identifier, sender_cb: @sender_cb, parionsdirect_password_url: @parionsdirect_password_url, parionsdirect_password_response: @parionsdirect_password_response.body, parionsdirect_password: @password, parionsdirect_salt: @salt)
+          UssdSession.create(session_identifier: @session_identifier, sender_cb: @sender_cb, parionsdirect_password_url: @parionsdirect_password_url, parionsdirect_password_response: (@parionsdirect_password_response.body rescue 'ERR'), parionsdirect_password: @password, parionsdirect_salt: @salt)
         else
           # Saisie du mot de passe de création de compte parionsdirect
           if @current_ussd_session.session_identifier == '1'
@@ -174,12 +174,12 @@ class UssdTestingController < ApplicationController
           # Saisie de la confirmation du mot de passe de création de compte parionsdirect
           if @current_ussd_session.session_identifier == '3'
             create_parionsdirect_account
-            @current_ussd_session.update_attributes(session_identifier: @session_identifier, creation_pd_password: @creation_pd_password, creation_pd_password_confirmation: @creation_pd_password_confirmation, creation_pd_request: @creation_pd_request, creation_pd_response: @creation_pd_response.body, pd_account_created: @pd_account_created)
+            @current_ussd_session.update_attributes(session_identifier: @session_identifier, creation_pd_password: @creation_pd_password, creation_pd_password_confirmation: @creation_pd_password_confirmation, creation_pd_request: @creation_pd_request, creation_pd_response: (@creation_pd_response.body rescue 'ERR'), pd_account_created: @pd_account_created)
           end
           # Saisie du numéro de compte PAYMONEY
           if @current_ussd_session.session_identifier == '4-'
             create_paymoney_account
-            @current_ussd_session.update_attributes(session_identifier: @session_identifier, creation_pw_request: @creation_pw_request, creation_pw_response: @creation_pw_response.body, pw_account_created: @pw_account_created)
+            @current_ussd_session.update_attributes(session_identifier: @session_identifier, creation_pw_request: @creation_pw_request, creation_pw_response: (@creation_pw_response.body rescue 'ERR'), pw_account_created: @pw_account_created)
           end
           if @current_ussd_session.session_identifier == '2'
             check_parionsdirect_password
