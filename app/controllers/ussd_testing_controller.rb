@@ -173,8 +173,13 @@ class UssdTestingController < ApplicationController
           end
           # Saisie de la confirmation du mot de passe de création de compte parionsdirect
           if @current_ussd_session.session_identifier == '3'
-            create_parionsdirect_and_paymoney_account
-            @current_ussd_session.update_attributes(session_identifier: @session_identifier, creation_pd_password: @creation_pd_password, creation_pd_password_confirmation: @creation_pd_password_confirmation, creation_pd_request: @creation_pd_request, creation_pd_response: @creation_pd_response.body, pd_account_created: @pd_account_created, creation_pw_request: @creation_pw_request, creation_pw_response: @creation_pw_response.body, pw_account_created: @pw_account_created)
+            create_parionsdirect_account
+            @current_ussd_session.update_attributes(session_identifier: @session_identifier, creation_pd_password: @creation_pd_password, creation_pd_password_confirmation: @creation_pd_password_confirmation, creation_pd_request: @creation_pd_request, creation_pd_response: @creation_pd_response.body, pd_account_created: @pd_account_created)
+          end
+          # Saisie du numéro de compte PAYMONEY
+          if @current_ussd_session.session_identifier == '4-'
+            create_paymoney_account
+            @current_ussd_session.update_attributes(session_identifier: @session_identifier, creation_pw_request: @creation_pw_request, creation_pw_response: @creation_pw_response.body, pw_account_created: @pw_account_created)
           end
           if @current_ussd_session.session_identifier == '2'
             check_parionsdirect_password
@@ -200,7 +205,7 @@ class UssdTestingController < ApplicationController
 
     if password.blank?
       # Le client n'a pas de compte parionsdirect et doit en créer un
-      @rendered_text = %Q[Veuillez entrer un mot de passe.]
+      @rendered_text = %Q[Pour accéder à ce service, créez votre compte de jeu en entrant un mot de passe de 4 caractères.]
       @session_identifier = '1'
     else
       # Le client a un compte parionsdirect et doit s'authentifier
@@ -248,7 +253,7 @@ class UssdTestingController < ApplicationController
 
   def check_paymoney_account_number
     if @ussd_string.blank?
-      # Le client n'a pas de compte parionsdirect et entrer un mot de passe pour en créer un
+      # Le client saisit son numéro de compte Paymoney pour le faire valider
       @rendered_text = %Q[Veuillez saisir votre numéro de compte Paymoney.]
       @session_identifier = '4'
     else
@@ -283,9 +288,9 @@ class UssdTestingController < ApplicationController
   # Création d'un nouveau compte parionsdirect par saisie du mot de passe
   def set_parionsdirect_password
     # L'utilisateur n'a pas saisi de mot de passe, on le ramène au menu précédent
-    if @ussd_string.blank?
+    if @ussd_string.blank? || @ussd_string.length != 4
       # Le client n'a pas de compte parionsdirect et entrer un mot de passe pour en créer un
-      @rendered_text = %Q[Veuillez entrer un mot de passe.]
+      @rendered_text = %Q[Pour accéder à ce service, créez votre compte de jeu en entrant un mot de passe de 4 caractères.]
       @session_identifier = '1'
     else
       @creation_pd_password = @ussd_string
@@ -296,9 +301,9 @@ class UssdTestingController < ApplicationController
   end
 
   # Création d'un nouveau compte parionsdirect par confirmation du mot de passe et création d'un compte paymoney
-  def create_parionsdirect_and_paymoney_account
+  def create_parionsdirect_account
     # L'utilisateur n'a pas saisi de confirmation de mot de passe, on le ramène au menu précédent
-    if @ussd_string.blank?
+    if @ussd_string.blank? || @ussd_string.length != 4
       # Le client n'a pas de compte parionsdirect et confirmer le mot de passe pour en créer un
       @rendered_text = %Q[Veuillez confirmer le mot de passe précédemment entré.]
       @session_identifier = '3'
@@ -330,27 +335,51 @@ class UssdTestingController < ApplicationController
           @session_identifier = '3'
         else
           @pd_account_created = true
-          # Création du compte paymoney
-          @creation_pw_request = Parameter.first.paymoney_url + "/PAYMONEY_WALLET/rest/ussd_create_compte/#{@msisdn[-8,8]}"
-          @creation_pw_response = Typhoeus.get(@creation_pw_request, connecttimeout: 30)
-          paymoney_account = JSON.parse(@creation_pw_response.body) rescue nil
-          # Le compte paymoney a été créé
-          if (paymoney_account["errors"] rescue nil).blank?
-            @pw_account_created = true
-            @rendered_text = %Q[
-              Veuillez saisir votre numéro de compte Paymoney.
-              ]
-            @session_identifier = '4'
-          else
-            @pw_account_created = false
-            @rendered_text = %Q[
-              Une erreur s'est produite lors de la création du compte Paymoney
-              Veuillez confirmer le mot de passe précédemment entré.
-              ]
-            @session_identifier = '3'
-          end
+          @rendered_text = %Q[
+            Votre compte de jeu PARIONSDIRECT a été créé avec succès. Pour jouer, il vous faut un compte PAYMONEY. Avez vous un compte PAYMONEY?
+            1- Oui
+            2- Non
+            ]
+          @session_identifier = '4-'
         end
       end
+    end
+  end
+
+  def create_paymoney_account
+    if ['1', '2'].include?(@ussd_string)
+      if @ussd_string == '2'
+        # Création du compte paymoney du client
+        @creation_pw_request = Parameter.first.paymoney_url + "/PAYMONEY_WALLET/rest/ussd_create_compte/#{@msisdn[-8,8]}"
+        @creation_pw_response = Typhoeus.get(@creation_pw_request, connecttimeout: 30)
+        paymoney_account = JSON.parse(@creation_pw_response.body) rescue nil
+        # Le compte paymoney a été créé
+        if (paymoney_account["errors"] rescue nil).blank?
+          @pw_account_created = true
+          @rendered_text = %Q[
+            Veuillez saisir votre numéro de compte Paymoney.
+            ]
+          @session_identifier = '4'
+        else
+          @pw_account_created = false
+          @rendered_text = %Q[
+            Une erreur s'est produite lors de la création du compte Paymoney
+            Veuillez confirmer le mot de passe précédemment entré.
+            ]
+          @session_identifier = '3'
+        end
+      else
+        # Le client saisit son numéro de compte Paymoney pour le faire valider
+        @rendered_text = %Q[Veuillez saisir votre numéro de compte Paymoney.]
+        @session_identifier = '4'
+      end
+    else
+      @rendered_text = %Q[
+        Votre compte de jeu PARIONSDIRECT a été créé avec succès. Pour jouer, il vous faut un compte PAYMONEY. Avez vous un compte PAYMONEY?
+        1- Oui
+        2- Non
+        ]
+      @session_identifier = '4-'
     end
   end
 
