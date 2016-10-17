@@ -263,7 +263,7 @@ class UssdTestingController < ApplicationController
         @pw_account_number = @ussd_string
         @pw_account_token = @check_pw_account_response.body
         # On associe le compte Paymoney du client à son numéro
-        AccountProfile.create(msisdn: @msisdn[-8,8], paymoney_account_number: @pw_account_number) rescue nil
+        AccountProfile.find_by_msisdn(@msisdn[-8,8]).update_attributes(paymoney_account_number: @pw_account_number) rescue nil
         @rendered_text = %Q[
           1- Jeux
           2- Mes paris
