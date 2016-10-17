@@ -194,6 +194,8 @@ class UssdTestingController < ApplicationController
         #send_ussd(@operation_type, @msisdn, @sender_cb, @linkid, @rendered_text)
       end
     #end
+
+    render text: @rendered_text
   end
 
   def authenticate_or_create_parionsdirect_account(msisdn)
