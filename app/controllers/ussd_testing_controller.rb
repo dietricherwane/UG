@@ -155,9 +155,9 @@ class UssdTestingController < ApplicationController
 
     UssdReceptionLog.create(received_parameters: @raw_body, rev_id: @rev_id, rev_password: @rev_password, sp_id: @sp_id, service_id: @service_id, timestamp: @timestamp, trace_unique_id: @unique_id, msg_type: @msg_type, sender_cb: @sender_cb, receiver_cb: @receive_cb, ussd_of_type: @ussd_op_type, msisdn: @msisdn, service_code: @service_code, code_scheme: @code_scheme, ussd_string: @ussd_string, error_code: @error_code, error_message: @error_message, remote_ip: remote_ip_address)
 
-    #render :xml => @result
+    render :xml => @result
 
-    #Thread.new do
+    Thread.new do
       if @error_code == '0'
         # Récupération d'une session existante
         @current_ussd_session = UssdSession.find_by_sender_cb(@sender_cb)
@@ -166,36 +166,33 @@ class UssdTestingController < ApplicationController
           authenticate_or_create_parionsdirect_account(@msisdn)
           UssdSession.create(session_identifier: @session_identifier, sender_cb: @sender_cb, parionsdirect_password_url: @parionsdirect_password_url, parionsdirect_password_response: (@parionsdirect_password_response.body rescue 'ERR'), parionsdirect_password: @password, parionsdirect_salt: @salt)
         else
+          case @current_ussd_session.session_identifier
           # Saisie du mot de passe de création de compte parionsdirect
-          if @current_ussd_session.session_identifier == '1'
+          when '1'
             set_parionsdirect_password
             @current_ussd_session.update_attributes(session_identifier: @session_identifier, creation_pd_password: @creation_pd_password)
-          end
           # Saisie de la confirmation du mot de passe de création de compte parionsdirect
-          if @current_ussd_session.session_identifier == '3'
+          when '3'
             create_parionsdirect_account
             @current_ussd_session.update_attributes(session_identifier: @session_identifier, creation_pd_password: @creation_pd_password, creation_pd_password_confirmation: @creation_pd_password_confirmation, creation_pd_request: @creation_pd_request, creation_pd_response: (@creation_pd_response.body rescue 'ERR'), pd_account_created: @pd_account_created)
-          end
           # Saisie du numéro de compte PAYMONEY
-          if @current_ussd_session.session_identifier == '4-'
+          when '4-'
             create_paymoney_account
             @current_ussd_session.update_attributes(session_identifier: @session_identifier, creation_pw_request: @creation_pw_request, creation_pw_response: (@creation_pw_response.body rescue 'ERR'), pw_account_created: @pw_account_created)
-          end
-          if @current_ussd_session.session_identifier == '2'
+          when '2'
             check_parionsdirect_password
             @current_ussd_session.update_attributes(session_identifier: @session_identifier, connection_pd_pasword: @ussd_string)
-          end
-          if @current_ussd_session.session_identifier == '4'
+          when '4'
             check_paymoney_account_number
             @current_ussd_session.update_attributes(session_identifier: @session_identifier, check_pw_account_url: @check_pw_account_url, check_pw_account_response: @check_pw_account_response, pw_account_number: @pw_account_number, pw_account_token: @pw_account_token)
           end
         end
 
-        #send_ussd(@operation_type, @msisdn, @sender_cb, @linkid, @rendered_text)
+        send_ussd(@operation_type, @msisdn, @sender_cb, @linkid, @rendered_text)
       end
-    #end
+    end
 
-    render text: @rendered_text
+    #render text: @rendered_text
   end
 
   def authenticate_or_create_parionsdirect_account(msisdn)
