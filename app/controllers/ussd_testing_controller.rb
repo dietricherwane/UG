@@ -205,11 +205,11 @@ class UssdTestingController < ApplicationController
 
     if password.blank?
       # Le client n'a pas de compte parionsdirect et doit en créer un
-      @rendered_text = %Q[Pour accéder à ce service, créez votre compte de jeu en entrant un mot de passe de 4 caractères.]
+      @rendered_text = %Q[authenticate-Pour accéder à ce service, créez votre compte de jeu en entrant un mot de passe de 4 caractères.]
       @session_identifier = '1'
     else
       # Le client a un compte parionsdirect et doit s'authentifier
-      @rendered_text = %Q[Veuillez entrer votre mot de passe parionsdirect.]
+      @rendered_text = %Q[authenticate-Veuillez entrer votre mot de passe parionsdirect.]
       @session_identifier = '2'
     end
   end
@@ -290,12 +290,12 @@ class UssdTestingController < ApplicationController
     # L'utilisateur n'a pas saisi de mot de passe, on le ramène au menu précédent
     if @ussd_string.blank? || @ussd_string.length != 4
       # Le client n'a pas de compte parionsdirect et entrer un mot de passe pour en créer un
-      @rendered_text = %Q[Pour accéder à ce service, créez votre compte de jeu en entrant un mot de passe de 4 caractères.]
+      @rendered_text = %Q[set-Pour accéder à ce service, créez votre compte de jeu en entrant un mot de passe de 4 caractères.]
       @session_identifier = '1'
     else
       @creation_pd_password = @ussd_string
       # Le client n'a pas de compte parionsdirect et confirmer le mot de passe pour en créer un
-      @rendered_text = %Q[Veuillez confirmer le mot de passe précédemment entré.]
+      @rendered_text = %Q[set-Veuillez confirmer le mot de passe précédemment entré.]
       @session_identifier = '3'
     end
   end
@@ -305,14 +305,14 @@ class UssdTestingController < ApplicationController
     # L'utilisateur n'a pas saisi de confirmation de mot de passe, on le ramène au menu précédent
     if @ussd_string.blank? || @ussd_string.length != 4
       # Le client n'a pas de compte parionsdirect et confirmer le mot de passe pour en créer un
-      @rendered_text = %Q[Veuillez confirmer le mot de passe précédemment entré.]
+      @rendered_text = %Q[create-Veuillez confirmer le mot de passe précédemment entré.]
       @session_identifier = '3'
     else
       @creation_pd_password_confirmation = @ussd_string
       # Les mots de passe saisis ne sont pas identiques
       if @current_ussd_session.creation_pd_password != @creation_pd_password_confirmation
         # Le client n'a pas de compte parionsdirect et confirmer le mot de passe pour en créer un
-        @rendered_text = %Q[Veuillez confirmer le mot de passe précédemment entré.]
+        @rendered_text = %Q[create-Veuillez confirmer le mot de passe précédemment entré.]
         @session_identifier = '3'
       else
         @pseudo = "#{Digest::SHA1.hexdigest([DateTime.now.iso8601(6), rand].join).hex.to_s[0..8]}"
