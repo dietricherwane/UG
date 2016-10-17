@@ -329,7 +329,7 @@ class UssdTestingController < ApplicationController
         if pd_account.blank? || !pd_account["errors"].blank?
           @pd_account_created = false
           @rendered_text = %Q[
-            Une erreur s'est produite lors de la création du compte Paymoney
+            Une erreur s'est produite lors de la création du compte PARIONSDIRECT
             Veuillez confirmer le mot de passe précédemment entré.
             ]
           @session_identifier = '3'
