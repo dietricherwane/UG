@@ -356,7 +356,7 @@ class UssdTestingController < ApplicationController
         if (paymoney_account["errors"] rescue nil).blank?
           @pw_account_created = true
           @rendered_text = %Q[
-            Veuillez saisir votre numéro de compte Paymoney.
+            Vous allez recevoir un SMS avec  les détails de votre portemonnaie de jeux PAYMONEY.
             ]
           @session_identifier = '4'
         else
