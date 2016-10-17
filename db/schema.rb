@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161016032022) do
+ActiveRecord::Schema.define(version: 20161017120409) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -140,6 +140,8 @@ ActiveRecord::Schema.define(version: 20161016032022) do
     t.text     "check_pw_account_response"
     t.string   "pw_account_number"
     t.string   "pw_account_token"
+    t.boolean  "pd_account_created"
+    t.boolean  "pw_account_created"
   end
 
 end
