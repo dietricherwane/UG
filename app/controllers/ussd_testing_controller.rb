@@ -174,7 +174,7 @@ class UssdTestingController < ApplicationController
           # Saisie de la confirmation du mot de passe de création de compte parionsdirect
           when '3'
             create_parionsdirect_account
-            @current_ussd_session.update_attributes(session_identifier: @session_identifier, creation_pd_password: @creation_pd_password, creation_pd_password_confirmation: @creation_pd_password_confirmation, creation_pd_request: @creation_pd_request, creation_pd_response: (@creation_pd_response.body rescue 'ERR'), pd_account_created: @pd_account_created)
+            @current_ussd_session.update_attributes(session_identifier: @session_identifier, creation_pd_password_confirmation: @creation_pd_password_confirmation, creation_pd_request: @creation_pd_request, creation_pd_response: (@creation_pd_response.body rescue 'ERR'), pd_account_created: @pd_account_created)
           # Saisie du numéro de compte PAYMONEY
           when '4-'
             create_paymoney_account
