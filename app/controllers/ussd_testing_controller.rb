@@ -184,7 +184,7 @@ class UssdTestingController < ApplicationController
             @current_ussd_session.update_attributes(session_identifier: @session_identifier, connection_pd_pasword: @ussd_string)
           when '4'
             check_paymoney_account_number
-            @current_ussd_session.update_attributes(session_identifier: @session_identifier, check_pw_account_url: @check_pw_account_url, check_pw_account_response: @check_pw_account_response, pw_account_number: @pw_account_number, pw_account_token: @pw_account_token)
+            @current_ussd_session.update_attributes(session_identifier: @session_identifier, check_pw_account_url: @check_pw_account_url, check_pw_account_response: (@check_pw_account_response.body rescue 'ERR'), pw_account_number: @pw_account_number, pw_account_token: @pw_account_token)
           end
         end
 
