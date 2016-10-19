@@ -175,17 +175,48 @@ class UssdTestingController < ApplicationController
           when '3'
             create_parionsdirect_account
             @current_ussd_session.update_attributes(session_identifier: @session_identifier, creation_pd_password_confirmation: @creation_pd_password_confirmation, creation_pd_request: @creation_pd_request, creation_pd_response: (@creation_pd_response.body rescue 'ERR'), pd_account_created: @pd_account_created)
-          # Saisie du numéro de compte PAYMONEY
-          when '4-'
-            create_paymoney_account
-            @current_ussd_session.update_attributes(session_identifier: @session_identifier, creation_pw_request: @creation_pw_request, creation_pw_response: (@creation_pw_response.body rescue 'ERR'), pw_account_created: @pw_account_created)
           when '2'
             check_parionsdirect_password
             @current_ussd_session.update_attributes(session_identifier: @session_identifier, connection_pd_pasword: @ussd_string)
           when '4'
             check_paymoney_account_number
             @current_ussd_session.update_attributes(session_identifier: @session_identifier, check_pw_account_url: @check_pw_account_url, check_pw_account_response: (@check_pw_account_response.body rescue 'ERR'), pw_account_number: @pw_account_number, pw_account_token: @pw_account_token)
+          # Saisie du numéro de compte PAYMONEY
+          when '4-'
+            create_paymoney_account
+            @current_ussd_session.update_attributes(session_identifier: @session_identifier, creation_pw_request: @creation_pw_request, creation_pw_response: (@creation_pw_response.body rescue 'ERR'), pw_account_created: @pw_account_created)
+           # Sélection d'un élément du menu
+          when '5'
+            set_session_identifier_depending_on_menu_selected
+            if @status
+              case @ussd_string
+                when '1'
+
+                when '2'
+
+                when '3'
+                  get_paymoney_password_to_check_sold
+                when '4'
+
+                when '5'
+
+                when '6'
+                  get_paymoney_password_to_check_otp
+                when '7'
+
+              end
+            end
+            @current_ussd_session.update_attributes(session_identifier: @session_identifier)
           end
+          # Consultation du solde du compte Paymoney
+          when '8'
+            # log fields
+            get_paymoney_sold
+            @current_ussd_session.update_attributes(session_identifier: @session_identifier)
+          when '9'
+            # log fields
+            get_paymoney_otp
+            @current_ussd_session.update_attributes(session_identifier: @session_identifier)
         end
 
         send_ussd(@operation_type, @msisdn, @sender_cb, @linkid, @rendered_text)
@@ -193,6 +224,111 @@ class UssdTestingController < ApplicationController
     end
 
     #render text: @rendered_text
+  end
+
+  def set_session_identifier_depending_on_menu_selected
+    @status = false
+    if ['1', '2', '3', '4', '5', '6', '7'].include?(@ussd_string)
+      status = true
+    else
+      @rendered_text = %Q[
+      1- Jeux
+      2- Mes paris
+      3- Mon solde
+      4- Rechargement
+      5- Votre service SMS
+      6- Mes OTP - codes retraits
+      7- Mes comptes
+      ]
+      @session_identifier = '5'
+    end
+  end
+
+  def get_paymoney_password_to_check_sold
+    @rendered_text = %Q[
+      Veuillez entrer votre mot de passe PAYMONEY pour consulter votre solde.
+    ]
+    @session_identifier = '8'
+  end
+
+  def get_paymoney_password_to_check_otp
+    @rendered_text = %Q[
+      Veuillez entrer votre mot de passe PAYMONEY pour consulter votre liste d'OTP.
+    ]
+    @session_identifier = '9'
+  end
+
+  def get_paymoney_otp
+    if @ussd_string.blank?
+      @rendered_text = %Q[
+      Veuillez entrer votre mot de passe PAYMONEY pour consulter votre liste d'OTP.
+      ]
+      @session_identifier = '8'
+    else
+      account_profile = AccountProfile.find_by_msisdn(@msisdn[-8,8])
+      @get_paymoney_otp_url = Parameter.first.paymoney_url + "/PAYMONEY_WALLET/rest/getLastOtp/#{session[:paymoney_account_number]}/#{password}/"
+      @get_paymoney_otp_response = Typhoeus.get(@get_paymoney_otp_url, connecttimeout: 30)
+
+      otps = %Q[{"otps":] + otps + %Q[}]
+      otps = JSON.parse(otps)["otps"] rescue nil
+
+      balance = JSON.parse(@get_paymoney_sold_response.body)["solde"] rescue nil
+      if balance.blank?
+        @rendered_text = %Q[
+        Le mot de passe saisi n'est pas valide.
+        Veuillez entrer votre mot de passe PAYMONEY pour consulter votre solde.
+        ]
+        @session_identifier = '8'
+      else
+        @rendered_text = %Q[
+        Votre solde PAYMONEY est de: #{balance rescue 0} FCFA
+
+        1- Jeux
+        2- Mes paris
+        3- Mon solde
+        4- Rechargement
+        5- Votre service SMS
+        6- Mes OTP - codes retraits
+        7- Mes comptes
+        ]
+        @session_identifier = '5'
+      end
+    end
+  end
+
+  def get_paymoney_sold
+    if @ussd_string.blank?
+      @rendered_text = %Q[
+      Veuillez entrer votre mot de passe PAYMONEY pour consulter votre solde.
+      ]
+      @session_identifier = '8'
+    else
+      account_profile = AccountProfile.find_by_msisdn(@msisdn[-8,8])
+      @get_paymoney_sold_url = Parameter.first.paymoney_url + "/PAYMONEY_WALLET/rest/solte_compte/#{account_profile.paymoney_account_number}/#{@ussd_string}"
+      @get_paymoney_sold_response = Typhoeus.get(@get_paymoney_sold_url, connecttimeout: 30)
+
+      balance = JSON.parse(@get_paymoney_sold_response.body)["solde"] rescue nil
+      if balance.blank?
+        @rendered_text = %Q[
+        Le mot de passe saisi n'est pas valide.
+        Veuillez entrer votre mot de passe PAYMONEY pour consulter votre solde.
+        ]
+        @session_identifier = '8'
+      else
+        @rendered_text = %Q[
+        Votre solde PAYMONEY est de: #{balance rescue 0} FCFA
+
+        1- Jeux
+        2- Mes paris
+        3- Mon solde
+        4- Rechargement
+        5- Votre service SMS
+        6- Mes OTP - codes retraits
+        7- Mes comptes
+        ]
+        @session_identifier = '5'
+      end
+    end
   end
 
   def authenticate_or_create_parionsdirect_account(msisdn)
@@ -204,11 +340,11 @@ class UssdTestingController < ApplicationController
 
     if password.blank?
       # Le client n'a pas de compte parionsdirect et doit en créer un
-      @rendered_text = %Q[authenticate-Pour accéder à ce service, créez votre compte de jeu en entrant un mot de passe de 4 caractères.]
+      @rendered_text = %Q[Pour accéder à ce service, créez votre compte de jeu en entrant un mot de passe de 4 caractères.]
       @session_identifier = '1'
     else
       # Le client a un compte parionsdirect et doit s'authentifier
-      @rendered_text = %Q[authenticate-Veuillez entrer votre mot de passe parionsdirect.]
+      @rendered_text = %Q[Veuillez entrer votre mot de passe parionsdirect.]
       @session_identifier = '2'
     end
   end
@@ -263,7 +399,7 @@ class UssdTestingController < ApplicationController
         @pw_account_number = @ussd_string
         @pw_account_token = @check_pw_account_response.body
         # On associe le compte Paymoney du client à son numéro
-        AccountProfile.find_by_msisdn(@msisdn[-8,8]).update_attributes(paymoney_account_number: @pw_account_number) rescue nil
+        AccountProfile.find_by_msisdn(@msisdn[-8,8]).update_attributes(paymoney_account_number: @pw_account_number) rescue AccountProfile.create(msisdn: @msisdn[-8,8], paymoney_account_number: @pw_account_number) rescue nil
         @rendered_text = %Q[
           1- Jeux
           2- Mes paris
@@ -289,12 +425,12 @@ class UssdTestingController < ApplicationController
     # L'utilisateur n'a pas saisi de mot de passe, on le ramène au menu précédent
     if @ussd_string.blank? || @ussd_string.length != 4
       # Le client n'a pas de compte parionsdirect et entrer un mot de passe pour en créer un
-      @rendered_text = %Q[set-Pour accéder à ce service, créez votre compte de jeu en entrant un mot de passe de 4 caractères.]
+      @rendered_text = %Q[Pour accéder à ce service, créez votre compte de jeu en entrant un mot de passe de 4 caractères.]
       @session_identifier = '1'
     else
       @creation_pd_password = @ussd_string
       # Le client n'a pas de compte parionsdirect et confirmer le mot de passe pour en créer un
-      @rendered_text = %Q[set-Veuillez confirmer le mot de passe précédemment entré.]
+      @rendered_text = %Q[Veuillez confirmer le mot de passe précédemment entré.]
       @session_identifier = '3'
     end
   end
@@ -304,14 +440,14 @@ class UssdTestingController < ApplicationController
     # L'utilisateur n'a pas saisi de confirmation de mot de passe, on le ramène au menu précédent
     if @ussd_string.blank? || @ussd_string.length != 4
       # Le client n'a pas de compte parionsdirect et confirmer le mot de passe pour en créer un
-      @rendered_text = %Q[create-Veuillez confirmer le mot de passe précédemment entré.]
+      @rendered_text = %Q[Veuillez confirmer le mot de passe précédemment entré.]
       @session_identifier = '3'
     else
       @creation_pd_password_confirmation = @ussd_string
       # Les mots de passe saisis ne sont pas identiques
       if @current_ussd_session.creation_pd_password != @creation_pd_password_confirmation
         # Le client n'a pas de compte parionsdirect et confirmer le mot de passe pour en créer un
-        @rendered_text = %Q[create-Veuillez confirmer le mot de passe précédemment entré.]
+        @rendered_text = %Q[Veuillez confirmer le mot de passe précédemment entré.]
         @session_identifier = '3'
       else
         @pseudo = "#{Digest::SHA1.hexdigest([DateTime.now.iso8601(6), rand].join).hex.to_s[0..8]}"
