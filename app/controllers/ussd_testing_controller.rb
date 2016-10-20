@@ -186,6 +186,18 @@ class UssdTestingController < ApplicationController
             create_paymoney_account
             @current_ussd_session.update_attributes(session_identifier: @session_identifier, creation_pw_request: @creation_pw_request, creation_pw_response: (@creation_pw_response.body rescue 'ERR'), pw_account_created: @pw_account_created)
            # Sélection d'un élément du menu
+          when '8'
+            # solde du compte paymoney
+            get_paymoney_sold
+            @current_ussd_session.update_attributes(session_identifier: @session_identifier, paymoney_sold_url: @get_paymoney_sold_url, paymoney_sold_response: (@get_paymoney_sold_response.body rescue nil))
+          when '9'
+            # affichage de la liste des otp
+            get_paymoney_otp
+            @current_ussd_session.update_attributes(session_identifier: @session_identifier, paymoney_otp_url: @get_paymoney_otp_url, paymoney_otp_response: (@get_paymoney_otp_response.body rescue nil))
+          when '10'
+            # retour au menu principal ou affichage des otp d'un autre compte
+            list_otp_set_session_identifier
+            @current_ussd_session.update_attributes(session_identifier: @session_identifier)
           when '5'
             set_session_identifier_depending_on_menu_selected
             if @status
@@ -207,18 +219,6 @@ class UssdTestingController < ApplicationController
               end
             end
             # Consultation du solde du compte Paymoney
-          when '8'
-            # solde du compte paymoney
-            get_paymoney_sold
-            @current_ussd_session.update_attributes(session_identifier: @session_identifier, paymoney_sold_url: @get_paymoney_sold_url, paymoney_sold_response: (@get_paymoney_sold_response.body rescue nil))
-          when '9'
-            # affichage de la liste des otp
-            get_paymoney_otp
-            @current_ussd_session.update_attributes(session_identifier: @session_identifier, paymoney_otp_url: @get_paymoney_otp_url, paymoney_otp_response: (@get_paymoney_otp_response.body rescue nil))
-          when '10'
-            # retour au menu principal ou affichage des otp d'un autre compte
-            list_otp_set_session_identifier
-            @current_ussd_session.update_attributes(session_identifier: @session_identifier)
           end
         end
 
