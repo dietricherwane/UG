@@ -215,6 +215,7 @@ class UssdTestingController < ApplicationController
 
                 when '6'
                   get_paymoney_password_to_check_otp
+                  @current_ussd_session.update_attributes(session_identifier: @session_identifier)
                 when '7'
 
               end
