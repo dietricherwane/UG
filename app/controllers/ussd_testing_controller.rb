@@ -157,7 +157,7 @@ class UssdTestingController < ApplicationController
 
     render :xml => @result
 
-    #Thread.new do
+    Thread.new do
       if @error_code == '0'
         # Récupération d'une session existante
         @current_ussd_session = UssdSession.find_by_sender_cb(@sender_cb)
@@ -226,9 +226,9 @@ class UssdTestingController < ApplicationController
 
         send_ussd(@operation_type, @msisdn, @sender_cb, @linkid, @rendered_text)
       end
-    #end
+    end
 
-    render text: @rendered_text
+    #render text: @rendered_text
   end
 
   def set_session_identifier_depending_on_menu_selected
@@ -273,7 +273,7 @@ class UssdTestingController < ApplicationController
       @session_identifier = '8'
     else
       account_profile = AccountProfile.find_by_msisdn(@msisdn[-8,8])
-      @get_paymoney_otp_url = Parameter.first.paymoney_url + "/PAYMONEY_WALLET/rest/getLastOtp/#{session[:paymoney_account_number]}/#{password}/"
+      @get_paymoney_otp_url = Parameter.first.paymoney_url + "/PAYMONEY_WALLET/rest/getLastOtp/#{account_profile.paymoney_account_number}/#{@ussd_string}/"
       @get_paymoney_otp_response = Typhoeus.get(@get_paymoney_otp_url, connecttimeout: 30)
 
       otps = %Q[{"otps":] + otps + %Q[}]
