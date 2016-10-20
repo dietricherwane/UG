@@ -206,9 +206,7 @@ class UssdTestingController < ApplicationController
 
               end
             end
-            @current_ussd_session.update_attributes(session_identifier: @session_identifier)
-          end
-          # Consultation du solde du compte Paymoney
+            # Consultation du solde du compte Paymoney
           when '8'
             # solde du compte paymoney
             get_paymoney_sold
@@ -220,6 +218,8 @@ class UssdTestingController < ApplicationController
           when '10'
             # retour au menu principal ou affichage des otp d'un autre compte
             list_otp_set_session_identifier
+            @current_ussd_session.update_attributes(session_identifier: @session_identifier)
+          end
         end
 
         send_ussd(@operation_type, @msisdn, @sender_cb, @linkid, @rendered_text)

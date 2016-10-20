@@ -53801,3 +53801,46 @@ Migrating to AddPaymoneyOtpFieldsToUssdSessions (20161020074937)
   [1m[36mSQL (0.5ms)[0m  [1mINSERT INTO "schema_migrations" ("version") VALUES ($1)[0m  [["version", "20161020074937"]]
   [1m[35m (22.3ms)[0m  COMMIT
   [1m[36mActiveRecord::SchemaMigration Load (0.7ms)[0m  [1mSELECT "schema_migrations".* FROM "schema_migrations"[0m
+
+
+Started POST "/mtn/ussd/main_menu" for 127.0.0.1 at 2016-10-20 10:31:03 +0000
+  [1m[36mActiveRecord::SchemaMigration Load (33.2ms)[0m  [1mSELECT "schema_migrations".* FROM "schema_migrations"[0m
+
+SyntaxError (/home/dietrich/workshop/UssdGateway/app/controllers/ussd_testing_controller.rb:212: syntax error, unexpected keyword_when, expecting keyword_end
+          when '8'
+              ^
+/home/dietrich/workshop/UssdGateway/app/controllers/ussd_testing_controller.rb:216: syntax error, unexpected keyword_when, expecting keyword_end
+          when '9'
+              ^
+/home/dietrich/workshop/UssdGateway/app/controllers/ussd_testing_controller.rb:220: syntax error, unexpected keyword_when, expecting keyword_end
+          when '10'
+              ^):
+  app/controllers/ussd_testing_controller.rb:212: syntax error, unexpected keyword_when, expecting keyword_end
+  app/controllers/ussd_testing_controller.rb:216: syntax error, unexpected keyword_when, expecting keyword_end
+  app/controllers/ussd_testing_controller.rb:220: syntax error, unexpected keyword_when, expecting keyword_end
+
+
+  Rendered /home/dietrich/.rvm/gems/ruby-2.0.0-p195@rails4.0.7/gems/actionpack-4.1.8/lib/action_dispatch/middleware/templates/rescues/_source.erb (0.8ms)
+  Rendered /home/dietrich/.rvm/gems/ruby-2.0.0-p195@rails4.0.7/gems/actionpack-4.1.8/lib/action_dispatch/middleware/templates/rescues/_trace.html.erb (2.2ms)
+  Rendered /home/dietrich/.rvm/gems/ruby-2.0.0-p195@rails4.0.7/gems/actionpack-4.1.8/lib/action_dispatch/middleware/templates/rescues/_request_and_response.html.erb (29.5ms)
+  Rendered /home/dietrich/.rvm/gems/ruby-2.0.0-p195@rails4.0.7/gems/actionpack-4.1.8/lib/action_dispatch/middleware/templates/rescues/diagnostics.erb within rescues/layout (60.3ms)
+
+
+Started POST "/mtn/ussd/main_menu" for 127.0.0.1 at 2016-10-20 10:33:51 +0000
+Processing by UssdTestingController#main_menu as */*
+Can't verify CSRF token authenticity
+  [1m[35m (0.5ms)[0m  BEGIN
+  [1m[36mSQL (77.4ms)[0m  [1mINSERT INTO "ussd_reception_logs" ("code_scheme", "created_at", "error_code", "error_message", "msg_type", "msisdn", "received_parameters", "receiver_cb", "remote_ip", "rev_id", "rev_password", "sender_cb", "service_code", "service_id", "sp_id", "timestamp", "trace_unique_id", "updated_at", "ussd_of_type", "ussd_string") VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20) RETURNING "id"[0m  [["code_scheme", "15"], ["created_at", "2016-10-20 10:33:51.546026"], ["error_code", "0"], ["error_message", ""], ["msg_type", "1"], ["msisdn", "22544447310"], ["received_parameters", "<?xml version=\"1.0\" encoding=\"utf-8\" ?><soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"><soapenv:Header><NotifySOAPHeader xmlns:ns1=\"http://www.huawei.com.cn/schema/common/v2_1\"><spId>2250110000460</spId><serviceId>225012000003070</serviceId><timeStamp>20161017181611</timeStamp><traceUniqueID>504021504991610171815563083006</traceUniqueID><OperatorID>22501</OperatorID></NotifySOAPHeader></soapenv:Header><soapenv:Body><notifyUssdReception xmlns:ns2=\"http://www.csapi.org/schema/parlayx/ussd/notification/v1_0/local\"><msgType>1</msgType><senderCB>300512487</senderCB><receiveCB>300512487</receiveCB><ussdOpType>3</ussdOpType><msIsdn>22544447310</msIsdn><serviceCode>218</serviceCode><codeScheme>15</codeScheme><ussdString>440000019</ussdString></notifyUssdReception></soapenv:Body></soapenv:Envelope>"], ["receiver_cb", "300512487"], ["remote_ip", "127.0.0.1"], ["rev_id", ""], ["rev_password", ""], ["sender_cb", "300512487"], ["service_code", "218"], ["service_id", "225012000003070"], ["sp_id", "2250110000460"], ["timestamp", "20161017181611"], ["trace_unique_id", "504021504991610171815563083006"], ["updated_at", "2016-10-20 10:33:51.546026"], ["ussd_of_type", "3"], ["ussd_string", "440000019"]]
+  [1m[35m (20.1ms)[0m  COMMIT
+Completed 200 OK in 416ms (Views: 0.4ms | ActiveRecord: 207.6ms)
+  [1m[36mUssdSession Load (15.7ms)[0m  [1mSELECT  "ussd_sessions".* FROM "ussd_sessions"  WHERE "ussd_sessions"."sender_cb" = '300512487' LIMIT 1[0m
+  [1m[35mParameter Load (31.6ms)[0m  SELECT  "parameters".* FROM "parameters"   ORDER BY "parameters"."id" ASC LIMIT 1
+ETHON: Libcurl initialized
+ETHON: performed EASY effective_url=http://154.68.45.82:1180/85fg69a7a9c59f3a0/api/users/password/44447310 response_code=0 return_code=couldnt_connect total_time=0.0
+  [1m[36m (0.6ms)[0m  [1mBEGIN[0m
+  [1m[35mSQL (9.7ms)[0m  INSERT INTO "ussd_sessions" ("created_at", "parionsdirect_password_response", "parionsdirect_password_url", "sender_cb", "session_identifier", "updated_at") VALUES ($1, $2, $3, $4, $5, $6) RETURNING "id"  [["created_at", "2016-10-20 10:33:51.830039"], ["parionsdirect_password_response", ""], ["parionsdirect_password_url", "http://154.68.45.82:1180/85fg69a7a9c59f3a0/api/users/password/44447310"], ["sender_cb", "300512487"], ["session_identifier", "1"], ["updated_at", "2016-10-20 10:33:51.830039"]]
+  [1m[36m (24.9ms)[0m  [1mCOMMIT[0m
+ETHON: performed EASY effective_url=HTTP://196.201.33.108:8310/SendUssdService/services/SendUssd response_code=0 return_code=couldnt_connect total_time=0.0
+  [1m[35m (0.6ms)[0m  BEGIN
+  [1m[36mSQL (46.2ms)[0m  [1mINSERT INTO "mtn_start_session_logs" ("created_at", "operation_type", "request_code", "request_headers", "request_log", "request_url", "response_log", "status", "total_time", "updated_at") VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING "id"[0m  [["created_at", "2016-10-20 10:33:51.915568"], ["operation_type", "Send ussd"], ["request_code", 0], ["request_headers", "{}"], ["request_log", "\n      <?xml version = \"1.0\" encoding = \"utf-8\" ?>\n      <soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:loc=\"http://www.csapi.org/schema/parlayx/ussd/send/v1_0/local\">\n        <soapenv:Header>\n          <tns:RequestSOAPHeader xmlns:tns=\"http://www.huawei.com.cn/schema/common/v2_1\">\n            <tns:spId>2250110000460</tns:spId>\n            <tns:spPassword>6fbc4552f108aa50bc3c577a5bb1ebdb</tns:spPassword>\n            <tns:serviceId>225012000003070</tns:serviceId>\n            <tns:timeStamp>20161020103351</tns:timeStamp>\n            <tns:OA>22544447310</tns:OA>\n            <tns:FA>22544447310</tns:FA>\n            <tns:linkid></tns:linkid>\n          </tns:RequestSOAPHeader>\n        </soapenv:Header>\n        <soapenv:Body>\n          <loc:sendUssd>\n            <loc:msgType>1</loc:msgType>\n            <loc:senderCB>300512487</loc:senderCB>\n            <loc:receiveCB>300512487</loc:receiveCB>\n            <loc:ussdOpType>1</loc:ussdOpType>\n            <loc:msIsdn>22544447310</loc:msIsdn>\n            <loc:serviceCode>218</loc:serviceCode>\n            <loc:codeScheme>15</loc:codeScheme>\n            <loc:ussdString>Pour accéder à ce service, créez votre compte de jeu en entrant un mot de passe de 4 caractères.</loc:ussdString>\n          </loc:sendUssd>\n        </soapenv:Body>\n      </soapenv:Envelope>\n    "], ["request_url", "196.201.33.108:8310/SendUssdService/services/SendUssd"], ["response_log", ""], ["status", "t"], ["total_time", 0.0], ["updated_at", "2016-10-20 10:33:51.915568"]]
+  [1m[35m (24.8ms)[0m  COMMIT
