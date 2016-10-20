@@ -276,7 +276,7 @@ class UssdTestingController < ApplicationController
       @get_paymoney_otp_url = Parameter.first.paymoney_url + "/PAYMONEY_WALLET/rest/getLastOtp/#{account_profile.paymoney_account_number}/#{@ussd_string}/"
       @get_paymoney_otp_response = Typhoeus.get(@get_paymoney_otp_url, connecttimeout: 30)
 
-      otps = %Q[{"otps":] + otps + %Q[}]
+      otps = %Q[{"otps":] + (@get_paymoney_otp_response.body rescue nil) + %Q[}]
       otps = JSON.parse(otps)["otps"] rescue nil
 
       if otps.blank?
