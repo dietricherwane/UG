@@ -237,39 +237,34 @@ class UssdTestingController < ApplicationController
       @status = true
     else
       @rendered_text = %Q[
-      1- Jeux
-      2- Mes paris
-      3- Mon solde
-      4- Rechargement
-      5- Votre service SMS
-      6- Mes OTP - codes retraits
-      7- Mes comptes
+1- Jeux
+2- Mes paris
+3- Mon solde
+4- Rechargement
+5- Votre service SMS
+6- Mes OTP
+7- Mes comptes
       ]
       @session_identifier = '5'
     end
   end
 
   def get_paymoney_password_to_check_sold
-    @rendered_text = %Q[
-      Veuillez entrer votre mot de passe PAYMONEY pour consulter votre solde.
+    @rendered_text = %Q[Veuillez entrer votre mot de passe PAYMONEY pour consulter votre solde.
 
-      1- Solde autre compte
+1- Solde autre compte
     ]
     @session_identifier = '8'
   end
 
   def get_paymoney_password_to_check_otp
-    @rendered_text = %Q[
-      Veuillez entrer votre mot de passe PAYMONEY pour consulter votre liste d'OTP.
-    ]
+    @rendered_text = %Q[Veuillez entrer votre mot de passe PAYMONEY pour consulter votre liste d'OTP.]
     @session_identifier = '9'
   end
 
   def get_paymoney_otp
     if @ussd_string.blank?
-      @rendered_text = %Q[
-      Veuillez entrer votre mot de passe PAYMONEY pour consulter votre liste d'OTP.
-      ]
+      @rendered_text = %Q[Veuillez entrer votre mot de passe PAYMONEY pour consulter votre liste d'OTP.]
       @session_identifier = '8'
     else
       account_profile = AccountProfile.find_by_msisdn(@msisdn[-8,8])
@@ -281,10 +276,10 @@ class UssdTestingController < ApplicationController
 
       if otps.blank?
         @rendered_text = %Q[
-        Votre liste d'OTP est vide
+Votre liste d'OTP est vide
 
-        1- OTP autre compte
-        0- Retour
+1- OTP autre compte
+0- Retour
         ]
         @session_identifier = '10'
       else
@@ -295,10 +290,9 @@ class UssdTestingController < ApplicationController
 ]
         end
         @rendered_text = %Q[
-        #{otp_string}
-
-        1- OTP autre compte
-        0- Retour
+#{otp_string}
+1- OTP autre compte
+0- Retour
         ]
         @session_identifier = '10'
       end
@@ -325,15 +319,15 @@ class UssdTestingController < ApplicationController
         @session_identifier = '8'
       else
         @rendered_text = %Q[
-        Votre solde PAYMONEY est de: #{balance rescue 0} FCFA
+Votre solde PAYMONEY est de: #{balance rescue 0} FCFA
 
-        1- Jeux
-        2- Mes paris
-        3- Mon solde
-        4- Rechargement
-        5- Votre service SMS
-        6- Mes OTP - codes retraits
-        7- Mes comptes
+1- Jeux
+2- Mes paris
+3- Mon solde
+4- Rechargement
+5- Votre service SMS
+6- Mes OTP
+7- Mes comptes
         ]
         @session_identifier = '5'
       end
@@ -379,20 +373,19 @@ class UssdTestingController < ApplicationController
           @session_identifier = '4'
         else
           @rendered_text = %Q[
-          1- Jeux
-          2- Mes paris
-          3- Mon solde
-          4- Rechargement
-          5- Votre service SMS
-          6- Mes OTP - codes retraits
-          7- Mes comptes
+1- Jeux
+2- Mes paris
+3- Mon solde
+4- Rechargement
+5- Votre service SMS
+6- Mes OTP
+7- Mes comptes
           ]
           @session_identifier = '5'
         end
       else
-        @rendered_text = %Q[
-          Le mot de passe saisi n'est pas valide
-          Veuillez entrer votre mot de passe parionsdirect.
+        @rendered_text = %Q[Le mot de passe saisi n'est pas valide.
+Veuillez entrer votre mot de passe parionsdirect.
           ]
         @session_identifier = '2'
       end
@@ -414,19 +407,18 @@ class UssdTestingController < ApplicationController
         # On associe le compte Paymoney du client à son numéro
         AccountProfile.find_by_msisdn(@msisdn[-8,8]).update_attributes(paymoney_account_number: @pw_account_number) rescue AccountProfile.create(msisdn: @msisdn[-8,8], paymoney_account_number: @pw_account_number) rescue nil
         @rendered_text = %Q[
-          1- Jeux
-          2- Mes paris
-          3- Mon solde
-          4- Rechargement
-          5- Votre service SMS
-          6- Mes OTP - codes retraits
-          7- Mes comptes
+1- Jeux
+2- Mes paris
+3- Mon solde
+4- Rechargement
+5- Votre service SMS
+6- Mes OTP
+7- Mes comptes
           ]
         @session_identifier = '5'
       else
-        @rendered_text = %Q[
-          Le compte Paymoney fourni n'a pas été trouvé.
-          Veuillez saisir votre numéro de compte Paymoney.
+        @rendered_text = %Q[Le compte Paymoney fourni n'a pas été trouvé.
+Veuillez saisir votre numéro de compte Paymoney.
           ]
         @session_identifier = '4'
       end
