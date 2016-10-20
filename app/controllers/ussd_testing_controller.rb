@@ -208,6 +208,7 @@ class UssdTestingController < ApplicationController
 
                 when '3'
                   get_paymoney_password_to_check_sold
+                  @current_ussd_session.update_attributes(session_identifier: @session_identifier)
                 when '4'
 
                 when '5'
