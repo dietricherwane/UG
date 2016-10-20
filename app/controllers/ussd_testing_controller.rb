@@ -291,7 +291,9 @@ class UssdTestingController < ApplicationController
         otp_string = ""
         otps.each do |otp|
           t = Time.at(((otp["otpDate"].to_s)[0..9]).to_i)
-          otp_string << otp["otpPin"] + ' ' + (otp["otpStatus"] == true ? 'Valide' : 'Désactivé') + t.strftime(" %d-%m-%Y ") + t.strftime("%Hh %Mmn")
+          otp_string << otp["otpPin"] + ' ' + (otp["otpStatus"] == true ? 'Valide' : 'Désactivé') + t.strftime(" %d-%m-%Y ") + t.strftime("%Hh %Mmn") + %Q[
+
+        ]
         end
         @rendered_text = %Q[
         #{otp_string}
