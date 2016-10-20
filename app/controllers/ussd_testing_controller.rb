@@ -210,13 +210,16 @@ class UssdTestingController < ApplicationController
           end
           # Consultation du solde du compte Paymoney
           when '8'
-            # log fields
+            # solde du compte paymoney
             get_paymoney_sold
-            @current_ussd_session.update_attributes(session_identifier: @session_identifier)
+            @current_ussd_session.update_attributes(session_identifier: @session_identifier, paymoney_sold_url: @get_paymoney_sold_url, paymoney_sold_response: (@get_paymoney_sold_response.body rescue nil))
           when '9'
-            # log fields
+            # affichage de la liste des otp
             get_paymoney_otp
-            @current_ussd_session.update_attributes(session_identifier: @session_identifier)
+            @current_ussd_session.update_attributes(session_identifier: @session_identifier, paymoney_otp_url: @get_paymoney_otp_url, paymoney_otp_response: (@get_paymoney_otp_response.body rescue nil))
+          when '10'
+            # retour au menu principal ou affichage des otp d'un autre compte
+            list_otp_set_session_identifier
         end
 
         send_ussd(@operation_type, @msisdn, @sender_cb, @linkid, @rendered_text)
@@ -272,26 +275,27 @@ class UssdTestingController < ApplicationController
       otps = %Q[{"otps":] + otps + %Q[}]
       otps = JSON.parse(otps)["otps"] rescue nil
 
-      balance = JSON.parse(@get_paymoney_sold_response.body)["solde"] rescue nil
-      if balance.blank?
+      if otps.blank?
         @rendered_text = %Q[
-        Le mot de passe saisi n'est pas valide.
-        Veuillez entrer votre mot de passe PAYMONEY pour consulter votre solde.
-        ]
-        @session_identifier = '8'
-      else
-        @rendered_text = %Q[
-        Votre solde PAYMONEY est de: #{balance rescue 0} FCFA
+        Votre liste d'OTP est vide
 
-        1- Jeux
-        2- Mes paris
-        3- Mon solde
-        4- Rechargement
-        5- Votre service SMS
-        6- Mes OTP - codes retraits
-        7- Mes comptes
+        1- OTP autre compte
+        0- Retour
         ]
-        @session_identifier = '5'
+        @session_identifier = '10'
+      else
+        otp_string = ""
+        otps.each do |otp|
+          t = Time.at(((otp["otpDate"].to_s)[0..9]).to_i)
+          otp_string << otp["otpPin"] + ' ' + (otp["otpStatus"] == true ? 'Valide' : 'Désactivé') + t.strftime(" %d-%m-%Y ") + t.strftime("%Hh %Mmn")
+        end
+        @rendered_text = %Q[
+        #{otp_string}
+
+        1- OTP autre compte
+        0- Retour
+        ]
+        @session_identifier = '10'
       end
     end
   end
@@ -329,6 +333,10 @@ class UssdTestingController < ApplicationController
         @session_identifier = '5'
       end
     end
+  end
+
+  def list_otp_set_session_identifier
+
   end
 
   def authenticate_or_create_parionsdirect_account(msisdn)

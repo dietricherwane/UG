@@ -53785,3 +53785,19 @@ Migrating to AddPdFieldsToUssdSessions (20161017120409)
   [1m[36mSQL (0.8ms)[0m  [1mINSERT INTO "schema_migrations" ("version") VALUES ($1)[0m  [["version", "20161017120409"]]
   [1m[35m (8.5ms)[0m  COMMIT
   [1m[36mActiveRecord::SchemaMigration Load (0.8ms)[0m  [1mSELECT "schema_migrations".* FROM "schema_migrations"[0m
+  [1m[36mActiveRecord::SchemaMigration Load (30.9ms)[0m  [1mSELECT "schema_migrations".* FROM "schema_migrations"[0m
+Migrating to AddPaymoneySoldFieldsToUssdSessions (20161020074645)
+  [1m[35m (0.6ms)[0m  BEGIN
+  [1m[36m (114.0ms)[0m  [1mALTER TABLE "ussd_sessions" ADD COLUMN "paymoney_sold_url" text[0m
+  [1m[35m (0.7ms)[0m  ALTER TABLE "ussd_sessions" ADD COLUMN "paymoney_sold_response" text
+  [1m[36mSQL (0.9ms)[0m  [1mINSERT INTO "schema_migrations" ("version") VALUES ($1)[0m  [["version", "20161020074645"]]
+  [1m[35m (19.2ms)[0m  COMMIT
+  [1m[36mActiveRecord::SchemaMigration Load (0.7ms)[0m  [1mSELECT "schema_migrations".* FROM "schema_migrations"[0m
+  [1m[36mActiveRecord::SchemaMigration Load (0.9ms)[0m  [1mSELECT "schema_migrations".* FROM "schema_migrations"[0m
+Migrating to AddPaymoneyOtpFieldsToUssdSessions (20161020074937)
+  [1m[35m (0.6ms)[0m  BEGIN
+  [1m[36m (1.2ms)[0m  [1mALTER TABLE "ussd_sessions" ADD COLUMN "paymoney_otp_url" text[0m
+  [1m[35m (0.6ms)[0m  ALTER TABLE "ussd_sessions" ADD COLUMN "paymoney_otp_response" text
+  [1m[36mSQL (0.5ms)[0m  [1mINSERT INTO "schema_migrations" ("version") VALUES ($1)[0m  [["version", "20161020074937"]]
+  [1m[35m (22.3ms)[0m  COMMIT
+  [1m[36mActiveRecord::SchemaMigration Load (0.7ms)[0m  [1mSELECT "schema_migrations".* FROM "schema_migrations"[0m
