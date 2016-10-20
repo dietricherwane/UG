@@ -232,7 +232,7 @@ class UssdTestingController < ApplicationController
   def set_session_identifier_depending_on_menu_selected
     @status = false
     if ['1', '2', '3', '4', '5', '6', '7'].include?(@ussd_string)
-      status = true
+      @status = true
     else
       @rendered_text = %Q[
       1- Jeux
