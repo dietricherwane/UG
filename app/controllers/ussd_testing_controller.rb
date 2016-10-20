@@ -157,7 +157,7 @@ class UssdTestingController < ApplicationController
 
     render :xml => @result
 
-    Thread.new do
+    #Thread.new do
       if @error_code == '0'
         # Récupération d'une session existante
         @current_ussd_session = UssdSession.find_by_sender_cb(@sender_cb)
@@ -226,9 +226,9 @@ class UssdTestingController < ApplicationController
 
         send_ussd(@operation_type, @msisdn, @sender_cb, @linkid, @rendered_text)
       end
-    end
+    #end
 
-    #render text: @rendered_text
+    render text: @rendered_text
   end
 
   def set_session_identifier_depending_on_menu_selected
@@ -252,6 +252,8 @@ class UssdTestingController < ApplicationController
   def get_paymoney_password_to_check_sold
     @rendered_text = %Q[
       Veuillez entrer votre mot de passe PAYMONEY pour consulter votre solde.
+
+      1- Solde autre compte
     ]
     @session_identifier = '8'
   end
