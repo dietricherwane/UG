@@ -308,13 +308,14 @@ class UssdTestingController < ApplicationController
   end
 
   def loto_display_bet_selection
-    @rendered_text = %Q[
+    @rendered_text = %Q[#{@current_ussd_session.draw_day_label}
+
 1- PN - 1 numéro
 2- 2N - 2 numéro
 3- 3N - 3 numéro
 4- 4N - 4 numéro
 5- 5N - 5 numéro]
-      @session_identifier = '13'
+    @session_identifier = '13'
   end
 
   # Affiche la liste des jeux
