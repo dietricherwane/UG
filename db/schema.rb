@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161020074937) do
+ActiveRecord::Schema.define(version: 20161021162522) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -146,6 +146,8 @@ ActiveRecord::Schema.define(version: 20161020074937) do
     t.text     "paymoney_sold_response"
     t.text     "paymoney_otp_url"
     t.text     "paymoney_otp_response"
+    t.string   "draw_day_label"
+    t.string   "draw_day_shortcut"
   end
 
 end

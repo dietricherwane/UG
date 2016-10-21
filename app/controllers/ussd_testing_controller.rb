@@ -203,7 +203,8 @@ class UssdTestingController < ApplicationController
             if @status
               case @ussd_string
                 when '1'
-
+                  display_games_menu
+                  @current_ussd_session.update_attributes(session_identifier: @session_identifier)
                 when '2'
 
                 when '3'
@@ -220,7 +221,49 @@ class UssdTestingController < ApplicationController
 
               end
             end
-            # Consultation du solde du compte Paymoney
+          # Affichage du menu listant les jeux
+          when '11'
+            set_session_identifier_depending_on_game_selected
+            if @status
+              case @ussd_string
+                when '1'
+                  loto_display_draw_day
+                  @current_ussd_session.update_attributes(session_identifier: @session_identifier)
+                when '2'
+
+                when '3'
+
+                when '4'
+
+              end
+            end
+          # Choix du loto
+          when '12'
+            set_session_identifier_depending_on_draw_day_selected
+            if @status
+              case @ussd_string
+                when '1'
+                  draw_day_label = 'Etoile'
+                  draw_day_shortcut = 'etoile'
+                when '2'
+                  draw_day_label = 'Emergence'
+                  draw_day_shortcut = 'emergence'
+                when '3'
+                  draw_day_label = 'Fortune'
+                  draw_day_shortcut = 'fortune'
+                when '4'
+                  draw_day_label = 'Privilège'
+                  draw_day_shortcut = 'privilege'
+                when '5'
+                  draw_day_label = 'Solution'
+                  draw_day_shortcut = 'solution'
+                when '6'
+                  draw_day_label = 'Diamant'
+                  draw_day_shortcut = 'diamant'
+              end
+              loto_display_bet_selection
+              @current_ussd_session.update_attributes(session_identifier: @session_identifier, draw_day_label: draw_day_label, draw_day_shortcut: draw_day_shortcut)
+            end
           end
         end
 
@@ -243,10 +286,71 @@ class UssdTestingController < ApplicationController
 4- Rechargement
 5- Votre service SMS
 6- Mes OTP
-7- Mes comptes
-      ]
+7- Mes comptes]
       @session_identifier = '5'
     end
+  end
+
+  def set_session_identifier_depending_on_draw_day_selected
+    @status = false
+    if ['1', '2', '3', '4', '5', '6'].include?(@ussd_string)
+      @status = true
+    else
+      @rendered_text = %Q[
+1- Etoile #{(-16 + DateTime.parse(reference_date).upto(DateTime.now).count(&:monday?)).to_s}
+2- Emergence #{(-16 + DateTime.parse(reference_date).upto(DateTime.now).count(&:tuesday?)).to_s}
+3- Fortune #{(-8 + DateTime.parse(reference_date).upto(DateTime.now).count(&:wednesday?)).to_s}
+4- Privilège #{(-16 + DateTime.parse(reference_date).upto(DateTime.now).count(&:thursday?)).to_s}
+5- Solution #{(-17 + DateTime.parse(reference_date).upto(DateTime.now).count(&:friday?)).to_s}
+6- Diamant #{(-8 + DateTime.parse(reference_date).upto(DateTime.now).count(&:saturday?)).to_s}]
+      @session_identifier = '12'
+    end
+  end
+
+  def loto_display_bet_selection
+    @rendered_text = %Q[
+1- PN - 1 numéro
+2- 2N - 2 numéro
+3- 3N - 3 numéro
+4- 4N - 4 numéro
+5- 5N - 5 numéro]
+      @session_identifier = '13'
+  end
+
+  # Affiche la liste des jeux
+  def display_games_menu
+    @rendered_text = %Q[
+1- Loto Bonheur
+2- PMU ALR
+3- PMU PLR
+4- SPORTCASH]
+      @session_identifier = '11'
+  end
+
+  def set_session_identifier_depending_on_game_selected
+    @status = false
+    if ['1', '2', '3', '4'].include?(@ussd_string)
+      @status = true
+    else
+      @rendered_text = %Q[
+1- Loto Bonheur
+2- PMU ALR
+3- PMU PLR
+4- SPORTCASH]
+      @session_identifier = '11'
+    end
+  end
+
+  def loto_display_draw_day
+    reference_date = "01/01/#{Date.today.year} 17:00:00"
+    @rendered_text = %Q[
+1- Etoile #{(-16 + DateTime.parse(reference_date).upto(DateTime.now).count(&:monday?)).to_s}
+2- Emergence #{(-16 + DateTime.parse(reference_date).upto(DateTime.now).count(&:tuesday?)).to_s}
+3- Fortune #{(-8 + DateTime.parse(reference_date).upto(DateTime.now).count(&:wednesday?)).to_s}
+4- Privilège #{(-16 + DateTime.parse(reference_date).upto(DateTime.now).count(&:thursday?)).to_s}
+5- Solution #{(-17 + DateTime.parse(reference_date).upto(DateTime.now).count(&:friday?)).to_s}
+6- Diamant #{(-8 + DateTime.parse(reference_date).upto(DateTime.now).count(&:saturday?)).to_s}]
+    @session_identifier = '12'
   end
 
   def get_paymoney_password_to_check_sold
