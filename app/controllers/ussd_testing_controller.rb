@@ -261,8 +261,8 @@ class UssdTestingController < ApplicationController
                   draw_day_label = 'Diamant'
                   draw_day_shortcut = 'diamant'
               end
-              loto_display_bet_selection
               @current_ussd_session.update_attributes(session_identifier: @session_identifier, draw_day_label: draw_day_label, draw_day_shortcut: draw_day_shortcut)
+              loto_display_bet_selection
             end
           end
         end
