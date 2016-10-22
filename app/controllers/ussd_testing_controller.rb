@@ -545,9 +545,9 @@ Montant débité: #{@repeats} FCFA. Confirmez en saisissant votre code secret PA
         @repeats = @ussd_string.to_i
       when 'perm'
         @repeats = @selection.combination(bet_selection).count * @ussd_string.to_i
-      when 'champ reduit'
+      when 'champ_reduit'
         @repeats = @selection.combination(bet_selection - @numbers.count).count * @ussd_string.to_i
-      when 'champ total'
+      when 'champ_total'
         @repeats = Array.new(90 - @numbers.count).combination(bet_selection - @numbers.count).count * @ussd_string.to_i
     end
     #else
