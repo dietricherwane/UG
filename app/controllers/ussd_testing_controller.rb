@@ -539,16 +539,17 @@ Montant débité: #{@repeats} FCFA. Confirmez en saisissant votre code secret PA
     @selection = @current_ussd_session.selection_field.split rescue [] # selection
 
     #if @current_ussd_session.bet_selection != 'PN'
-      case @current_ussd_session.formula_label
-        when 'Simple'
-          @repeats = @ussd_string.to_i
-        when 'Perm'
-          @repeats = @selection.combination(@current_ussd_session.bet_selection.sub('N', '').to_i).count * @ussd_string.to_i
-        when 'Champ reduit'
-          @repeats = @selection.combination(@current_ussd_session.bet_selection.sub('N', '').to_i - @numbers.count).count * @ussd_string.to_i
-        when 'Champ total'
-          @repeats = Array.new(90 - @numbers.count).combination(@current_ussd_session.bet_selection.sub('N', '').to_i - @numbers.count).count * @ussd_string.to_i
-      end
+    @current_ussd_session.bet_selection == 'PN' ? bet_selection = 1 : bet_selection = @current_ussd_session.bet_selection.sub('N', '').to_i
+    case @current_ussd_session.formula_label
+      when 'Simple'
+        @repeats = @ussd_string.to_i
+      when 'Perm'
+        @repeats = @selection.combination(bet_selection).count * @ussd_string.to_i
+      when 'Champ reduit'
+        @repeats = @selection.combination(bet_selection - @numbers.count).count * @ussd_string.to_i
+      when 'Champ total'
+        @repeats = Array.new(90 - @numbers.count).combination(bet_selection - @numbers.count).count * @ussd_string.to_i
+    end
     #else
       #@repeats = @ussd_string.to_i
     #end
