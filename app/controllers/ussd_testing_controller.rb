@@ -314,6 +314,10 @@ class UssdTestingController < ApplicationController
             # Vérification des numéros de base saisis et de leur tranche
             loto_check_base_numbers
             @current_ussd_session.update_attributes(session_identifier: @session_identifier, base_field: @ussd_string)
+          when '16'
+            # Vérification des numéros de sélection saisis et de leur tranche
+            loto_check_selection_numbers
+            @current_ussd_session.update_attributes(session_identifier: @session_identifier, selection_field: @selection_field)
           end
         end
 
@@ -438,6 +442,7 @@ Choisissez votre formule
 
   def loto_check_base_numbers
     @current_ussd_session = @current_ussd_session
+    @ussd_string = @ussd_string
     if base_numbers_overflow || invalid_base_numbers_range
       @rendered_text = %Q[#{@error_message}
 Loto bonheur - #{@current_ussd_session.draw_day_label} #{@current_ussd_session.bet_selection} #{@formula_label}
@@ -464,6 +469,28 @@ Veuillez entrer votre mise de base.
 ]
         @session_identifier = '17'
       end
+    end
+  end
+
+  def loto_check_selection_numbers
+    @current_ussd_session = @current_ussd_session
+    @ussd_string = @ussd_string
+    if selection_numbers_overflow || invalid_selection_numbers_range
+      @rendered_text = %Q[Loto bonheur - #{@current_ussd_session.draw_day_label} #{@current_ussd_session.bet_selection} #{@formula_label}
+Base: #{@current_ussd_session.base_field}
+#{@current_ussd_session.bet_selection == 'PN' ? 'Saisissez votre numéro' : "Saisissez vos numéros séparés d'un espace"} (Entre 1 et 90)
+
+Veuillez entrer votre sélection.
+]
+      @session_identifier = '16'
+    else
+      @rendered_text = %Q[Loto bonheur - #{@current_ussd_session.draw_day_label} #{@current_ussd_session.bet_selection} #{@formula_label}
+Base: #{@current_ussd_session.base_field}
+#{@current_ussd_session.bet_selection == 'PN' ? 'Saisissez votre numéro' : "Saisissez vos numéros séparés d'un espace"} (Entre 1 et 90)
+
+Veuillez entrer votre mise de base.
+]
+      @session_identifier = '17'
     end
   end
 
@@ -1006,7 +1033,42 @@ Veuillez saisir votre numéro de compte Paymoney.
     return status
   end
 
+  def selection_numbers_overflow
+    status = false
+    @error_message
+    # Simple
+    if @current_ussd_session.formula_label == 'Simple' && (@ussd_string.split.length rescue 0) != @current_ussd_session.bet_selection.gsub('N', '').to_i
+      status = true
+      @error_message = "Vous devez sélectionner #{@current_ussd_session.bet_selection.gsub('N', '').to_i} numéros"
+    end
+    # Perm
+    if @current_ussd_session.formula_label == 'Perm' && ((@ussd_string.split.length rescue 0) > 10 || (@current_ussd_session.bet_selection.split.length rescue 0) < @current_ussd_session.bet_selection.gsub('N', '').to_i + 1)
+      status = true
+      @error_message = "Vous devez sélectionner entre #{@current_ussd_session.bet_selection.gsub('N', '').to_i + 1} et 10 numéros"
+    end
+
+    return status
+  end
+
   def invalid_base_numbers_range
+    status = false
+    @error_message = ''
+    numbers = @ussd_string.split rescue []
+
+    numbers.each do |number|
+      if number.to_i < 1 || number.to_i > 90
+        status = true
+      end
+    end
+
+    if status
+      @error_message = "Veuillez choisir des numéros compris entre 1 et 90  pour parier."
+    end
+
+    return status
+  end
+
+  def invalid_selection_numbers_range
     status = false
     @error_message = ''
     numbers = @ussd_string.split rescue []
