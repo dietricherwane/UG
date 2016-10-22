@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161022170341) do
+ActiveRecord::Schema.define(version: 20161022191640) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -155,6 +155,11 @@ ActiveRecord::Schema.define(version: 20161022170341) do
     t.string   "base_field"
     t.string   "selection_field"
     t.string   "stake"
+    t.string   "loto_bet_paymoney_password"
+    t.text     "loto_place_bet_url"
+    t.text     "loto_place_bet_response"
+    t.text     "get_gamer_id_request"
+    t.text     "get_gamer_id_response"
   end
 
 end
