@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161022093621) do
+ActiveRecord::Schema.define(version: 20161022115643) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -152,6 +152,8 @@ ActiveRecord::Schema.define(version: 20161022093621) do
     t.string   "bet_selection_shortcut"
     t.string   "formula_label"
     t.string   "formula_shortcut"
+    t.string   "base_field"
+    t.string   "selection_field"
   end
 
 end

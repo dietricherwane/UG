@@ -309,6 +309,11 @@ class UssdTestingController < ApplicationController
               loto_display_horse_selection_fields
               @current_ussd_session.update_attributes(session_identifier: @session_identifier, formula_label: @formula_label, formula_shortcut: @formula_shortcut)
             end
+          # Saisie de la base au loto
+          when '15'
+            # Vérification des numéros de base saisis et de leur tranche
+            loto_check_base_numbers
+            @current_ussd_session.update_attributes(session_identifier: @session_identifier, base_field: @ussd_string)
           end
         end
 
@@ -424,8 +429,41 @@ Choisissez votre formule
       @session_identifier = '15'
     end
     if base_required == false
-      @rendered_text << 'Veuillez entrer votre sélection.'
-      @session_identifier = '16'
+      if @formula_label != 'Champ total'
+        @rendered_text << 'Veuillez entrer votre sélection.'
+        @session_identifier = '16'
+      end
+    end
+  end
+
+  def loto_check_base_numbers
+    @ussd_string = @ussd_string
+    @current_session = @current_session
+    if base_numbers_overflow || invalid_base_numbers_range
+      @rendered_text = %Q[#{@error_message}
+Loto bonheur - #{@current_ussd_session.draw_day_label} #{@current_ussd_session.bet_selection} #{@formula_label}
+#{@current_ussd_session.bet_selection == 'PN' ? 'Saisissez votre numéro' : "Saisissez vos numéros séparés d'un espace"} (Entre 1 et 90)
+
+Veuillez entrer votre base.
+]
+      @session_identifier = '15'
+    else
+      if @current_session.formula_label != 'Champ total'
+        @rendered_text = %Q[Loto bonheur - #{@current_ussd_session.draw_day_label} #{@current_ussd_session.bet_selection} #{@formula_label}
+Base: #{@ussd_string}
+#{@current_ussd_session.bet_selection == 'PN' ? 'Saisissez votre numéro' : "Saisissez vos numéros séparés d'un espace"} (Entre 1 et 90)
+
+Veuillez entrer votre sélection.
+]
+        @session_identifier = '16'
+      else
+        @rendered_text = %Q[Loto bonheur - #{@current_ussd_session.draw_day_label} #{@current_ussd_session.bet_selection} #{@formula_label}
+Base: #{@ussd_string}
+#{@current_ussd_session.bet_selection == 'PN' ? 'Saisissez votre numéro' : "Saisissez vos numéros séparés d'un espace"} (Entre 1 et 90)
+
+Veuillez entrer votre mise de base.
+]
+      @session_identifier = '17'
     end
   end
 
@@ -949,5 +987,40 @@ Veuillez saisir votre numéro de compte Paymoney.
 
   def start_ussd_log
     render text: MtnStartSessionLog.last.to_yaml
+  end
+
+  def base_numbers_overflow
+    status = false
+    @error_message
+    # Champ reduit
+    if @current_ussd_session.formula_label == 'Champ reduit' && (@ussd_string.split.length rescue 0) > (@current_ussd_session.bet_selection.gsub('N', '').to_i - 1)
+      status = true
+      @error_message = "Vous devez sélectionner au maximum #{(@current_ussd_session.bet_selection.gsub('N', '').to_i - 1)} numéros"
+    end
+    # Champ total
+    if @current_ussd_session.formula_label == 'Champ total' && (@ussd_string.split.length rescue 0) > (@current_ussd_session.bet_selection.gsub('N', '').to_i - 1)
+      status = true
+      @error_message = "Vous devez sélectionner au maximum #{(@current_ussd_session.bet_selection.gsub('N', '').to_i - 1)}"
+    end
+
+    return status
+  end
+
+  def invalid_base_numbers_range
+    status = false
+    @error_message = ''
+    numbers = @ussd_string.split rescue []
+
+    numbers.each do |number|
+      if number.to_i < 1 || number.to_i > 90
+        status = true
+      end
+    end
+
+    if status
+      @error_message = "Veuillez choisir des numéros compris entre 1 et 90  pour parier."
+    end
+
+    return status
   end
 end
