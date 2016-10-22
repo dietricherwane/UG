@@ -155,9 +155,9 @@ class UssdTestingController < ApplicationController
 
     UssdReceptionLog.create(received_parameters: @raw_body, rev_id: @rev_id, rev_password: @rev_password, sp_id: @sp_id, service_id: @service_id, timestamp: @timestamp, trace_unique_id: @unique_id, msg_type: @msg_type, sender_cb: @sender_cb, receiver_cb: @receive_cb, ussd_of_type: @ussd_op_type, msisdn: @msisdn, service_code: @service_code, code_scheme: @code_scheme, ussd_string: @ussd_string, error_code: @error_code, error_message: @error_message, remote_ip: remote_ip_address)
 
-    #render :xml => @result
+    render :xml => @result
 
-    #Thread.new do
+    Thread.new do
       if @error_code == '0'
         # Récupération d'une session existante
         @current_ussd_session = UssdSession.find_by_sender_cb(@sender_cb)
@@ -244,58 +244,58 @@ class UssdTestingController < ApplicationController
               reference_date = "01/01/#{Date.today.year} 17:00:00"
               case @ussd_string
                 when '1'
-                  draw_day_label = "Etoile #{(-16 + DateTime.parse(reference_date).upto(DateTime.now).count(&:monday?)).to_s}"
-                  draw_day_shortcut = 'etoile'
+                  @draw_day_label = "Etoile #{(-16 + DateTime.parse(reference_date).upto(DateTime.now).count(&:monday?)).to_s}"
+                  @draw_day_shortcut = 'etoile'
                 when '2'
-                  draw_day_label = "Emergence #{(-16 + DateTime.parse(reference_date).upto(DateTime.now).count(&:tuesday?)).to_s}"
-                  draw_day_shortcut = 'emergence'
+                  @draw_day_label = "Emergence #{(-16 + DateTime.parse(reference_date).upto(DateTime.now).count(&:tuesday?)).to_s}"
+                  @draw_day_shortcut = 'emergence'
                 when '3'
-                  draw_day_label = "Fortune #{(-8 + DateTime.parse(reference_date).upto(DateTime.now).count(&:wednesday?)).to_s}"
-                  draw_day_shortcut = 'fortune'
+                  @draw_day_label = "Fortune #{(-8 + DateTime.parse(reference_date).upto(DateTime.now).count(&:wednesday?)).to_s}"
+                  @draw_day_shortcut = 'fortune'
                 when '4'
-                  draw_day_label = "Privilège #{(-16 + DateTime.parse(reference_date).upto(DateTime.now).count(&:thursday?)).to_s}"
-                  draw_day_shortcut = 'privilege'
+                  @draw_day_label = "Privilège #{(-16 + DateTime.parse(reference_date).upto(DateTime.now).count(&:thursday?)).to_s}"
+                  @draw_day_shortcut = 'privilege'
                 when '5'
-                  draw_day_label = "Solution #{(-17 + DateTime.parse(reference_date).upto(DateTime.now).count(&:friday?)).to_s}"
-                  draw_day_shortcut = 'solution'
+                  @draw_day_label = "Solution #{(-17 + DateTime.parse(reference_date).upto(DateTime.now).count(&:friday?)).to_s}"
+                  @draw_day_shortcut = 'solution'
                 when '6'
-                  draw_day_label = "Diamant #{(-8 + DateTime.parse(reference_date).upto(DateTime.now).count(&:saturday?)).to_s}"
-                  draw_day_shortcut = 'diamant'
+                  @draw_day_label = "Diamant #{(-8 + DateTime.parse(reference_date).upto(DateTime.now).count(&:saturday?)).to_s}"
+                  @draw_day_shortcut = 'diamant'
               end
-              @current_ussd_session.update_attributes(session_identifier: @session_identifier, draw_day_label: draw_day_label, draw_day_shortcut: draw_day_shortcut)
               loto_display_bet_selection
+              @current_ussd_session.update_attributes(session_identifier: @session_identifier, draw_day_label: @draw_day_label, draw_day_shortcut: @draw_day_shortcut)
             end
           when '13'
             set_session_identifier_depending_on_bet_selection_selected
             if @status
               case @ussd_string
                 when '1'
-                  bet_selection = "PN"
-                  bet_selection_shortcut = 'pn'
+                  @bet_selection = "PN"
+                  @bet_selection_shortcut = 'pn'
                 when '2'
-                  bet_selection = "2N"
-                  bet_selection_shortcut = '2n'
+                  @bet_selection = "2N"
+                  @bet_selection_shortcut = '2n'
                 when '3'
-                  bet_selection = "3N"
-                  bet_selection_shortcut = '3n'
+                  @bet_selection = "3N"
+                  @bet_selection_shortcut = '3n'
                 when '4'
-                  bet_selection = "4N"
-                  bet_selection_shortcut = '4n'
+                  @bet_selection = "4N"
+                  @bet_selection_shortcut = '4n'
                 when '5'
-                  bet_selection = "5N"
-                  bet_selection_shortcut = '5n'
+                  @bet_selection = "5N"
+                  @bet_selection_shortcut = '5n'
               end
-              @current_ussd_session.update_attributes(session_identifier: @session_identifier, bet_selection: bet_selection, bet_selection_shortcut: bet_selection_shortcut)
               loto_display_formula_selection
+              @current_ussd_session.update_attributes(session_identifier: @session_identifier, bet_selection: @bet_selection, bet_selection_shortcut: @bet_selection_shortcut)
             end
           end
         end
 
         send_ussd(@operation_type, @msisdn, @sender_cb, @linkid, @rendered_text)
       end
-    #end
+    end
 
-    render text: @rendered_text
+    #render text: @rendered_text
   end
 
   def set_session_identifier_depending_on_menu_selected
@@ -349,7 +349,7 @@ class UssdTestingController < ApplicationController
   end
 
   def loto_display_bet_selection
-    @rendered_text = %Q[#{@current_ussd_session.draw_day_label}
+    @rendered_text = %Q[#{@draw_day_label}
 
 1- PN - 1 numéro
 2- 2N - 2 numéro
@@ -360,13 +360,14 @@ class UssdTestingController < ApplicationController
   end
 
   def loto_display_formula_selection
-    @rendered_text = %Q[Loto bonheur - #{@current_ussd_session.bet_selection}
+    @rendered_text = %Q[Loto bonheur - #{@bet_selection}
 Choisissez votre formule
 
 1- Simple
 2- Perm]
-    if @current_ussd_session.bet_selection != '1N'
-      @rendered_text << %Q[3- Champ réduit
+    if @bet_selection != 'PN'
+      @rendered_text << %Q[
+3- Champ réduit
 4- Champ total]
     end
     @session_identifier = '14'
