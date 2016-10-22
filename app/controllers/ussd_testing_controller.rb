@@ -243,26 +243,49 @@ class UssdTestingController < ApplicationController
             if @status
               case @ussd_string
                 when '1'
-                  draw_day_label = 'Etoile'
+                  draw_day_label = "Etoile #{(-16 + DateTime.parse(reference_date).upto(DateTime.now).count(&:monday?)).to_s}"
                   draw_day_shortcut = 'etoile'
                 when '2'
-                  draw_day_label = 'Emergence'
+                  draw_day_label = "Emergence #{(-16 + DateTime.parse(reference_date).upto(DateTime.now).count(&:tuesday?)).to_s}"
                   draw_day_shortcut = 'emergence'
                 when '3'
-                  draw_day_label = 'Fortune'
+                  draw_day_label = "Fortune #{(-8 + DateTime.parse(reference_date).upto(DateTime.now).count(&:wednesday?)).to_s}"
                   draw_day_shortcut = 'fortune'
                 when '4'
-                  draw_day_label = 'Privilège'
+                  draw_day_label = "Privilège #{(-16 + DateTime.parse(reference_date).upto(DateTime.now).count(&:thursday?)).to_s}"
                   draw_day_shortcut = 'privilege'
                 when '5'
-                  draw_day_label = 'Solution'
+                  draw_day_label = "Solution #{(-17 + DateTime.parse(reference_date).upto(DateTime.now).count(&:friday?)).to_s}"
                   draw_day_shortcut = 'solution'
                 when '6'
-                  draw_day_label = 'Diamant'
+                  draw_day_label = "Diamant #{(-8 + DateTime.parse(reference_date).upto(DateTime.now).count(&:saturday?)).to_s}"
                   draw_day_shortcut = 'diamant'
               end
               @current_ussd_session.update_attributes(session_identifier: @session_identifier, draw_day_label: draw_day_label, draw_day_shortcut: draw_day_shortcut)
               loto_display_bet_selection
+            end
+          when '13'
+            set_session_identifier_depending_on_bet_selection_selected
+            if @status
+              case @ussd_string
+                when '1'
+                  bet_selection = "PN"
+                  bet_selection_shortcut = 'pn'
+                when '2'
+                  bet_selection = "2N"
+                  bet_selection_shortcut = '2n'
+                when '3'
+                  bet_selection = "3N"
+                  bet_selection_shortcut = '3n'
+                when '4'
+                  bet_selection = "4N"
+                  bet_selection_shortcut = '4n'
+                when '5'
+                  bet_selection = "5N"
+                  bet_selection_shortcut = '5n'
+              end
+              @current_ussd_session.update_attributes(session_identifier: @session_identifier, bet_selection: bet_selection, bet_selection_shortcut: bet_selection_shortcut)
+              loto_display_formula_selection
             end
           end
         end
@@ -307,6 +330,22 @@ class UssdTestingController < ApplicationController
     end
   end
 
+  def set_session_identifier_depending_on_bet_selection_selected
+    @status = false
+    if ['1', '2', '3', '4', '5'].include?(@ussd_string)
+      @status = true
+    else
+      @rendered_text = %Q[#{@current_ussd_session.draw_day_label}
+
+1- PN - 1 numéro
+2- 2N - 2 numéro
+3- 3N - 3 numéro
+4- 4N - 4 numéro
+5- 5N - 5 numéro]
+    @session_identifier = '13'
+    end
+  end
+
   def loto_display_bet_selection
     @rendered_text = %Q[#{@current_ussd_session.draw_day_label}
 
@@ -316,6 +355,19 @@ class UssdTestingController < ApplicationController
 4- 4N - 4 numéro
 5- 5N - 5 numéro]
     @session_identifier = '13'
+  end
+
+  def loto_display_formula_selection
+    @rendered_text = %Q[Loto bonheur - #{@current_ussd_session.bet_selection}
+Choisissez votre formule
+
+1- Simple
+2- Perm]
+    if @current_ussd_session.bet_selection != '1N'
+      @rendered_text << %Q[3- Champ réduit
+4- Champ total]
+    end
+    @session_identifier = '14'
   end
 
   # Affiche la liste des jeux

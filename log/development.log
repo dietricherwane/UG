@@ -53852,3 +53852,11 @@ Migrating to AddDrawDayFieldsToUssdSessions (20161021162522)
   [1m[36mSQL (0.5ms)[0m  [1mINSERT INTO "schema_migrations" ("version") VALUES ($1)[0m  [["version", "20161021162522"]]
   [1m[35m (20.3ms)[0m  COMMIT
   [1m[36mActiveRecord::SchemaMigration Load (0.7ms)[0m  [1mSELECT "schema_migrations".* FROM "schema_migrations"[0m
+  [1m[36mActiveRecord::SchemaMigration Load (42.0ms)[0m  [1mSELECT "schema_migrations".* FROM "schema_migrations"[0m
+Migrating to AddBetSelectionFieldsToUssdSession (20161022003136)
+  [1m[35m (0.6ms)[0m  BEGIN
+  [1m[36m (114.5ms)[0m  [1mALTER TABLE "ussd_sessions" ADD COLUMN "bet_selection" character varying(255)[0m
+  [1m[35m (0.6ms)[0m  ALTER TABLE "ussd_sessions" ADD COLUMN "bet_selection_shortcut" character varying(255)
+  [1m[36mSQL (0.8ms)[0m  [1mINSERT INTO "schema_migrations" ("version") VALUES ($1)[0m  [["version", "20161022003136"]]
+  [1m[35m (19.7ms)[0m  COMMIT
+  [1m[36mActiveRecord::SchemaMigration Load (0.7ms)[0m  [1mSELECT "schema_migrations".* FROM "schema_migrations"[0m
