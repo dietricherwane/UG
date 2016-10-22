@@ -463,7 +463,8 @@ Base: #{@ussd_string}
 
 Veuillez entrer votre mise de base.
 ]
-      @session_identifier = '17'
+        @session_identifier = '17'
+      end
     end
   end
 
