@@ -1021,14 +1021,14 @@ Veuillez saisir votre numéro de compte Paymoney.
     status = false
     @error_message
     # Champ reduit
-    if @current_ussd_session.formula_label == 'Champ reduit' && (@ussd_string.split.length rescue 0) > (@current_ussd_session.bet_selection.gsub('N', '').to_i - 1)
+    if @current_ussd_session.formula_label == 'Champ reduit' && (@ussd_string.split.length rescue 0) > ((@current_ussd_session.bet_selection == 'PN' ? 1 : @current_ussd_session.bet_selection.gsub('N', '').to_i) - 1)
       status = true
-      @error_message = "Vous devez sélectionner au maximum #{(@current_ussd_session.bet_selection.gsub('N', '').to_i - 1)} numéros"
+      @error_message = "Vous devez sélectionner au maximum #{((@current_ussd_session.bet_selection == 'PN' ? 1 : @current_ussd_session.bet_selection.gsub('N', '').to_i) - 1)} numéros"
     end
     # Champ total
-    if @current_ussd_session.formula_label == 'Champ total' && (@ussd_string.split.length rescue 0) > (@current_ussd_session.bet_selection.gsub('N', '').to_i - 1)
+    if @current_ussd_session.formula_label == 'Champ total' && (@ussd_string.split.length rescue 0) > ((@current_ussd_session.bet_selection == 'PN' ? 1 : @current_ussd_session.bet_selection.gsub('N', '').to_i) - 1)
       status = true
-      @error_message = "Vous devez sélectionner au maximum #{(@current_ussd_session.bet_selection.gsub('N', '').to_i - 1)}"
+      @error_message = "Vous devez sélectionner au maximum #{((@current_ussd_session.bet_selection == 'PN' ? 1 : @current_ussd_session.bet_selection.gsub('N', '').to_i) - 1)}"
     end
 
     return status
@@ -1038,14 +1038,14 @@ Veuillez saisir votre numéro de compte Paymoney.
     status = false
     @error_message
     # Simple
-    if @current_ussd_session.formula_label == 'Simple' && (@ussd_string.split.length rescue 0) != @current_ussd_session.bet_selection.gsub('N', '').to_i
+    if @current_ussd_session.formula_label == 'Simple' && (@ussd_string.split.length rescue 0) != (@current_ussd_session.bet_selection == 'PN' ? 1 : @current_ussd_session.bet_selection.gsub('N', '').to_i)
       status = true
-      @error_message = "Vous devez sélectionner #{@current_ussd_session.bet_selection.gsub('N', '').to_i} numéros"
+      @error_message = "Vous devez sélectionner #{(@current_ussd_session.bet_selection == 'PN' ? 1 : @current_ussd_session.bet_selection.gsub('N', '').to_i)} numéros"
     end
     # Perm
-    if @current_ussd_session.formula_label == 'Perm' && ((@ussd_string.split.length rescue 0) > 10 || (@current_ussd_session.bet_selection.split.length rescue 0) < @current_ussd_session.bet_selection.gsub('N', '').to_i + 1)
+    if @current_ussd_session.formula_label == 'Perm' && ((@ussd_string.split.length rescue 0) > 10 || (@current_ussd_session.bet_selection.split.length rescue 0) < (@current_ussd_session.bet_selection == 'PN' ? 1 : @current_ussd_session.bet_selection.gsub('N', '').to_i) + 1)
       status = true
-      @error_message = "Vous devez sélectionner entre #{@current_ussd_session.bet_selection.gsub('N', '').to_i + 1} et 10 numéros"
+      @error_message = "Vous devez sélectionner entre #{(@current_ussd_session.bet_selection == 'PN' ? 1 : @current_ussd_session.bet_selection.gsub('N', '').to_i) + 1} et 10 numéros"
     end
 
     return status
