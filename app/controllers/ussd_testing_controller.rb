@@ -241,6 +241,7 @@ class UssdTestingController < ApplicationController
           when '12'
             set_session_identifier_depending_on_draw_day_selected
             if @status
+              reference_date = "01/01/#{Date.today.year} 17:00:00"
               case @ussd_string
                 when '1'
                   draw_day_label = "Etoile #{(-16 + DateTime.parse(reference_date).upto(DateTime.now).count(&:monday?)).to_s}"
@@ -319,6 +320,7 @@ class UssdTestingController < ApplicationController
     if ['1', '2', '3', '4', '5', '6'].include?(@ussd_string)
       @status = true
     else
+      reference_date = "01/01/#{Date.today.year} 17:00:00"
       @rendered_text = %Q[
 1- Etoile #{(-16 + DateTime.parse(reference_date).upto(DateTime.now).count(&:monday?)).to_s}
 2- Emergence #{(-16 + DateTime.parse(reference_date).upto(DateTime.now).count(&:tuesday?)).to_s}
