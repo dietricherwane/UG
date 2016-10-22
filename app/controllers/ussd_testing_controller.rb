@@ -437,7 +437,7 @@ Choisissez votre formule
   end
 
   def loto_check_base_numbers
-    @current_session = @current_session
+    @current_ussd_session = @current_ussd_session
     if base_numbers_overflow || invalid_base_numbers_range
       @rendered_text = %Q[#{@error_message}
 Loto bonheur - #{@current_ussd_session.draw_day_label} #{@current_ussd_session.bet_selection} #{@formula_label}
@@ -447,7 +447,7 @@ Veuillez entrer votre base.
 ]
       @session_identifier = '15'
     else
-      if @current_session.formula_label != 'Champ total'
+      if @current_ussd_session.formula_label != 'Champ total'
         @rendered_text = %Q[Loto bonheur - #{@current_ussd_session.draw_day_label} #{@current_ussd_session.bet_selection} #{@formula_label}
 Base: #{@ussd_string}
 #{@current_ussd_session.bet_selection == 'PN' ? 'Saisissez votre numéro' : "Saisissez vos numéros séparés d'un espace"} (Entre 1 et 90)
