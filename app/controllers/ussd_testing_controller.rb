@@ -476,8 +476,9 @@ Veuillez entrer votre mise de base.
     @current_ussd_session = @current_ussd_session
     @ussd_string = @ussd_string
     if selection_numbers_overflow || invalid_selection_numbers_range
-      @rendered_text = %Q[Loto bonheur - #{@current_ussd_session.draw_day_label} #{@current_ussd_session.bet_selection} #{@formula_label}
-Base: #{@current_ussd_session.base_field}
+      @rendered_text = %Q[#{@error_message}
+Loto bonheur - #{@current_ussd_session.draw_day_label} #{@current_ussd_session.bet_selection} #{@formula_label}
+#{!@current_ussd_session.base_field.blank? ? "Base: " + @current_ussd_session.base_field : ""}
 #{@current_ussd_session.bet_selection == 'PN' ? 'Saisissez votre numéro' : "Saisissez vos numéros séparés d'un espace"} (Entre 1 et 90)
 
 Veuillez entrer votre sélection.
@@ -486,7 +487,6 @@ Veuillez entrer votre sélection.
     else
       @rendered_text = %Q[Loto bonheur - #{@current_ussd_session.draw_day_label} #{@current_ussd_session.bet_selection} #{@formula_label}
 Base: #{@current_ussd_session.base_field}
-#{@current_ussd_session.bet_selection == 'PN' ? 'Saisissez votre numéro' : "Saisissez vos numéros séparés d'un espace"} (Entre 1 et 90)
 
 Veuillez entrer votre mise de base.
 ]
