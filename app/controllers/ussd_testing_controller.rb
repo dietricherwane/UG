@@ -321,7 +321,7 @@ class UssdTestingController < ApplicationController
           when '17'
             # Saisie de la mise de base et affichage de l'évaluation du pari
             loto_evaluate_bet
-            @current_ussd_session.update_attributes(session_identifier: @session_identifier, stake: @ussd_string + '-' + @repeats)
+            @current_ussd_session.update_attributes(session_identifier: @session_identifier, stake: @ussd_string + '-' + @repeats.to_s)
           end
         end
 
