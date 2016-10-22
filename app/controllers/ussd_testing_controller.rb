@@ -540,14 +540,14 @@ Montant débité: #{@repeats} FCFA. Confirmez en saisissant votre code secret PA
 
     #if @current_ussd_session.bet_selection != 'PN'
     @current_ussd_session.bet_selection == 'PN' ? bet_selection = 1 : bet_selection = @current_ussd_session.bet_selection.sub('N', '').to_i
-    case @current_ussd_session.formula_label
-      when 'Simple'
+    case @current_ussd_session.formula_shortcut
+      when 'simple'
         @repeats = @ussd_string.to_i
-      when 'Perm'
+      when 'perm'
         @repeats = @selection.combination(bet_selection).count * @ussd_string.to_i
-      when 'Champ reduit'
+      when 'champ reduit'
         @repeats = @selection.combination(bet_selection - @numbers.count).count * @ussd_string.to_i
-      when 'Champ total'
+      when 'champ total'
         @repeats = Array.new(90 - @numbers.count).combination(bet_selection - @numbers.count).count * @ussd_string.to_i
     end
     #else
