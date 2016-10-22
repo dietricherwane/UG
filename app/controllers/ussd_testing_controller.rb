@@ -241,7 +241,7 @@ class UssdTestingController < ApplicationController
           when '12'
             set_session_identifier_depending_on_draw_day_selected
             if @status
-              reference_date = "01/01/#{Date.today.year} 17:00:00"
+              reference_date = "01/01/#{Date.today.year} 19:00:00"
               case @ussd_string
                 when '1'
                   @draw_day_label = "Etoile #{(-16 + DateTime.parse(reference_date).upto(DateTime.now).count(&:monday?)).to_s}"
@@ -359,7 +359,7 @@ class UssdTestingController < ApplicationController
     if ['1', '2', '3', '4', '5', '6'].include?(@ussd_string)
       @status = true
     else
-      reference_date = "01/01/#{Date.today.year} 17:00:00"
+      reference_date = "01/01/#{Date.today.year} 19:00:00"
       @rendered_text = %Q[
 1- Etoile #{(-16 + DateTime.parse(reference_date).upto(DateTime.now).count(&:monday?)).to_s}
 2- Emergence #{(-16 + DateTime.parse(reference_date).upto(DateTime.now).count(&:tuesday?)).to_s}
@@ -656,7 +656,7 @@ Montant débité: #{@current_ussd_session.stake.split('-')[1]} FCFA. Confirmez e
   end
 
   def loto_display_draw_day
-    reference_date = "01/01/#{Date.today.year} 17:00:00"
+    reference_date = "01/01/#{Date.today.year} 19:00:00"
     @rendered_text = %Q[
 1- Etoile #{(-16 + DateTime.parse(reference_date).upto(DateTime.now).count(&:monday?)).to_s}
 2- Emergence #{(-16 + DateTime.parse(reference_date).upto(DateTime.now).count(&:tuesday?)).to_s}
@@ -1257,40 +1257,40 @@ Veuillez saisir votre numéro de compte Paymoney.
     @selector2 = ''
     case @current_ussd_session.draw_day_shortcut
       when 'etoile'
-        @selector2 = -16 + DateTime.parse("01/01/#{Date.today.year} 17:00:00").upto(DateTime.now).count(&:monday?)
+        @selector2 = -16 + DateTime.parse("01/01/#{Date.today.year} 19:00:00").upto(DateTime.now).count(&:monday?)
       when 'emergence'
-        @selector2 = -16 + DateTime.parse("01/01/#{Date.today.year} 17:00:00").upto(DateTime.now).count(&:tuesday?)
+        @selector2 = -16 + DateTime.parse("01/01/#{Date.today.year} 19:00:00").upto(DateTime.now).count(&:tuesday?)
       when 'fortune'
-        @selector2 = -8 + DateTime.parse("01/01/#{Date.today.year} 17:00:00").upto(DateTime.now).count(&:wednesday?)
+        @selector2 = -8 + DateTime.parse("01/01/#{Date.today.year} 19:00:00").upto(DateTime.now).count(&:wednesday?)
       when 'privilege'
-        @selector2 = -16 + DateTime.parse("01/01/#{Date.today.year} 17:00:00").upto(DateTime.now).count(&:thursday?)
+        @selector2 = -16 + DateTime.parse("01/01/#{Date.today.year} 19:00:00").upto(DateTime.now).count(&:thursday?)
       when 'solution'
-        @selector2 = -17 + DateTime.parse("01/01/#{Date.today.year} 17:00:00").upto(DateTime.now).count(&:friday?)
+        @selector2 = -17 + DateTime.parse("01/01/#{Date.today.year} 19:00:00").upto(DateTime.now).count(&:friday?)
       when 'diamant'
-        @selector2 = -8 + DateTime.parse("01/01/#{Date.today.year} 17:00:00").upto(DateTime.now).count(&:saturday?)
+        @selector2 = -8 + DateTime.parse("01/01/#{Date.today.year} 19:00:00").upto(DateTime.now).count(&:saturday?)
       end
 
     @begin_date = ''
     @end_date = ''
     case @current_ussd_session.draw_day_shortcut
       when 'etoile'
-        @begin_date = Date.commercial(Date.today.year, Date.today.cwday.modulo(4)+Date.today.cweek, 1).strftime("%d-%m-%Y 17:00:00")
-        @end_date = Date.commercial(Date.today.year, 1 + Date.today.cweek, 1).strftime("%d-%m-%Y 17:00:00")
+        @begin_date = Date.commercial(Date.today.year, Date.today.cwday.modulo(4)+Date.today.cweek, 1).strftime("%d-%m-%Y 19:00:00")
+        @end_date = Date.commercial(Date.today.year, 1 + Date.today.cweek, 1).strftime("%d-%m-%Y 19:00:00")
       when 'emergence'
-        @begin_date = Date.commercial(Date.today.year, Date.today.cwday.modulo(4)+Date.today.cweek, 2).strftime("%d-%m-%Y 17:00:00")
-        @end_date = Date.commercial(Date.today.year, 1 + Date.today.cweek, 2).strftime("%d-%m-%Y 17:00:00")
+        @begin_date = Date.commercial(Date.today.year, Date.today.cwday.modulo(4)+Date.today.cweek, 2).strftime("%d-%m-%Y 19:00:00")
+        @end_date = Date.commercial(Date.today.year, 1 + Date.today.cweek, 2).strftime("%d-%m-%Y 19:00:00")
       when 'fortune'
-        @begin_date = Date.commercial(Date.today.year, Date.today.cwday.modulo(4)+Date.today.cweek, 3).strftime("%d-%m-%Y 17:00:00")
-        @end_date = Date.commercial(Date.today.year, 1 + Date.today.cweek, 3).strftime("%d-%m-%Y 17:00:00")
+        @begin_date = Date.commercial(Date.today.year, Date.today.cwday.modulo(4)+Date.today.cweek, 3).strftime("%d-%m-%Y 19:00:00")
+        @end_date = Date.commercial(Date.today.year, 1 + Date.today.cweek, 3).strftime("%d-%m-%Y 19:00:00")
       when 'privilege'
-        @begin_date = Date.commercial(Date.today.year, Date.today.cwday.modulo(4)+Date.today.cweek, 4).strftime("%d-%m-%Y 17:00:00")
-        @end_date = Date.commercial(Date.today.year, 1 + Date.today.cweek, 4).strftime("%d-%m-%Y 17:00:00")
+        @begin_date = Date.commercial(Date.today.year, Date.today.cwday.modulo(4)+Date.today.cweek, 4).strftime("%d-%m-%Y 19:00:00")
+        @end_date = Date.commercial(Date.today.year, 1 + Date.today.cweek, 4).strftime("%d-%m-%Y 19:00:00")
       when 'solution'
-        @begin_date = Date.commercial(Date.today.year, Date.today.cwday.modulo(4)+Date.today.cweek, 5).strftime("%d-%m-%Y 17:00:00")
-        @end_date = Date.commercial(Date.today.year, 1 + Date.today.cweek, 5).strftime("%d-%m-%Y 17:00:00")
+        @begin_date = Date.commercial(Date.today.year, Date.today.cwday.modulo(4)+Date.today.cweek, 5).strftime("%d-%m-%Y 19:00:00")
+        @end_date = Date.commercial(Date.today.year, 1 + Date.today.cweek, 5).strftime("%d-%m-%Y 19:00:00")
       when 'diamant'
-        @begin_date = Date.commercial(Date.today.year, Date.today.cwday.modulo(4)+Date.today.cweek, 6).strftime("%d-%m-%Y 17:00:00")
-        @end_date = Date.commercial(Date.today.year, 1 + Date.today.cweek, 6).strftime("%d-%m-%Y 17:00:00")
+        @begin_date = Date.commercial(Date.today.year, Date.today.cwday.modulo(4)+Date.today.cweek, 6).strftime("%d-%m-%Y 19:00:00")
+        @end_date = Date.commercial(Date.today.year, 1 + Date.today.cweek, 6).strftime("%d-%m-%Y 19:00:00")
       end
   end
 end
