@@ -237,7 +237,7 @@ class UssdTestingController < ApplicationController
 
               end
             end
-          # Choix du loto
+          # Choix du jour de tirage
           when '12'
             set_session_identifier_depending_on_draw_day_selected
             if @status
@@ -265,6 +265,7 @@ class UssdTestingController < ApplicationController
               loto_display_bet_selection
               @current_ussd_session.update_attributes(session_identifier: @session_identifier, draw_day_label: @draw_day_label, draw_day_shortcut: @draw_day_shortcut)
             end
+          # Choix de la sélection
           when '13'
             set_session_identifier_depending_on_bet_selection_selected
             if @status
@@ -287,6 +288,26 @@ class UssdTestingController < ApplicationController
               end
               loto_display_formula_selection
               @current_ussd_session.update_attributes(session_identifier: @session_identifier, bet_selection: @bet_selection, bet_selection_shortcut: @bet_selection_shortcut)
+            end
+          when '14'
+            set_session_identifier_depending_on_formula_selected
+            if @status
+              case @ussd_string
+                when '1'
+                  @formula_label = "Simple"
+                  @formula_shortcut = 'simple'
+                when '2'
+                  @formula_label = "Perm"
+                  @formula_shortcut = 'perm'
+                when '3'
+                  @formula_label = "Champ réduit"
+                  @formula_shortcut = 'champ_reduit'
+                when '4'
+                  @formula_label = "Champ total"
+                  @formula_shortcut = 'champ_total'
+              end
+              loto_display_horse_selection_fields
+              @current_ussd_session.update_attributes(session_identifier: @session_identifier, formula_label: @formula_label, formula_shortcut: @formula_shortcut)
             end
           end
         end
@@ -344,7 +365,26 @@ class UssdTestingController < ApplicationController
 3- 3N - 3 numéro
 4- 4N - 4 numéro
 5- 5N - 5 numéro]
-    @session_identifier = '13'
+      @session_identifier = '13'
+    end
+  end
+
+  def set_session_identifier_depending_on_formula_selected
+    @status = false
+    if ['1', '2', '3', '4'].include?(@ussd_string)
+      @status = true
+    else
+      @rendered_text = %Q[Loto bonheur - #{@current_ussd_session.bet_selection}
+Choisissez votre formule
+
+1- Simple
+2- Perm]
+      if @bet_selection != 'PN'
+        @rendered_text << %Q[
+3- Champ réduit
+4- Champ total]
+      end
+      @session_identifier = '14'
     end
   end
 
@@ -371,6 +411,22 @@ Choisissez votre formule
 4- Champ total]
     end
     @session_identifier = '14'
+  end
+
+  def loto_display_horse_selection_fields
+    base_required = false
+    @rendered_text = %Q[Loto bonheur - #{@current_ussd_session.draw_day_label} #{@current_ussd_session.bet_selection} #{@formula_label}
+#{@current_ussd_session.bet_selection == 'PN' ? 'Saisissez votre numéro' : "Saisissez vos numéros séparés d'un espace"} (Entre 1 et 90)
+]
+    if @formula_label != 'Simple' && @formula_label != 'Perm'
+      base_required = true
+      @rendered_text << 'Veuillez entrer votre base.'
+      @session_identifier = '15'
+    end
+    if base_required == false
+      @rendered_text << 'Veuillez entrer votre sélection.'
+      @session_identifier = '16'
+    end
   end
 
   # Affiche la liste des jeux
