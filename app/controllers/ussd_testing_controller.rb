@@ -514,7 +514,7 @@ Veuillez entrer votre mise de base.]
     else
       set_repeats
       @repeats = @repeats
-      if @repeats.to_i > 100000 || @repeats.to_i < 100
+      if @repeats > 100000 || @repeats < 100
         @rendered_text = %Q[Votre pari est estimé à: #{@repeats} FCFA. Le montant de votre pari doit être compris entre 100 et 100 000 FCFA.
 Loto bonheur - #{@current_ussd_session.draw_day_label} #{@current_ussd_session.bet_selection} #{@current_ussd_session.formula_label}
 #{!@current_ussd_session.base_field.blank? ? "Base: " + @current_ussd_session.base_field : ""}
@@ -534,7 +534,7 @@ Montant débité: #{@repeats} FCFA. Confirmez en saisissant votre code secret PA
   end
 
   def set_repeats
-    @repeats = ''
+    @repeats = 0
     @numbers = @current_ussd_session.base_field.split rescue [] # base
     @selection = @current_ussd_session.selection_field.split rescue [] # selection
 
