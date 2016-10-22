@@ -318,6 +318,10 @@ class UssdTestingController < ApplicationController
             # Vérification des numéros de sélection saisis et de leur tranche
             loto_check_selection_numbers
             @current_ussd_session.update_attributes(session_identifier: @session_identifier, selection_field: @selection_field)
+          when '17'
+            # Saisie de la mise de base et affichage de l'évaluation du pari
+            loto_evaluate_bet
+            @current_ussd_session.update_attributes(session_identifier: @session_identifier, stake: @ussd_string + '-' @repeats)
           end
         end
 
@@ -491,7 +495,63 @@ Sélection: #{@ussd_string}
 
 Veuillez entrer votre mise de base.
 ]
+      @selection_field = @ussd_string
       @session_identifier = '17'
+    end
+  end
+
+  def loto_evaluate_bet
+    @current_ussd_session = @current_ussd_session
+    @ussd_string = @ussd_string
+    if @ussd_string.blank? || not_a_number?(@ussd_string)
+      @rendered_text = %Q[Veuillez entrer une mise de base valide
+Loto bonheur - #{@current_ussd_session.draw_day_label} #{@current_ussd_session.bet_selection} #{@current_ussd_session.formula_label}
+#{!@current_ussd_session.base_field.blank? ? "Base: " + @current_ussd_session.base_field : ""}
+#{!@current_ussd_session.selection_field.blank? ? "Sélection: " + @current_ussd_session.selection_field : ""}
+
+Veuillez entrer votre mise de base.]
+      @session_identifier = '17'
+    else
+      set_repeats
+      @repeats = @repeats
+      if @repeats.to_i > 100000 || @repeats.to_i < 100
+        @rendered_text = %Q[Votre pari est estimé à: #{@repeats} FCFA. Le montant de votre pari doit être compris entre 100 et 100 000 FCFA.
+Loto bonheur - #{@current_ussd_session.draw_day_label} #{@current_ussd_session.bet_selection} #{@current_ussd_session.formula_label}
+#{!@current_ussd_session.base_field.blank? ? "Base: " + @current_ussd_session.base_field : ""}
+#{!@current_ussd_session.selection_field.blank? ? "Sélection: " + @current_ussd_session.selection_field : ""}
+
+Veuillez entrer votre mise de base.]
+        @session_identifier = '17'
+      else
+        flash.now[:success] = "VOUS VOUS APPRETEZ A PRENDRE UN PARI: #{session[:bet] == '1N' ? 'PN' : session[:bet]} #{session[:formula]} Montant débité: #{@repeats} F CFA. Confirmez en saisissant votre code secret PAYMONEY."
+        @rendered_text = %Q[Vous vous appretez à prendre un pari: #{@current_ussd_session.draw_day_label} #{@current_ussd_session.bet_selection} #{@current_ussd_session.formula_label}
+#{!@current_ussd_session.base_field.blank? ? "Base: " + @current_ussd_session.base_field : ""}
+#{!@current_ussd_session.selection_field.blank? ? "Sélection: " + @current_ussd_session.selection_field : ""}
+
+Montant débité: #{@repeats} FCFA. Confirmez en saisissant votre code secret PAYMONEY.]
+        @session_identifier = '18'
+      end
+    end
+  end
+
+  def set_repeats
+    @repeats = ''
+    @numbers = @current_ussd_session.base_field.split rescue [] # base
+    @selection = @current_ussd_session.selection_field.split rescue [] # selection
+
+    if @current_ussd_session.bet_selection != 'PN'
+      case @current_ussd_session.formula_label
+        when 'Simple'
+          @repeats = @ussd_string.to_i
+        when 'Perm'
+          @repeats = @selection.combination(@current_ussd_session.bet_selection.sub('N', '').to_i).count * @ussd_string.to_i
+        when 'Champ reduit'
+          @repeats = @selection.combination(@current_ussd_session.bet_selection.sub('N', '').to_i - @numbers.count).count * @ussd_string.to_i
+        when 'Champ total'
+          @repeats = Array.new(90 - @numbers.count).combination(@current_ussd_session.bet_selection.sub('N', '').to_i - @numbers.count).count * @ussd_string.to_i
+      end
+    else
+      @repeats = @ussd_string.to_i
     end
   end
 
