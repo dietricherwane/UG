@@ -527,7 +527,6 @@ Veuillez entrer votre mise de base.]
         @rendered_text = %Q[Vous vous appretez à prendre un pari: #{@current_ussd_session.draw_day_label} #{@current_ussd_session.bet_selection} #{@current_ussd_session.formula_label}
 #{!@current_ussd_session.base_field.blank? ? "Base: " + @current_ussd_session.base_field : ""}
 #{!@current_ussd_session.selection_field.blank? ? "Sélection: " + @current_ussd_session.selection_field : ""}
-
 Montant débité: #{@repeats} FCFA. Confirmez en saisissant votre code secret PAYMONEY.]
         @session_identifier = '18'
       end
@@ -539,7 +538,7 @@ Montant débité: #{@repeats} FCFA. Confirmez en saisissant votre code secret PA
     @numbers = @current_ussd_session.base_field.split rescue [] # base
     @selection = @current_ussd_session.selection_field.split rescue [] # selection
 
-    if @current_ussd_session.bet_selection != 'PN'
+    #if @current_ussd_session.bet_selection != 'PN'
       case @current_ussd_session.formula_label
         when 'Simple'
           @repeats = @ussd_string.to_i
@@ -550,9 +549,9 @@ Montant débité: #{@repeats} FCFA. Confirmez en saisissant votre code secret PA
         when 'Champ total'
           @repeats = Array.new(90 - @numbers.count).combination(@current_ussd_session.bet_selection.sub('N', '').to_i - @numbers.count).count * @ussd_string.to_i
       end
-    else
-      @repeats = @ussd_string.to_i
-    end
+    #else
+      #@repeats = @ussd_string.to_i
+    #end
   end
 
   # Affiche la liste des jeux
