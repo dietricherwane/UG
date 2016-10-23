@@ -336,6 +336,17 @@ class UssdTestingController < ApplicationController
             # Vérification du numéro de course entré
             plr_game_selection
             @current_ussd_session.update_attributes(session_identifier: @session_identifier, plr_race_number: @ussd_string)
+          when '22'
+            set_session_identifier_depending_on_plr_game_selection
+            if @status
+              case @ussd_string
+                when '1'
+
+                when '2'
+                  display_plr_race_details
+                  @current_ussd_session.update_attributes(session_identifier: @session_identifier, plr_race_details_request: @plr_race_details_request, plr_race_details_response: @plr_race_details_response)
+              end
+            end
           end
         end
 
@@ -1377,6 +1388,38 @@ Vous avez sélectionné la course: Réunion: R#{@current_ussd_session.plr_reunio
 2- Détail des courses]
         @session_identifier = '22'
       end
+    end
+  end
+
+  def set_session_identifier_depending_on_plr_game_selection
+    @status = false
+    if !['1', '2'].include?(@ussd_string)
+      @rendered_text = %Q[PMU PLR
+Vous avez sélectionné la course: Réunion: R#{@current_ussd_session.plr_reunion_number} - Course: C#{@ussd_string}
+
+1- Jouer
+2- Détail des courses]
+      @session_identifier = '22'
+    else
+      @status = true
+    end
+  end
+
+  def display_plr_race_details
+    @plr_race_details_request = Parameter.first.parionsdirect_url + "/ussd_pmu/get_plr_race_list_info/R#{session[:plr_reunion_number]}/C#{session[:plr_race_number]}"
+    races = RestClient.get(@plr_race_details_request) rescue nil
+    @plr_race_details_response = races
+
+    races = JSON.parse(races) rescue nil
+    races = races["plr_race_list"] rescue nil
+    @races = ""
+
+    races.each do |race|
+      @races << %Q[PMU PLR
+Numéro de course: #{race["numero_course"]} - Départ: #{race["depart"]}
+Réunion: #{race["reunion"]} - Course: #{race["course"]}
+Nombre de partants: #{race["Partants"]#}
+Détails: #{race["details"]}]
     end
   end
 end
