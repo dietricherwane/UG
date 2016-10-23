@@ -332,6 +332,10 @@ class UssdTestingController < ApplicationController
             # Vérification du numéro de réunion entré et sélection de la course
             plr_get_race
             @current_ussd_session.update_attributes(session_identifier: @session_identifier, get_plr_race_list_request: @get_plr_race_list_request, get_plr_race_list_response: @get_plr_race_list_response, plr_reunion_number: @ussd_string)
+          when '21'
+            # Vérification du numéro de course entré
+            plr_game_selection
+            @current_ussd_session.update_attributes(session_identifier: @session_identifier, plr_race_number: @ussd_string)
           end
         end
 
@@ -1327,7 +1331,7 @@ Veuillez entrer le numéro de réunion]
     if @ussd_string.blank?
       @rendered_text = %Q[PMU PLR
 Veuillez entrer le numéro de réunion]
-    @session_identifier = '20'
+      @session_identifier = '20'
     else
       plr_get_reunions_list
       @get_plr_race_list_request = @get_plr_race_list_request
@@ -1342,6 +1346,36 @@ Veuillez entrer un numéro de réunion valide]
 Réunion: R#{@ussd_string}
 Veuillez entrer le numéro de course]
         @session_identifier = '21'
+      end
+    end
+  end
+
+  def plr_game_selection
+    if @ussd_string.blank?
+      @rendered_text = %Q[PMU PLR
+Réunion: R#{@ussd_string}
+Veuillez entrer le numéro de course valide]
+      @session_identifier = '21'
+    else
+      status = false
+      JSON.parse(@current_ussd_session.get_plr_race_list_response).each do |race|
+        if "R" + @current_ussd_session.plr_reunion_number == race["reunion"] && ('C' + @ussd_string) == race["course"]
+          status = true
+        end
+      end
+
+      if status == false
+        %Q[PMU PLR
+Réunion: R#{@ussd_string}
+Veuillez entrer le numéro de course valide]
+      @session_identifier = '21'
+      else
+        %Q[PMU PLR
+Vous avez sélectionné la course: Réunion: R#{@current_ussd_session.plr_reunion_number} - Course: C#{@ussd_string}
+
+1- Jouer
+2- Détail des courses]
+        @session_identifier = '22'
       end
     end
   end
