@@ -341,8 +341,11 @@ class UssdTestingController < ApplicationController
             if @status
               case @ussd_string
                 when '1'
-
+                  # Affichage des types de paris
+                  display_plr_bet_type
+                  @current_ussd_session.update_attributes(session_identifier: @session_identifier)
                 when '2'
+                  # Affichage des détails de course
                   display_plr_race_details
                   @current_ussd_session.update_attributes(session_identifier: @session_identifier, plr_race_details_request: @plr_race_details_request, plr_race_details_response: @plr_race_details_response)
               end
@@ -1421,5 +1424,14 @@ Réunion: #{race["reunion"]} - Course: #{race["course"]}
 Nombre de partants: #{race["Partants"]}
 Détails: #{race["details"]}]
     end
+  end
+
+  def display_plr_bet_type
+    @rendered_text = %Q[1- Trio
+2- Jumelé gagnant
+3- Jumelé placé
+4- Simple gagnant
+5- Simple placé]
+    @session_identifier = '23'
   end
 end
