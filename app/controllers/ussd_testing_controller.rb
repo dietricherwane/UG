@@ -1359,7 +1359,7 @@ Veuillez entrer le numéro de course valide]
     else
       status = false
       JSON.parse(@current_ussd_session.get_plr_race_list_response).each do |race|
-        if "R" + @current_ussd_session.plr_reunion_number == race["reunion"].to_s && ('C' + @ussd_string) == race["course"].to_s
+        if "R" + @current_ussd_session.plr_reunion_number.to_s == race["reunion"].to_s && ('C' + @ussd_string) == race["course"].to_s
           status = true
         end
       end
