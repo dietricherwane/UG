@@ -377,6 +377,24 @@ class UssdTestingController < ApplicationController
               end
               @current_ussd_session.update_attributes(session_identifier: @session_identifier, plr_bet_type_label: @plr_bet_type_label, plr_bet_type_shortcut: @plr_bet_type_shortcut)
             end
+          when '24'
+            set_session_identifier_depending_on_plr_formula_selected
+            if @status
+              case @ussd_string
+                when '1'
+                  @plr_formula_label = 'Long champs'
+                  @plr_formula_shortcut = 'long_champs'
+                  plr_display_plr_selection
+                when '2'
+                  @plr_formula_label = 'Champ réduit'
+                  @plr_formula_shortcut = 'champ_reduit'
+                  #plr_display_plr_formula
+                when '3'
+                  @plr_formula_label = 'Champ total'
+                  @plr_formula_shortcut = 'champ_total'
+                  #plr_display_plr_formula
+              end
+              @current_ussd_session.update_attributes(session_identifier: @session_identifier, plr_formula_label: @plr_formula_label, plr_formula_shortcut: @plr_formula_shortcut)
           when '26'
             plr_select_number_of_times
             @current_ussd_session.update_attributes(session_identifier: @session_identifier, plr_selection: @plr_selection)
@@ -1477,6 +1495,19 @@ Détails: #{race["details"]}]
 3- Jumelé placé
 4- Simple gagnant
 5- Simple placé]
+      @session_identifier = '23'
+    end
+  end
+
+  def set_session_identifier_depending_on_plr_formula_selected
+    @status = false
+    if ['1', '2', '3'].include?(@ussd_string)
+      @status = true
+    else
+      @rendered_text = %Q[Réunion: R#{@current_ussd_session.plr_reunion_number} - Course: C#{@current_ussd_session.plr_race_number}
+1- Long champ
+2- Champ réduit
+3- Champ total]
       @session_identifier = '23'
     end
   end
