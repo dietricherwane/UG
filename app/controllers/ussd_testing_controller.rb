@@ -350,6 +350,33 @@ class UssdTestingController < ApplicationController
                   @current_ussd_session.update_attributes(session_identifier: @session_identifier, plr_race_details_request: @plr_race_details_request, plr_race_details_response: @plr_race_details_response)
               end
             end
+          when '23'
+            set_session_identifier_depending_on_plr_bet_type_selected
+            if @status
+              case @ussd_string
+                when '1'
+                  @plr_bet_type_label = 'Trio'
+                  @plr_bet_type_shortcut = 'trio'
+                  plr_display_plr_formula
+                when '2'
+                  @plr_bet_type_label = "Jumelé gagnant"
+                  @plr_bet_type_shortcut = 'jumele_gagnant'
+                  plr_display_plr_formula
+                when '3'
+                  @plr_bet_type_label = "Jumelé placé"
+                  @plr_bet_type_shortcut = 'jumele_place'
+                  plr_display_plr_formula
+                when '4'
+                  @plr_bet_type_label = "Simple gagnant"
+                  @plr_bet_type_shortcut = 'simple_gagnant'
+                  plr_display_plr_selection
+                when '5'
+                  @plr_bet_type_label = "Simple placé"
+                  @plr_bet_type_shortcut = 'simple_place'
+                  plr_display_plr_selection
+              end
+              @current_ussd_session.update_attributes(session_identifier: @session_identifier, plr_bet_type_label: @plr_bet_type_label, plr_bet_type_shortcut: @plr_bet_type_shortcut)
+            end
           end
         end
 
@@ -1427,11 +1454,41 @@ Détails: #{race["details"]}]
   end
 
   def display_plr_bet_type
-    @rendered_text = %Q[1- Trio
+    @rendered_text = %Q[Réunion: R#{@current_ussd_session.plr_reunion_number} - Course: C#{@current_ussd_session.plr_race_number}
+1- Trio
 2- Jumelé gagnant
 3- Jumelé placé
 4- Simple gagnant
 5- Simple placé]
     @session_identifier = '23'
+  end
+
+  def set_session_identifier_depending_on_plr_bet_type_selected
+    @status = false
+    if ['1', '2', '3', '4', '5'].include?(@ussd_string)
+      @status = true
+    else
+      @rendered_text = %Q[Réunion: R#{@current_ussd_session.plr_reunion_number} - Course: C#{@current_ussd_session.plr_race_number}
+1- Trio
+2- Jumelé gagnant
+3- Jumelé placé
+4- Simple gagnant
+5- Simple placé]
+      @session_identifier = '23'
+    end
+  end
+
+  def plr_display_plr_formula
+    @rendered_text = %Q[Réunion: R#{@current_ussd_session.plr_reunion_number} - Course: C#{@current_ussd_session.plr_race_number}
+1- Long champ
+2- Champ réduit
+3- Champ total]
+    @session_identifier = '24'
+  end
+
+  def plr_display_plr_selection
+    @rendered_text = %Q[Réunion: R#{@current_ussd_session.plr_reunion_number} - Course: C#{@current_ussd_session.plr_race_number}
+Saisissez les numéros de vos chevaux en les séparant par un espace]
+    @session_identifier = '26'
   end
 end
