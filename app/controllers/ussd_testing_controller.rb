@@ -230,10 +230,10 @@ class UssdTestingController < ApplicationController
                   loto_display_draw_day
                   @current_ussd_session.update_attributes(session_identifier: @session_identifier)
                 when '2'
+
+                when '3'
                   plr_get_reunion
                   @current_ussd_session.update_attributes(session_identifier: @session_identifier)
-                when '3'
-
                 when '4'
 
               end
