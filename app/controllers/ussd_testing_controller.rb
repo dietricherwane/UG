@@ -1406,7 +1406,7 @@ Vous avez sélectionné la course: Réunion: R#{@current_ussd_session.plr_reunio
   end
 
   def display_plr_race_details
-    @plr_race_details_request = Parameter.first.parionsdirect_url + "/ussd_pmu/get_plr_race_list_info/R#{session[:plr_reunion_number]}/C#{session[:plr_race_number]}"
+    @plr_race_details_request = Parameter.first.parionsdirect_url + "/ussd_pmu/get_plr_race_list_info/R#{@current_ussd_session.plr_reunion_number}/C#{@current_ussd_session.plr_race_number}"
     races = RestClient.get(@plr_race_details_request) rescue nil
     @plr_race_details_response = races
 
