@@ -396,6 +396,9 @@ class UssdTestingController < ApplicationController
               end
             end
             @current_ussd_session.update_attributes(session_identifier: @session_identifier, plr_formula_label: @plr_formula_label, plr_formula_shortcut: @plr_formula_shortcut)
+          when '25'
+            plr_selection_or_stake_depending_on_formula
+            @current_ussd_session.update_attributes(session_identifier: @session_identifier, plr_base: @ussd_string)
           when '26'
             plr_select_number_of_times
             @current_ussd_session.update_attributes(session_identifier: @session_identifier, plr_selection: @plr_selection)
@@ -1633,5 +1636,18 @@ Saisissez les numéros de vos chevaux en les séparant par un espace]
     end
 
     return status
+  end
+
+  # Controler les numéros de base
+  def plr_selection_or_stake_depending_on_formula
+    if @current_ussd_session.plr_formula_shortcut == 'champ_reduit'
+      @rendered_text = %Q[Réunion: R#{@current_ussd_session.plr_reunion_number} - Course: C#{@current_ussd_session.plr_race_number}
+Saisissez les numéros de vos chevaux en les séparant par un espace]
+      @session_identifier = '26'
+    else
+      @rendered_text = %Q[Réunion: R#{@current_ussd_session.plr_reunion_number} - Course: C#{@current_ussd_session.plr_race_number}
+Veuillez saisir le nombre de fois que vous souhaitez miser]
+      @session_identifier = '27'
+    end
   end
 end
