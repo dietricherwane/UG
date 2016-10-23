@@ -230,7 +230,8 @@ class UssdTestingController < ApplicationController
                   loto_display_draw_day
                   @current_ussd_session.update_attributes(session_identifier: @session_identifier)
                 when '2'
-
+                  plr_get_reunion
+                  @current_ussd_session.update_attributes(session_identifier: @session_identifier)
                 when '3'
 
                 when '4'
@@ -415,6 +416,13 @@ Choisissez votre formule
 4- 4N - 4 numéro
 5- 5N - 5 numéro]
     @session_identifier = '13'
+  end
+
+  def plr_get_reunion
+    @rendered_text = %Q[PMU PLR
+
+Veuillez entrer le numéro de réunion]
+    @session_identifier = '20'
   end
 
   def loto_display_formula_selection
