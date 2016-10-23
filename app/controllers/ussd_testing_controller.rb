@@ -388,11 +388,11 @@ class UssdTestingController < ApplicationController
                 when '2'
                   @plr_formula_label = 'Champ réduit'
                   @plr_formula_shortcut = 'champ_reduit'
-                  #plr_display_plr_formula
+                  plr_display_plr_base
                 when '3'
                   @plr_formula_label = 'Champ total'
                   @plr_formula_shortcut = 'champ_total'
-                  #plr_display_plr_formula
+                  plr_display_plr_base
               end
             end
             @current_ussd_session.update_attributes(session_identifier: @session_identifier, plr_formula_label: @plr_formula_label, plr_formula_shortcut: @plr_formula_shortcut)
@@ -1525,6 +1525,12 @@ Détails: #{race["details"]}]
     @rendered_text = %Q[Réunion: R#{@current_ussd_session.plr_reunion_number} - Course: C#{@current_ussd_session.plr_race_number}
 Saisissez les numéros de vos chevaux en les séparant par un espace]
     @session_identifier = '26'
+  end
+
+  def plr_display_plr_base
+    @rendered_text = %Q[Réunion: R#{@current_ussd_session.plr_reunion_number} - Course: C#{@current_ussd_session.plr_race_number}
+Saisissez la base]
+    @session_identifier = '25'
   end
 
   def plr_select_number_of_times
