@@ -328,6 +328,10 @@ class UssdTestingController < ApplicationController
             @account_profile = AccountProfile.find_by_msisdn(@msisdn[-8,8])
             loto_place_bet
             @current_ussd_session.update_attributes(session_identifier: @session_identifier, loto_bet_paymoney_password: @ussd_string, loto_place_bet_url: @loto_place_bet_url + @request_body, loto_place_bet_response: @loto_place_bet_response.body, get_gamer_id_request: @get_gamer_id_request, get_gamer_id_response: @get_gamer_id_response.body)
+          when '20'
+            # Vérification du numéro de réunion entré et sélection de la course
+            plr_get_race
+            @current_ussd_session.update_attributes(session_identifier: @session_identifier, get_plr_race_list_request: @get_plr_race_list_request, get_plr_race_list_response: @get_plr_race_list_response, plr_reunion_number: @ussd_string)
           end
         end
 
@@ -416,13 +420,6 @@ Choisissez votre formule
 4- 4N - 4 numéro
 5- 5N - 5 numéro]
     @session_identifier = '13'
-  end
-
-  def plr_get_reunion
-    @rendered_text = %Q[PMU PLR
-
-Veuillez entrer le numéro de réunion]
-    @session_identifier = '20'
   end
 
   def loto_display_formula_selection
@@ -1300,5 +1297,52 @@ Veuillez saisir votre numéro de compte Paymoney.
         @begin_date = Date.commercial(Date.today.year, Date.today.cwday.modulo(4)+Date.today.cweek, 6).strftime("%d-%m-%Y 19:00:00")
         @end_date = Date.commercial(Date.today.year, 1 + Date.today.cweek, 6).strftime("%d-%m-%Y 19:00:00")
       end
+  end
+
+  def plr_get_reunions_list
+    @get_plr_race_list_request = Parameter.first.parionsdirect_url + "/ussd_pmu/get_plr_race_list"
+    @get_plr_race_list_response = RestClient.get(@get_plr_race_list_request) rescue nil
+    @reunions = []
+
+    races = JSON.parse(@get_plr_race_list_response) rescue nil
+    races = races["plr_race_list"] rescue nil
+
+    unless races.blank?
+      races.each do |race|
+        if !@reunions.include?(race["reunion"])
+          @reunions << race["reunion"]
+        end
+      end
+    end
+  end
+
+  def plr_get_reunion
+    @rendered_text = %Q[PMU PLR
+
+Veuillez entrer le numéro de réunion]
+    @session_identifier = '20'
+  end
+
+  def plr_get_race
+    if @ussd_string.blank?
+      @rendered_text = %Q[PMU PLR
+Veuillez entrer le numéro de réunion]
+    @session_identifier = '20'
+    else
+      plr_get_reunions_list
+      @get_plr_race_list_request = @get_plr_race_list_request
+      @get_plr_race_list_response = @get_plr_race_list_response
+
+      if !@reunions.include?('R' + @ussd_string)
+        @rendered_text = %Q[PMU PLR
+Veuillez entrer un numéro de réunion valide]
+        @session_identifier = '20'
+      else
+        @rendered_text = %Q[PMU PLR
+Réunion: R#{@ussd_string}
+Veuillez entrer le numéro de course]
+        @session_identifier = '21'
+      end
+    end
   end
 end
