@@ -377,6 +377,9 @@ class UssdTestingController < ApplicationController
               end
               @current_ussd_session.update_attributes(session_identifier: @session_identifier, plr_bet_type_label: @plr_bet_type_label, plr_bet_type_shortcut: @plr_bet_type_shortcut)
             end
+          when '26'
+            plr_select_number_of_times
+            @current_ussd_session.update_attributes(session_identifier: @session_identifier, plr_selection: @plr_selection)
           end
         end
 
@@ -1490,5 +1493,107 @@ Détails: #{race["details"]}]
     @rendered_text = %Q[Réunion: R#{@current_ussd_session.plr_reunion_number} - Course: C#{@current_ussd_session.plr_race_number}
 Saisissez les numéros de vos chevaux en les séparant par un espace]
     @session_identifier = '26'
+  end
+
+  def plr_select_number_of_times
+    @ussd_string = @ussd_string
+    if plr_valid_horses_numbers
+      if plr_right_selection
+        if plr_numbers_in_selection_not_in_base
+          @rendered_text = %Q[Réunion: R#{@current_ussd_session.plr_reunion_number} - Course: C#{@current_ussd_session.plr_race_number}
+Veuillez saisir le nombre de fois que vous souhaitez miser]
+          @session_identifier = '27'
+        else
+          @rendered_text = %Q[#{@error_message}
+Réunion: R#{@current_ussd_session.plr_reunion_number} - Course: C#{@current_ussd_session.plr_race_number}
+Saisissez les numéros de vos chevaux en les séparant par un espace]
+          @session_identifier = '26'
+        end
+      else
+        @rendered_text = %Q[#{@error_message}
+Réunion: R#{@current_ussd_session.plr_reunion_number} - Course: C#{@current_ussd_session.plr_race_number}
+Saisissez les numéros de vos chevaux en les séparant par un espace]
+        @session_identifier = '26'
+      end
+    else
+      @rendered_text = %Q[#{@error_message}
+Réunion: R#{@current_ussd_session.plr_reunion_number} - Course: C#{@current_ussd_session.plr_race_number}
+Saisissez les numéros de vos chevaux en les séparant par un espace]
+      @session_identifier = '26'
+    end
+  end
+
+  def plr_valid_horses_numbers
+    status = true
+
+    if @ussd_string.blank?
+      status = false
+    else
+      @ussd_string.split.each do |horse_number|
+        if not_a_number?(horse_number)
+          status = false
+        end
+      end
+    end
+
+    return status
+  end
+
+  def plr_right_selection
+    status = true
+    @error_message = ""
+    if @current_ussd_session.plr_bet_type_shortcut == "simple_gagnant" && @ussd_string.split.length > 10
+      @error_message = "Vous pouvez sélectionner 10 numéros au maximum"
+      status = false
+    end
+    if @current_ussd_session.plr_bet_type_shortcut == "simple_place" && @ussd_string.split.length > 10
+      @error_message = "Vous pouvez sélectionner 10 numéros au maximum"
+      status = false
+    end
+    if @current_ussd_session.plr_bet_type_shortcut == "jumele_gagnant" && (@ussd_string.split.length > 10 || @ussd_string.split.length < 2)
+      @error_message = "Vous pouvez sélectionner entre 2 et 10 numéros"
+      status = false
+    end
+    if @current_ussd_session.plr_bet_type_shortcut == "jumele_gagnant" && @current_ussd_session.plr_formula_shortcut == "long_champs" && (@ussd_string.split.length > 10 || @ussd_string.split.length < 2)
+      @error_message = "Vous pouvez sélectionner entre 2 et 10 numéros"
+      status = false
+    end
+    if @current_ussd_session.plr_bet_type_shortcut == "jumele_place" && (@ussd_string.split.length > 10 || @ussd_string.split.length < 2)
+      @error_message = "Vous pouvez sélectionner entre 2 et 10 numéros"
+      status = false
+    end
+    if @current_ussd_session.plr_bet_type_shortcut == "jumele_place" && @current_ussd_session.plr_formula_shortcut == "long_champs" && (@ussd_string.split.length > 10 || @ussd_string.split.length < 2)
+      @error_message = "Vous pouvez sélectionner entre 2 et 10 numéros"
+      status = false
+    end
+    if @current_ussd_session.plr_bet_type_shortcut == "trio" && (@ussd_string.split.length > 10 || @ussd_string.split.length < 3)
+      @error_message = "Vous pouvez sélectionner entre 3 et 10 numéros"
+      status = false
+    end
+    if @current_ussd_session.plr_bet_type_shortcut == "trio" && @current_ussd_session.plr_formula_shortcut == "long_champs" && (@ussd_string.split.length > 10 || @ussd_string.split.length < 3)
+      @error_message = "Vous pouvez sélectionner entre 3 et 10 numéros"
+      status = false
+    end
+    if @current_ussd_session.plr_bet_type_shortcut == "champ_reduit"  && @ussd_string.split.length < 5
+      @error_message = "Vous devez sélectionner au moins 5 numéros"
+      status = false
+    end
+
+    return status
+  end
+
+  def plr_numbers_in_selection_not_in_base
+    status = true
+    @error_message = ""
+    if !@current_ussd_session.plr_base.blank?
+      @current_ussd_session.plr_base.split(",").each do |base_number|
+        if @ussd_string.split.include?(base_number)
+          @error_message = 'Veuillez choisir des numéros en sélection différents de ceux en base'
+          status = false
+        end
+      end
+    end
+
+    return status
   end
 end

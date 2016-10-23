@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161023212942) do
+ActiveRecord::Schema.define(version: 20161023221254) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -168,6 +168,11 @@ ActiveRecord::Schema.define(version: 20161023212942) do
     t.text     "plr_race_details_response"
     t.string   "plr_bet_type_label"
     t.string   "plr_bet_type_shortcut"
+    t.string   "plr_formula_label"
+    t.string   "plr_formula_shortcut"
+    t.string   "plr_base"
+    t.string   "plr_selection"
+    t.string   "plr_number_of_times"
   end
 
 end
