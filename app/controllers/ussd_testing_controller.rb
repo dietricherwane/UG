@@ -394,7 +394,8 @@ class UssdTestingController < ApplicationController
                   @plr_formula_shortcut = 'champ_total'
                   #plr_display_plr_formula
               end
-              @current_ussd_session.update_attributes(session_identifier: @session_identifier, plr_formula_label: @plr_formula_label, plr_formula_shortcut: @plr_formula_shortcut)
+            end
+            @current_ussd_session.update_attributes(session_identifier: @session_identifier, plr_formula_label: @plr_formula_label, plr_formula_shortcut: @plr_formula_shortcut)
           when '26'
             plr_select_number_of_times
             @current_ussd_session.update_attributes(session_identifier: @session_identifier, plr_selection: @plr_selection)
