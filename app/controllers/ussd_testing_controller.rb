@@ -1418,7 +1418,7 @@ Vous avez sélectionné la course: Réunion: R#{@current_ussd_session.plr_reunio
       @races << %Q[PMU PLR
 Numéro de course: #{race["numero_course"]} - Départ: #{race["depart"]}
 Réunion: #{race["reunion"]} - Course: #{race["course"]}
-Nombre de partants: #{race["Partants"]#}
+Nombre de partants: #{race["Partants"]}
 Détails: #{race["details"]}]
     end
   end
