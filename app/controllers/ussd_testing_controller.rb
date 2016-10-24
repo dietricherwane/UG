@@ -405,6 +405,10 @@ class UssdTestingController < ApplicationController
             @current_ussd_session.update_attributes(session_identifier: @session_identifier, plr_selection: @ussd_string)
           when '27'
             plr_evaluate_bet
+            @current_ussd_session.update_attributes(session_identifier: @session_identifier, plr_number_of_times: @ussd_string, plr_evaluate_bet_request: @plr_evaluate_bet_request + @request_body, plr_evaluate_bet_response: @plr_evaluate_bet_response, bet_cost_amount: @bet_cost_amount)
+          when '28'
+            @account_profile = AccountProfile.find_by_msisdn(@msisdn[-8,8])
+            plr_place_bet
             @current_ussd_session.update_attributes(session_identifier: @session_identifier, plr_number_of_times: @plr_number_of_times, plr_evaluate_bet_request: @plr_evaluate_bet_request + @request_body, plr_evaluate_bet_response: @plr_evaluate_bet_response)
           end
         end
@@ -1697,13 +1701,103 @@ R#{@current_ussd_session.plr_reunion_number}C#{@current_ussd_session.plr_race_nu
 #{@current_ussd_session.plr_bet_type_label} > #{@current_ussd_session.plr_formula_label}
 #{@current_ussd_session.plr_base.blank? ? '' : "Base: " + @current_ussd_session.plr_base}
 #{@current_ussd_session.plr_selection.blank? ? '' : "Sélection: " + @current_ussd_session.plr_selection}
-Votre pari est estimé à #{json_object["bet"]["bet_cost_amount"]} FCFA]
+Votre pari est estimé à #{json_object["bet"]["bet_cost_amount"]} FCFA.
+Confirmez en saisissant votre code secret]
+          @bet_cost_amount = json_object["bet"]["bet_cost_amount"]
           @session_identifier = '28'
         else
           @rendered_text = %Q[Le pari n'a pas pu être évalué
 Réunion: R#{@current_ussd_session.plr_reunion_number} - Course: C#{@current_ussd_session.plr_race_number}
 Veuillez saisir le nombre de fois que vous souhaitez miser]
           @session_identifier = '27'
+        end
+      end
+    end
+  end
+
+  def plr_place_bet
+    if @ussd_string.blank?
+      @rendered_text = %Q[Vous vous apprêtez à prendre un pari PMU PLR
+R#{@current_ussd_session.plr_reunion_number}C#{@current_ussd_session.plr_race_number}
+#{@current_ussd_session.plr_bet_type_label} > #{@current_ussd_session.plr_formula_label}
+#{@current_ussd_session.plr_base.blank? ? '' : "Base: " + @current_ussd_session.plr_base}
+#{@current_ussd_session.plr_selection.blank? ? '' : "Sélection: " + @current_ussd_session.plr_selection}
+Votre pari est estimé à #{@current_ussd_session.bet_cost_amount} FCFA.
+Confirmez en saisissant votre code secret]
+      @session_identifier = '28'
+    else
+      @get_gamer_id_request = Parameter.first.gateway_url + "/8ba869a7a9c59f3a0/api/users/gamer_id/#{@account_profile.msisdn}"
+      @get_gamer_id_response = Typhoeus.get(@get_gamer_id_request, connecttimeout: 30)
+      if @get_gamer_id_response.body.blank?
+        @rendered_text = %Q[Votre identifiant parieur n'a pas pu être récupéré.
+R#{@current_ussd_session.plr_reunion_number}C#{@current_ussd_session.plr_race_number}
+#{@current_ussd_session.plr_bet_type_label} > #{@current_ussd_session.plr_formula_label}
+#{@current_ussd_session.plr_base.blank? ? '' : "Base: " + @current_ussd_session.plr_base}
+#{@current_ussd_session.plr_selection.blank? ? '' : "Sélection: " + @current_ussd_session.plr_selection}
+Votre pari est estimé à #{@current_ussd_session.bet_cost_amount} FCFA.
+Confirmez en saisissant votre code secret]
+        @session_identifier = '28'
+      else
+        @plr_place_bet_request = Parameter.first.gateway_url + "/ail/pmu/api/dik749742e/bet/place/#{@get_gamer_id_response.body}/#{@account_profile.paymoney_account_number}/#{@ussd_string}"
+        plr_set_bet_code_and_modifier
+
+        @body = %Q[
+                    {
+                      "bet_code":"#{@bet_code}",
+                      "bet_modifier":"#{@bet_modifier}",
+                      "selector1":"#{@current_ussd_session.plr_reunion_number}",
+                      "selector2":"#{@current_ussd_session.plr_race_number}",
+                      "repeats":"#{@current_ussd_session.plr_number_of_times}",
+                      "special_entries":"#{@current_ussd_session.plr_base.blank? ? '' : @current_ussd_session.plr_base.split.join(',')}}",
+                      "normal_entries":"#{@current_ussd_session.plr_selection.blank? ? '' : @current_ussd_session.plr_selection.split.join(',')}",
+                      "race_details":"#{JSON.parse(@current_ussd_session.plr_race_details_response)["plr_race_list"].first["details"]}",
+                      "begin_date":"#{ Date.today.strftime('%d-%m-%Y') + ' ' + (JSON.parse(@current_ussd_session.plr_race_details_response)["plr_race_list"].first["depart"].gsub('H', ':') rescue '') + ':00'}",
+                      "end_date":""
+                    }
+                  ]
+        request = Typhoeus::Request.new(
+        @plr_place_bet_request,
+        method: :post,
+        body: @body
+        )
+        request.run
+        @plr_place_bet_response = request.response
+        json_object = JSON.parse(@plr_place_bet_response.body) rescue nil
+        if json_object.blank?
+          @rendered_text = %Q[Le pari n'a pas pu être placé.
+R#{@current_ussd_session.plr_reunion_number}C#{@current_ussd_session.plr_race_number}
+#{@current_ussd_session.plr_bet_type_label} > #{@current_ussd_session.plr_formula_label}
+#{@current_ussd_session.plr_base.blank? ? '' : "Base: " + @current_ussd_session.plr_base}
+#{@current_ussd_session.plr_selection.blank? ? '' : "Sélection: " + @current_ussd_session.plr_selection}
+Votre pari est estimé à #{@current_ussd_session.bet_cost_amount} FCFA.
+Confirmez en saisissant votre code secret]
+          @session_identifier = '28'
+        else
+          if json_object["error"].blank?
+            status = true
+            flash.now[:success] = %Q[
+              PMU PLR – R#{session[:plr_reunion_number]}C#{session[:plr_race_number]}
+              #{session[:bet_type_value]} > #{session[:plr_formula_value]}
+              Base: #{session[:plr_base]}
+              Sélection: #{session[:plr_selection]}
+              N° de ticket: #{json_object["bet"]["ticket_number"]}
+            ]
+            @rendered_text = %Q[PMU PLR – R#{session[:plr_reunion_number]}C#{session[:plr_race_number]}
+#{session[:bet_type_value]} > #{session[:plr_formula_value]}
+Base: #{session[:plr_base]}
+Sélection: #{session[:plr_selection]}
+N° de ticket: #{json_object["bet"]["ticket_number"]}]
+            @session_identifier = '29'
+          else
+            @rendered_text = %Q[Le pari n'a pas pu être placé.
+R#{@current_ussd_session.plr_reunion_number}C#{@current_ussd_session.plr_race_number}
+#{@current_ussd_session.plr_bet_type_label} > #{@current_ussd_session.plr_formula_label}
+#{@current_ussd_session.plr_base.blank? ? '' : "Base: " + @current_ussd_session.plr_base}
+#{@current_ussd_session.plr_selection.blank? ? '' : "Sélection: " + @current_ussd_session.plr_selection}
+Votre pari est estimé à #{@current_ussd_session.bet_cost_amount} FCFA.
+Confirmez en saisissant votre code secret]
+            @session_identifier = '28'
+          end
         end
       end
     end
