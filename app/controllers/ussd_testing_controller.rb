@@ -1673,7 +1673,7 @@ Veuillez saisir le nombre de fois que vous souhaitez miser]
                       "selector2":"#{@current_ussd_session.plr_race_number}",
                       "repeats":"#{@ussd_string}",
                       "special_entries":"#{@current_ussd_session.plr_base.blank? ? '' : @current_ussd_session.plr_base.split.join(',')}",
-                      "normal_entries":"#{#{@current_ussd_session.plr_selection.blank? ? '' : @current_ussd_session.plr_selection.split.join(',')}}"
+                      "normal_entries":"#{@current_ussd_session.plr_selection.blank? ? '' : @current_ussd_session.plr_selection.split.join(',')}"
                     }
                   ]
       @plr_evaluate_bet_response = Typhoeus::Request.new(
