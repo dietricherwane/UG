@@ -1657,7 +1657,7 @@ Veuillez saisir le nombre de fois que vous souhaitez miser]
 
   def plr_evaluate_bet
     @error_message = ''
-    if @ussd_string.blank? || not_a_number(@ussd_string)
+    if @ussd_string.blank? || not_a_number?(@ussd_string)
       @rendered_text = %Q[Réunion: R#{@current_ussd_session.plr_reunion_number} - Course: C#{@current_ussd_session.plr_race_number}
 Veuillez saisir le nombre de fois que vous souhaitez miser]
       @session_identifier = '27'
