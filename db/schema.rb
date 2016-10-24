@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161023221254) do
+ActiveRecord::Schema.define(version: 20161024081123) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -173,6 +173,8 @@ ActiveRecord::Schema.define(version: 20161023221254) do
     t.string   "plr_base"
     t.string   "plr_selection"
     t.string   "plr_number_of_times"
+    t.text     "plr_evaluate_bet_request"
+    t.text     "plr_evaluate_bet_response"
   end
 
 end

@@ -399,9 +399,13 @@ class UssdTestingController < ApplicationController
           when '25'
             plr_selection_or_stake_depending_on_formula
             @current_ussd_session.update_attributes(session_identifier: @session_identifier, plr_base: @ussd_string)
+          # PLR, sélectionner le nombre de fois
           when '26'
             plr_select_number_of_times
             @current_ussd_session.update_attributes(session_identifier: @session_identifier, plr_selection: @plr_selection)
+          when '27'
+            plr_evaluate_bet
+            @current_ussd_session.update_attributes(session_identifier: @session_identifier, plr_number_of_times: @plr_number_of_times, plr_evaluate_bet_request: @plr_evaluate_bet_request, plr_evaluate_bet_response: @plr_evaluate_bet_response)
           end
         end
 
@@ -1650,4 +1654,123 @@ Veuillez saisir le nombre de fois que vous souhaitez miser]
       @session_identifier = '27'
     end
   end
+
+  def plr_evaluate_bet
+    @error_message = ''
+    if @ussd_string.blank? || not_a_number(@ussd_string)
+      @rendered_text = %Q[Réunion: R#{@current_ussd_session.plr_reunion_number} - Course: C#{@current_ussd_session.plr_race_number}
+Veuillez saisir le nombre de fois que vous souhaitez miser]
+      @session_identifier = '27'
+    else
+      plr_set_bet_code_and_modifier
+      @current_ussd_session = @current_ussd_session
+      @plr_evaluate_bet_request = Parameter.first.gateway_url + "/ail/pmu/api/3c9342cf06/bet/query"
+      @request_body = %Q[
+                    {
+                      "bet_code":"#{@bet_code}",
+                      "bet_modifier":"#{@bet_modifier}",
+                      "selector1":"#{@current_ussd_session.plr_reunion_number}",
+                      "selector2":"#{@current_ussd_session.plr_race_number}",
+                      "repeats":"#{@ussd_string}",
+                      "special_entries":"#{@current_ussd_session.plr_base.blank? ? '' : @current_ussd_session.plr_base.split.join(',')}",
+                      "normal_entries":"#{#{@current_ussd_session.plr_selection.blank? ? '' : @current_ussd_session.plr_selection.split.join(',')}}"
+                    }
+                  ]
+      @plr_evaluate_bet_response = Typhoeus::Request.new(
+        @plr_evaluate_bet_request,
+        method: :post,
+        body: @request_body
+      )
+      @plr_evaluate_bet_response.run
+      @plr_evaluate_bet_response = @plr_evaluate_bet_response.response.body rescue nil
+      json_object = JSON.parse(@plr_evaluate_bet_response) rescue nil
+
+      if json_object.blank?
+        @rendered_text = %Q[Le pari n'a pas pu être évalué
+Réunion: R#{@current_ussd_session.plr_reunion_number} - Course: C#{@current_ussd_session.plr_race_number}
+Veuillez saisir le nombre de fois que vous souhaitez miser]
+        @session_identifier = '27'
+      else
+        if json_object["error"].blank?
+          @rendered_text = %Q[Vous vous apprêtez à prendre un pari PMU PLR
+R#{@current_ussd_session.plr_reunion_number}C#{@current_ussd_session.plr_race_number}
+#{@current_ussd_session.plr_bet_type_label} > #{@current_ussd_session.plr_formula_label}
+#{@current_ussd_session.plr_base.blank? ? '' : "Base: " + @current_ussd_session.plr_base}
+#{@current_ussd_session.plr_selection.blank? ? '' : "Sélection: " + @current_ussd_session.plr_selection}
+Votre pari est estimé à #{json_object["bet"]["bet_cost_amount"]} FCFA]
+          @session_identifier = '28'
+        else
+          @rendered_text = %Q[Le pari n'a pas pu être évalué
+Réunion: R#{@current_ussd_session.plr_reunion_number} - Course: C#{@current_ussd_session.plr_race_number}
+Veuillez saisir le nombre de fois que vous souhaitez miser]
+          @session_identifier = '27'
+        end
+      end
+    end
+  end
+
+  def plr_set_bet_code_and_modifier
+    @bet_code = ''
+    @bet_modifier = ''
+
+    if @current_ussd_session.plr_bet_type_shortcut == 'simple_gagnant'
+      @bet_code = '100'
+      @bet_modifier = '0'
+    end
+    if @current_ussd_session.plr_bet_type_shortcut == 'simple_place'
+      @bet_code = '101'
+      @bet_modifier = '0'
+    end
+    if @current_ussd_session.plr_bet_type_shortcut == 'jumele_gagnant'
+      case @current_ussd_session.plr_formula_shortcut
+        when 'long_champs'
+          @bet_code = '107'
+          @bet_modifier = '0'
+        when 'champ_reduit'
+          @bet_code = '111'
+          @bet_modifier = '0'
+        when 'champ_total'
+          @bet_code = '109'
+          @bet_modifier = '0'
+        end
+    end
+    if @current_ussd_session.plr_bet_type_shortcut == 'jumele_place'
+      case @current_ussd_session.plr_formula_shortcut
+        when 'long_champs'
+          @bet_code = '108'
+          @bet_modifier = '0'
+        when 'champ_reduit'
+          @bet_code = '112'
+          @bet_modifier = '0'
+        when 'champ_total'
+          @bet_code = '110'
+          @bet_modifier = '0'
+        end
+    end
+    if @current_ussd_session.plr_bet_type_shortcut == 'trio'
+      if @current_ussd_session.plr_formula_shortcut == 'long_champs'
+        @bet_code = '102'
+        @bet_modifier = '0'
+      end
+      if @current_ussd_session.plr_formula_shortcut == 'champ_reduit'
+        if @current_ussd_session.plr_base.split(',').length == 1
+          @bet_code = '104'
+          @bet_modifier = '0'
+        else
+          @bet_code = '106'
+          @bet_modifier = '0'
+        end
+      end
+      if @current_ussd_session.plr_formula_shortcut == 'champ_total'
+        if @current_ussd_session.plr_base.split(',').length == 1
+          @bet_code = '103'
+          @bet_modifier = '0'
+        else
+          @bet_code = '105'
+          @bet_modifier = '0'
+        end
+      end
+    end
+  end
+
 end
