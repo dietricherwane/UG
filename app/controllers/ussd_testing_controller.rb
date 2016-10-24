@@ -402,7 +402,7 @@ class UssdTestingController < ApplicationController
           # PLR, sélectionner le nombre de fois
           when '26'
             plr_select_number_of_times
-            @current_ussd_session.update_attributes(session_identifier: @session_identifier, plr_selection: @plr_selection)
+            @current_ussd_session.update_attributes(session_identifier: @session_identifier, plr_selection: @ussd_string)
           when '27'
             plr_evaluate_bet
             @current_ussd_session.update_attributes(session_identifier: @session_identifier, plr_number_of_times: @plr_number_of_times, plr_evaluate_bet_request: @plr_evaluate_bet_request + @request_body, plr_evaluate_bet_response: @plr_evaluate_bet_response)
