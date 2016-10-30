@@ -1872,7 +1872,7 @@ Confirmez en saisissant votre code secret]
     @alr_race_ids = current_program["race_ids"].split('-') rescue []
 
     @alr_race_list_request = Parameter.first.parionsdirect_url + "/ussd_pmu/get_alr_race_list"
-    @alr_race_list_response = Typhoeus.get(@@alr_race_list_request, connecttimeout: 30)
+    @alr_race_list_response = Typhoeus.get(@alr_race_list_request, connecttimeout: 30)
 
     @race_data = JSON.parse(@alr_race_list_response.body)["alr_race_list"] rescue nil
 
