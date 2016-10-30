@@ -53960,3 +53960,25 @@ Migrating to AddPlrPlaceBetToUssdSessions (20161024165557)
   [1m[35mSQL (0.7ms)[0m  INSERT INTO "schema_migrations" ("version") VALUES ($1)  [["version", "20161024165557"]]
   [1m[36m (22.6ms)[0m  [1mCOMMIT[0m
   [1m[35mActiveRecord::SchemaMigration Load (0.8ms)[0m  SELECT "schema_migrations".* FROM "schema_migrations"
+  [1m[36mActiveRecord::SchemaMigration Load (28.3ms)[0m  [1mSELECT "schema_migrations".* FROM "schema_migrations"[0m
+Migrating to AddAlrIndexFieldsToUssdSession (20161030172307)
+  [1m[35m (0.7ms)[0m  BEGIN
+  [1m[36m (81.2ms)[0m  [1mALTER TABLE "ussd_sessions" ADD COLUMN "alr_full_box" character varying(255)[0m
+  [1m[35m (1.0ms)[0m  ALTER TABLE "ussd_sessions" ADD COLUMN "alr_get_current_program_request" text
+  [1m[36m (0.8ms)[0m  [1mALTER TABLE "ussd_sessions" ADD COLUMN "alr_get_current_program_response" text[0m
+  [1m[35m (0.9ms)[0m  ALTER TABLE "ussd_sessions" ADD COLUMN "alr_program_id" character varying(255)
+  [1m[36m (0.8ms)[0m  [1mALTER TABLE "ussd_sessions" ADD COLUMN "alr_program_date" character varying(255)[0m
+  [1m[35m (0.9ms)[0m  ALTER TABLE "ussd_sessions" ADD COLUMN "alr_program_status" character varying(255)
+  [1m[36m (0.9ms)[0m  [1mALTER TABLE "ussd_sessions" ADD COLUMN "alr_race_ids" character varying(255)[0m
+  [1m[35m (0.8ms)[0m  ALTER TABLE "ussd_sessions" ADD COLUMN "alr_race_list_request" text
+  [1m[36m (0.7ms)[0m  [1mALTER TABLE "ussd_sessions" ADD COLUMN "alr_race_list_response" text[0m
+  [1m[35mSQL (0.7ms)[0m  INSERT INTO "schema_migrations" ("version") VALUES ($1)  [["version", "20161030172307"]]
+  [1m[36m (15.3ms)[0m  [1mCOMMIT[0m
+  [1m[35mActiveRecord::SchemaMigration Load (1.0ms)[0m  SELECT "schema_migrations".* FROM "schema_migrations"
+  [1m[36mActiveRecord::SchemaMigration Load (1.1ms)[0m  [1mSELECT "schema_migrations".* FROM "schema_migrations"[0m
+Migrating to AddAlrRaceDataToUssdSessions (20161030174114)
+  [1m[35m (0.5ms)[0m  BEGIN
+  [1m[36m (1.4ms)[0m  [1mALTER TABLE "ussd_sessions" ADD COLUMN "race_data" text[0m
+  [1m[35mSQL (0.6ms)[0m  INSERT INTO "schema_migrations" ("version") VALUES ($1)  [["version", "20161030174114"]]
+  [1m[36m (15.2ms)[0m  [1mCOMMIT[0m
+  [1m[35mActiveRecord::SchemaMigration Load (0.8ms)[0m  SELECT "schema_migrations".* FROM "schema_migrations"

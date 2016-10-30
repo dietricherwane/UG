@@ -230,7 +230,8 @@ class UssdTestingController < ApplicationController
                   loto_display_draw_day
                   @current_ussd_session.update_attributes(session_identifier: @session_identifier)
                 when '2'
-
+                  alr_display_races
+                  @current_ussd_session.update_attributes(session_identifier: @session_identifier, alr_get_current_program_request: @alr_get_current_program_request, alr_get_current_program_response: @alr_get_current_program_response.body, alr_program_id: @alr_program_id, alr_program_date: @alr_program_date, alr_program_status: @alr_program_status, alr_race_ids: @alr_race_ids, alr_race_list_request: @alr_race_list_request, alr_race_list_response: @alr_race_list_response, race_data: @race_data)
                 when '3'
                   plr_get_reunion
                   @current_ussd_session.update_attributes(session_identifier: @session_identifier)
@@ -1775,13 +1776,6 @@ Confirmez en saisissant votre code secret]
         else
           if json_object["error"].blank?
             status = true
-            flash.now[:success] = %Q[
-              PMU PLR – R#{session[:plr_reunion_number]}C#{session[:plr_race_number]}
-              #{session[:bet_type_value]} > #{session[:plr_formula_value]}
-              Base: #{session[:plr_base]}
-              Sélection: #{session[:plr_selection]}
-              N° de ticket: #{json_object["bet"]["ticket_number"]}
-            ]
             @rendered_text = %Q[PMU PLR – R#{session[:plr_reunion_number]}C#{session[:plr_race_number]}
 #{session[:bet_type_value]} > #{session[:plr_formula_value]}
 Base: #{session[:plr_base]}
@@ -1866,5 +1860,40 @@ Confirmez en saisissant votre code secret]
       end
     end
   end
+
+  def alr_display_races
+    @alr_get_current_program_request = Parameter.first.parionsdirect_url + "/8ba869a7a9c59f3a0/api/users/gamer_id/#{@msisdn}"
+    @alr_get_current_program_response = Typhoeus.get(@alr_get_current_program_request, connecttimeout: 30)
+
+    current_program = JSON.parse(@alr_get_current_program_response.body) rescue nil
+    @alr_program_id = current_program["program_id"] rescue nil
+    @alr_program_date = current_program["program_date"] rescue nil
+    @alr_program_status = current_program["status"] rescue nil
+    @alr_race_ids = current_program["race_ids"].split('-') rescue []
+
+    @alr_race_list_request = Parameter.first.parionsdirect_url + "/ussd_pmu/get_alr_race_list"
+    @alr_race_list_response = Typhoeus.get(@@alr_race_list_request, connecttimeout: 30)
+
+    @race_data = JSON.parse(@alr_race_list_response.body)["alr_race_list"] rescue nil
+
+    if @alr_program_status != 'ON' || @alr_race_ids.length == 0 || @race_data.blank?
+      @rendered_text = %Q[PMU - ALR - Il n'y a aucun programme disponible
+1- Loto Bonheur
+2- PMU ALR
+3- PMU PLR
+4- SPORTCASH]
+      @session_identifier = '11'
+    else
+      races = ""
+      @alr_race_ids.each do |race_id|
+         races << race_id[-1,1] + " - Nationale" + race_id[-1,1] + "
+"
+      end
+      @rendered_text = %Q[PMU - ALR
+#{races}]
+      @session_identifier = '30'
+    end
+  end
+
 
 end
