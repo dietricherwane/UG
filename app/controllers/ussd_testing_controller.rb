@@ -231,7 +231,7 @@ class UssdTestingController < ApplicationController
                   @current_ussd_session.update_attributes(session_identifier: @session_identifier)
                 when '2'
                   alr_display_races
-                  @current_ussd_session.update_attributes(session_identifier: @session_identifier, alr_get_current_program_request: @alr_get_current_program_request, alr_get_current_program_response: @alr_get_current_program_response.body, alr_program_id: @alr_program_id, alr_program_date: @alr_program_date, alr_program_status: @alr_program_status, alr_race_ids: @alr_race_ids.to_s, alr_race_list_request: @alr_race_list_request, alr_race_list_response: @alr_race_list_response, race_data: @race_data)
+                  @current_ussd_session.update_attributes(session_identifier: @session_identifier, alr_get_current_program_request: @alr_get_current_program_request, alr_get_current_program_response: @alr_get_current_program_response.body, alr_program_id: @alr_program_id, alr_program_date: @alr_program_date, alr_program_status: @alr_program_status, alr_race_ids: @alr_race_ids.to_s, alr_race_list_request: @alr_race_list_request, alr_race_list_response: @alr_race_list_response.body, race_data: @race_data)
                 when '3'
                   plr_get_reunion
                   @current_ussd_session.update_attributes(session_identifier: @session_identifier)
