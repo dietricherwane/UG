@@ -411,6 +411,9 @@ class UssdTestingController < ApplicationController
             @account_profile = AccountProfile.find_by_msisdn(@msisdn[-8,8])
             plr_place_bet
             @current_ussd_session.update_attributes(session_identifier: @session_identifier, plr_number_of_times: @plr_number_of_times, plr_evaluate_bet_request: @plr_evaluate_bet_request + @request_body, plr_evaluate_bet_response: @plr_evaluate_bet_response)
+          when '30'
+            alr_display_bet_type
+            @current_ussd_session.update_attributes(session_identifier: @session_identifier, national_label: @national_label, national_shortcut: @national_shortcut)
           end
         end
 
@@ -1869,12 +1872,12 @@ Confirmez en saisissant votre code secret]
     @alr_program_id = current_program["program_id"] rescue nil
     @alr_program_date = current_program["program_date"] rescue nil
     @alr_program_status = current_program["status"] rescue nil
-    @alr_race_ids = current_program["race_ids"].split('-') rescue []
+    @alr_race_ids = current_program["race_ids"] rescue nil#.split('-') rescue []
 
     @alr_race_list_request = Parameter.first.parionsdirect_url + "/ussd_pmu/get_alr_race_list"
     @alr_race_list_response = Typhoeus.get(@alr_race_list_request, connecttimeout: 30)
 
-    @race_data = JSON.parse(@alr_race_list_response.body)["alr_race_list"] rescue nil
+    @race_data = @alr_race_list_response.body rescue nil#JSON.parse(@alr_race_list_response.body)["alr_race_list"] rescue nil
 
     if @alr_program_status != 'ON' || @alr_race_ids.length == 0 || @race_data.blank?
       @rendered_text = %Q[PMU - ALR - Il n'y a aucun programme disponible
@@ -1885,7 +1888,7 @@ Confirmez en saisissant votre code secret]
       @session_identifier = '11'
     else
       races = ""
-      @alr_race_ids.each do |race_id|
+      @alr_race_ids.split('-').each do |race_id|
          races << race_id[-1,1] + " - Nationale" + race_id[-1,1] + "
 "
       end
@@ -1895,5 +1898,84 @@ Confirmez en saisissant votre code secret]
     end
   end
 
+  def alr_display_bet_type
+    status = false
+    @current_ussd_session.alr_race_ids.split('-').each do |race_id|
+       if @ussd_string == race_id[-1,1]
+         status = true
+       end
+    end
+
+    if status
+      @national_label = "Nationale #{@ussd_string}"
+      @national_shortcut = @ussd_string
+      @race_details = ""
+      @bet_types = ""
+      race_datum = JSON.parse(@current_ussd_session.race_data)["alr_race_list"]
+      if race_datum.blank?
+        @race_details =
+        @bet_types = "Paris fermés pour cette course"
+      else
+        custom_index = 0
+        race_datum.each do |race_data|
+          if race_data["race_id"] == @current_ussd_session.alr_program_id + '0' + @national_shortcut
+            bet_ids = race_data["bet_ids"].gsub('-SALE', '').split(',') rescue []
+            @race_details << race_data["name"] + "
+"
+            @race_details << "Nombre de partants: " + race_data["max_runners"] + "
+"
+            @race_details << "Non partants: " + race_data["scratched_list"] + "
+Veuillez choisir votre type de pari
+"
+            if bet_ids.include?('4')
+              @race_details << "#{custom_index+=1}- Couplé placé
+"
+            end
+            if bet_ids.include?('2')
+              @race_details << "#{custom_index+=1}- Couplé gagnant
+"
+            end
+            if bet_ids.include?('7')
+              @race_details << "#{custom_index+=1}- Tiercé
+"
+            end
+            if bet_ids.include?('14')
+              @race_details << "#{custom_index+=1}- Tiercé
+"
+            end
+            if bet_ids.include?('8')
+              @race_details << "#{custom_index+=1}- Quarté
+"
+            end
+            if bet_ids.include?('10')
+              @race_details << "#{custom_index+=1}- Quinté
+"
+            end
+            if bet_ids.include?('11')
+              @race_details << "#{custom_index+=1}- Quinté +
+"
+            end
+            if bet_ids.include?('13')
+              @race_details << "#{custom_index+=1}- Multi"
+            end
+          end
+        end
+      end
+
+      @rendered_text = %Q[PMU - ALR
+#{@national_label}
+#{@race_details}]
+      @session_identifier = '31'
+    else
+      races = ""
+      @current_ussd_session.alr_race_ids.split('-').each do |race_id|
+         races << race_id[-1,1] + " - Nationale" + race_id[-1,1] + "
+"
+      end
+      @rendered_text = %Q[PMU - ALR
+#{races}]
+      @session_identifier = '30'
+    end
+  end
 
 end
