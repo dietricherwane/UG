@@ -413,7 +413,7 @@ class UssdTestingController < ApplicationController
             @current_ussd_session.update_attributes(session_identifier: @session_identifier, plr_number_of_times: @plr_number_of_times, plr_evaluate_bet_request: @plr_evaluate_bet_request + @request_body, plr_evaluate_bet_response: @plr_evaluate_bet_response)
           when '30'
             alr_display_bet_type
-            @current_ussd_session.update_attributes(session_identifier: @session_identifier, national_label: @national_label, national_shortcut: @national_shortcut)
+            @current_ussd_session.update_attributes(session_identifier: @session_identifier, national_label: @national_label, national_shortcut: @national_shortcut, alr_bet_type_menu: @alr_bet_type_menu)
           end
         end
 
@@ -1911,6 +1911,7 @@ Confirmez en saisissant votre code secret]
       @national_shortcut = @ussd_string
       @race_details = ""
       @bet_types = ""
+      @alr_bet_type_menu = ""
       race_datum = JSON.parse(@current_ussd_session.race_data)["alr_race_list"]
       if race_datum.blank?
         @race_details =
@@ -1930,33 +1931,41 @@ Veuillez choisir votre type de pari
             if bet_ids.include?('4')
               @race_details << "#{custom_index+=1}- Couplé placé
 "
+              @alr_bet_type_menu << "#{custom_index}-couple_place "
             end
             if bet_ids.include?('2')
               @race_details << "#{custom_index+=1}- Couplé gagnant
 "
+              @alr_bet_type_menu << "#{custom_index}-couple_gagnant "
             end
             if bet_ids.include?('7')
               @race_details << "#{custom_index+=1}- Tiercé
 "
+              @alr_bet_type_menu << "#{custom_index}-tierce "
             end
             if bet_ids.include?('14')
               @race_details << "#{custom_index+=1}- Tiercé
 "
+              @alr_bet_type_menu << "#{custom_index}-tierce "
             end
             if bet_ids.include?('8')
               @race_details << "#{custom_index+=1}- Quarté
 "
+              @alr_bet_type_menu << "#{custom_index}-quarte "
             end
             if bet_ids.include?('10')
               @race_details << "#{custom_index+=1}- Quinté
 "
+              @alr_bet_type_menu << "#{custom_index}-quinte "
             end
             if bet_ids.include?('11')
               @race_details << "#{custom_index+=1}- Quinté +
 "
+              @alr_bet_type_menu << "#{custom_index}-quinte_plus "
             end
             if bet_ids.include?('13')
               @race_details << "#{custom_index+=1}- Multi"
+              @alr_bet_type_menu << "#{custom_index}-multi "
             end
           end
         end
