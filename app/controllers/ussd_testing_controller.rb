@@ -414,6 +414,9 @@ class UssdTestingController < ApplicationController
           when '30'
             alr_display_bet_type
             @current_ussd_session.update_attributes(session_identifier: @session_identifier, national_label: @national_label, national_shortcut: @national_shortcut, alr_bet_type_menu: @alr_bet_type_menu)
+          when '31'
+            alr_display_formula
+            @current_ussd_session.update_attributes(session_identifier: @session_identifier, alr_bet_type_label: @bet_type_label)
           end
         end
 
@@ -1984,6 +1987,109 @@ Veuillez choisir votre type de pari
       @rendered_text = %Q[PMU - ALR
 #{races}]
       @session_identifier = '30'
+    end
+  end
+
+  def alr_display_formula
+    custom_index = 0
+    race_datum = JSON.parse(@current_ussd_session.race_data)["alr_race_list"]
+    race_datum.each do |race_data|
+      if race_data["race_id"] == @current_ussd_session.alr_program_id + '0' + @national_shortcut
+        bet_ids = race_data["bet_ids"].gsub('-SALE', '').split(',') rescue []
+        @race_header << race_data["name"] + "
+"
+        @race_header << "Nombre de partants: " + race_data["max_runners"] + "
+"
+        @race_header << "Non partants: " + race_data["scratched_list"] + "
+Veuillez choisir votre type de pari
+"
+        if bet_ids.include?('4')
+          @race_details << "#{custom_index+=1}- Couplé placé
+"
+          @alr_bet_type_menu << "#{custom_index}-couple_place "
+        end
+        if bet_ids.include?('2')
+          @race_details << "#{custom_index+=1}- Couplé gagnant
+"
+          @alr_bet_type_menu << "#{custom_index}-couple_gagnant "
+        end
+        if bet_ids.include?('7')
+          @race_details << "#{custom_index+=1}- Tiercé
+"
+          @alr_bet_type_menu << "#{custom_index}-tierce "
+        end
+        if bet_ids.include?('14')
+          @race_details << "#{custom_index+=1}- Tiercé
+"
+          @alr_bet_type_menu << "#{custom_index}-tierce "
+        end
+        if bet_ids.include?('8')
+          @race_details << "#{custom_index+=1}- Quarté
+"
+          @alr_bet_type_menu << "#{custom_index}-quarte "
+        end
+        if bet_ids.include?('10')
+          @race_details << "#{custom_index+=1}- Quinté
+"
+          @alr_bet_type_menu << "#{custom_index}-quinte "
+        end
+        if bet_ids.include?('11')
+          @race_details << "#{custom_index+=1}- Quinté +
+"
+          @alr_bet_type_menu << "#{custom_index}-quinte_plus "
+        end
+        if bet_ids.include?('13')
+          @race_details << "#{custom_index+=1}- Multi"
+          @alr_bet_type_menu << "#{custom_index}-multi "
+        end
+      end
+    end
+
+    if @ussd_string.to_i.between?(1, @current_ussd_session.alr_bet_type_menu.split().length)
+      @bet_type = @current_ussd_session.alr_bet_type_menu.split()[@ussd_string.to_i - 1].split('-')[1] rescue nil
+
+      case @bet_type
+        when 'multi'
+          @bet_type_label = 'Multi'
+        when 'couple_place'
+          @bet_type_label = 'Couplé placé'
+        when 'couple_gagnant'
+          @bet_type_label = 'Couplé gagnant'
+        when 'tierce'
+          @bet_type_label = 'Tiercé'
+        when 'quarte'
+          @bet_type_label = 'Quarté'
+        when 'quinte'
+          @bet_type_label = 'Quinté'
+        when 'quinte_plus'
+          @bet_type_label = 'Quinté +'
+      end
+
+      if @bet_type == 'multi'
+        @rendered_text = %Q[PMU - ALR
+#{@current_ussd_session.national_label} > #{@bet_type_label}
+#{@race_header}
+1- Multi 4/4
+2- Multi 4/5
+3- Multi 4/6
+4- Multi 4/7]
+        @session_identifier = '33'
+      else
+        @rendered_text = %Q[PMU - ALR
+#{@current_ussd_session.national_label} > #{@bet_type_label}
+#{@race_header}
+1- Long champ
+2- Champ réduit
+3- Champ total]
+        @session_identifier = '32'
+      end
+    else
+
+      @rendered_text = %Q[PMU - ALR
+#{@current_ussd_session.national_label}
+#{@race_header}
+#{@race_details}]
+      @session_identifier = '31'
     end
   end
 
