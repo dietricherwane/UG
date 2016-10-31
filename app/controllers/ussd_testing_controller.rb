@@ -1994,7 +1994,7 @@ Veuillez choisir votre type de pari
     custom_index = 0
     race_datum = JSON.parse(@current_ussd_session.race_data)["alr_race_list"]
     race_datum.each do |race_data|
-      if race_data["race_id"] == @current_ussd_session.alr_program_id + '0' + @national_shortcut
+      if race_data["race_id"] == @current_ussd_session.alr_program_id + '0' + @current_ussd_session.national_shortcut
         bet_ids = race_data["bet_ids"].gsub('-SALE', '').split(',') rescue []
         @race_header << race_data["name"] + "
 "
