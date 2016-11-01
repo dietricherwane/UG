@@ -1780,7 +1780,7 @@ Confirmez en saisissant votre code secret]
                       "selector1":"#{@current_ussd_session.plr_reunion_number}",
                       "selector2":"#{@current_ussd_session.plr_race_number}",
                       "repeats":"#{@current_ussd_session.plr_number_of_times}",
-                      "special_entries":"#{@current_ussd_session.plr_base.blank? ? '' : @current_ussd_session.plr_base.split.join(',') rescue ''}}",
+                      "special_entries":"#{@current_ussd_session.plr_base.blank? ? '' : @current_ussd_session.plr_base.split.join(',') rescue ''}",
                       "normal_entries":"#{@current_ussd_session.plr_selection.blank? ? '' : @current_ussd_session.plr_selection.split.join(',') rescue ''}",
                       "race_details":"#{JSON.parse(@current_ussd_session.plr_race_details_response)["plr_race_list"].first["details"] rescue ''}",
                       "begin_date":"#{ Date.today.strftime('%d-%m-%Y') + ' ' + (JSON.parse(@current_ussd_session.plr_race_details_response)["plr_race_list"].first["depart"].gsub('H', ':') rescue '') + ':00'}",
