@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161101221747) do
+ActiveRecord::Schema.define(version: 20161101230159) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -198,6 +198,13 @@ ActiveRecord::Schema.define(version: 20161101221747) do
     t.string   "alr_selection"
     t.string   "full_formula_boolean"
     t.boolean  "full_formula"
+    t.string   "alr_stake"
+    t.text     "alr_evaluate_bet_request"
+    t.text     "alr_evaluate_bet_response"
+    t.string   "alr_bet_id"
+    t.string   "alr_scratched_list"
+    t.string   "alr_combinations"
+    t.string   "alr_amount"
   end
 
 end

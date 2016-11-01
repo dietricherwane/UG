@@ -416,7 +416,7 @@ class UssdTestingController < ApplicationController
             @current_ussd_session.update_attributes(session_identifier: @session_identifier, national_label: @national_label, national_shortcut: @national_shortcut, alr_bet_type_menu: @alr_bet_type_menu)
           when '31'
             alr_display_formula
-            @current_ussd_session.update_attributes(session_identifier: @session_identifier, alr_bet_type_label: @bet_type_label)
+            @current_ussd_session.update_attributes(session_identifier: @session_identifier, alr_bet_type_label: @bet_type_label, alr_bet_id: @alr_bet_id)
           when '32'
             set_session_identifier_depending_on_alr_bet_type_selected
             if @status
@@ -468,6 +468,9 @@ class UssdTestingController < ApplicationController
           when '36'
             alr_set_full_formula
             @current_ussd_session.update_attributes(session_identifier: @session_identifier, full_formula: @full_formula)
+          when '37'
+            alr_evaluate_bet
+            @current_ussd_session.update_attributes(session_identifier: @session_identifier, alr_stake: @alr_stake, alr_evaluate_bet_request: @alr_evaluate_bet_request + @body, alr_evaluate_bet_response: @alr_evaluate_bet_response.body, alr_scratched_list: @alr_scratched_list, alr_combinations: @alr_combinations, alr_amount: @alr_amount)
           end
         end
 
@@ -2105,18 +2108,25 @@ Veuillez choisir votre type de pari
       case @bet_type
         when 'multi'
           @bet_type_label = 'Multi'
+          @alr_bet_id = '13'
         when 'couple_place'
           @bet_type_label = 'Couplé placé'
+          @alr_bet_id = '4'
         when 'couple_gagnant'
           @bet_type_label = 'Couplé gagnant'
+          @alr_bet_id = '2'
         when 'tierce'
           @bet_type_label = 'Tiercé'
+          @alr_bet_id = '7'
         when 'quarte'
           @bet_type_label = 'Quarté'
+          @alr_bet_id = '8'
         when 'quinte'
           @bet_type_label = 'Quinté'
+          @alr_bet_id = '10'
         when 'quinte_plus'
           @bet_type_label = 'Quinté +'
+          @alr_bet_id = '11'
       end
 
       if @bet_type == 'multi'
@@ -2386,6 +2396,87 @@ PMU - ALR
 #{@race_header}
 Saisissez les numéros de vos chevaux séparés par un espace]
       @session_identifier = '35'
+    end
+  end
+
+  def alr_evaluate_bet
+    @current_ussd_session = @current_ussd_session
+    @ussd_string = @ussd_string
+    @race_header = ""
+    race_datum = JSON.parse(@current_ussd_session.race_data)["alr_race_list"]
+    race_datum.each do |race_data|
+      if race_data["race_id"] == @current_ussd_session.alr_program_id + '0' + @current_ussd_session.national_shortcut
+        bet_ids = race_data["bet_ids"].gsub('-SALE', '').split(',') rescue []
+        @race_header << race_data["name"] + "
+"
+        @race_header << "Nombre de partants: " + race_data["max_runners"] + "
+"
+        @race_header << "Non partants: " + race_data["scratched_list"] + "
+"
+      end
+    end
+    if @ussd_string.blank? || not_a_number?(@ussd_string)
+      @rendered_text = %Q[PMU - ALR
+#{@current_ussd_session.national_label} > #{@current_ussd_session.alr_bet_type_label}
+#{@race_header}
+Saisissez le nombre de fois]
+      @session_identifier = '37'
+    else
+      @alr_evaluate_bet_request = Parameter.first.gateway_url + "/cm3/api/0cad36b144/game/evaluate/#{@program_id}/#{@race_id}"
+      comma = @current_ussd_session.alr_selection.blank? ? '' : ','
+      items = @current_ussd_session.alr_base + (@current_ussd_session.alr_base.blank? ? '' : comma) + @current_ussd_session.alr_selection
+      @body = %Q(
+                    {
+                      "games":[
+                        {
+                          "game_id":"1",
+                          "bet_id":"#{@current_ussd_session.alr_bet_id}",
+                          "nb_units":"#{@ussd_string}",
+                          "full_box":"#{@current_ussd_session.full_formula == true ? 'TRUE' : 'FALSE'}",
+                          "items":[#{items.gsub(/x/i, %Q/"X"/)}]
+                        }
+                      ]
+                    }
+                  )
+      request = Typhoeus::Request.new(
+        @alr_evaluate_bet_request,
+        method: :post,
+        body: @body
+      )
+      request.run
+      @alr_evaluate_bet_response = request.response
+
+      json_object = JSON.parse(@alr_evaluate_bet_response.body) rescue nil
+      if json_object.blank?
+        @rendered_text = %Q[PMU - ALR
+Le pari n'a pas pu être évalué
+#{@current_ussd_session.national_label} > #{@current_ussd_session.alr_bet_type_label}
+#{@race_header}
+Saisissez le nombre de fois]
+        @session_identifier = '37'
+      else
+        if json_object["error"].blank?
+          @alr_scratched_list = json_object["evaluations"]["scratched"]
+          @alr_combinations = json_object["evaluations"]["evaluations"].first["nb_combinations"]
+          @alr_amount = json_object["evaluations"]["evaluations"].first["amount"]
+          @rendered_text = %Q[
+Vous vous apprêtez à prendre un pari PMU ALR
+#{@current_ussd_session.national_label} > #{@current_ussd_session.alr_bet_type_label}
+#{@race_header}
+#{@current_ussd_session.alr_base.blank? ? '' : "Base: " + @current_ussd_session.alr_base}
+#{@current_ussd_session.alr_selection.blank? ? '' : "Sélection: " + @current_ussd_session.alr_selection}
+Votre pari est estimé à #{@alr_amount} FCFA
+          ]
+          @session_identifier = '38'
+        else
+          @rendered_text = %Q[PMU - ALR
+Le pari n'a pas pu être évalué
+#{@current_ussd_session.national_label} > #{@current_ussd_session.alr_bet_type_label}
+#{@race_header}
+Saisissez le nombre de fois]
+          @session_identifier = '37'
+        end
+      end
     end
   end
 
