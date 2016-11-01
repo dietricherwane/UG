@@ -465,6 +465,9 @@ class UssdTestingController < ApplicationController
           when '35'
             validate_alr_horses
             @current_ussd_session.update_attributes(session_identifier: @session_identifier, alr_selection: @ussd_string)
+          when '36'
+            alr_set_full_formula
+            @current_ussd_session.update_attributes(session_identifier: @session_identifier, full_formula: @full_formula)
           end
         end
 
@@ -2247,6 +2250,38 @@ Saisissez les numéros de vos chevaux séparés par un espace]
 #{@race_header}
 Saisissez le numero de votre cheval de BASE et ulitiser X pour definir l'emplacement de votre selection]
     @session_identifier = '34'
+  end
+
+  def alr_set_full_formula
+    @race_header = ""
+    race_datum = JSON.parse(@current_ussd_session.race_data)["alr_race_list"]
+    race_datum.each do |race_data|
+      if race_data["race_id"] == @current_ussd_session.alr_program_id + '0' + @current_ussd_session.national_shortcut
+        bet_ids = race_data["bet_ids"].gsub('-SALE', '').split(',') rescue []
+        @race_header << race_data["name"] + "
+"
+        @race_header << "Nombre de partants: " + race_data["max_runners"] + "
+"
+        @race_header << "Non partants: " + race_data["scratched_list"] + "
+"
+      end
+    end
+
+    if ['1', '2'].include?(@ussd_string)
+      @ussd_string == '1' ? @full_formula = true : @full_formula = false
+      @rendered_text = %Q[PMU - ALR
+#{@current_ussd_session.national_label} > #{@current_ussd_session.alr_bet_type_label}
+#{@race_header}
+Saisissez le nombre de fois]
+      @session_identifier = '37'
+    else
+      @rendered_text = %Q[PMU - ALR
+#{@current_ussd_session.national_label} > #{@current_ussd_session.alr_bet_type_label}
+#{@race_header}
+Voulez-vous jouer en formule complète?
+1- Oui
+2- Non]
+    end
   end
 
   def validate_alr_base

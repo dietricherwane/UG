@@ -54035,3 +54035,10 @@ Migrating to AddPlrPlaceBetFieldsToUssdSessions (20161101151216)
 PG::DuplicateColumn: ERROR:  column "plr_place_bet_request" of relation "ussd_sessions" already exists
 : ALTER TABLE "ussd_sessions" ADD COLUMN "plr_place_bet_request" text
   [1m[35m (0.4ms)[0m  ROLLBACK
+  [1m[36mActiveRecord::SchemaMigration Load (0.9ms)[0m  [1mSELECT "schema_migrations".* FROM "schema_migrations"[0m
+Migrating to AddAlrFullFormulaToUssdSessions (20161101221747)
+  [1m[35m (0.4ms)[0m  BEGIN
+  [1m[36m (1.0ms)[0m  [1mALTER TABLE "ussd_sessions" ADD COLUMN "full_formula" boolean[0m
+  [1m[35mSQL (0.5ms)[0m  INSERT INTO "schema_migrations" ("version") VALUES ($1)  [["version", "20161101221747"]]
+  [1m[36m (13.2ms)[0m  [1mCOMMIT[0m
+  [1m[35mActiveRecord::SchemaMigration Load (0.8ms)[0m  SELECT "schema_migrations".* FROM "schema_migrations"

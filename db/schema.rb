@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161101144633) do
+ActiveRecord::Schema.define(version: 20161101221747) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -197,6 +197,7 @@ ActiveRecord::Schema.define(version: 20161101144633) do
     t.string   "alr_base"
     t.string   "alr_selection"
     t.string   "full_formula_boolean"
+    t.boolean  "full_formula"
   end
 
 end
