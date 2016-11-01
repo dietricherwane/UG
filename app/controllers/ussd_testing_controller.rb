@@ -2155,7 +2155,6 @@ Veuillez choisir votre type de pari
         @race_header << "Nombre de partants: " + race_data["max_runners"] + "
 "
         @race_header << "Non partants: " + race_data["scratched_list"] + "
-Veuillez choisir votre type de pari
 "
       end
     end
@@ -2165,6 +2164,28 @@ Veuillez choisir votre type de pari
 #{@race_header}
 Saisissez les numéros de vos chevaux séparés par un espace]
     @session_identifier = '35'
+  end
+
+  def alr_select_base
+    @race_header = ""
+    race_datum = JSON.parse(@current_ussd_session.race_data)["alr_race_list"]
+    race_datum.each do |race_data|
+      if race_data["race_id"] == @current_ussd_session.alr_program_id + '0' + @current_ussd_session.national_shortcut
+        bet_ids = race_data["bet_ids"].gsub('-SALE', '').split(',') rescue []
+        @race_header << race_data["name"] + "
+"
+        @race_header << "Nombre de partants: " + race_data["max_runners"] + "
+"
+        @race_header << "Non partants: " + race_data["scratched_list"] + "
+"
+      end
+    end
+
+    @rendered_text = %Q[PMU - ALR
+#{@current_ussd_session.national_label} > #{@current_ussd_session.alr_bet_type_label}
+#{@race_header}
+Saisissez le numero de votre cheval de BASE et ulitiser X pour definir l'emplacement de votre selection]
+    @session_identifier = '34'
   end
 
 end
