@@ -2268,17 +2268,37 @@ Saisissez le numero de votre cheval de BASE et ulitiser X pour definir l'emplace
 
     if alr_valid_base_numbers
       session[:alr_base] = @ussd_string.split.join(',')
-      if session[:raw_alr_formula] == 'champ_reduit'
-        redirect_to pmu_alr_select_horses_path(session[:raw_alr_formula])
+      if @current_ussd_session.alr_formula_label == 'Champ réduit'
+        @current_ussd_session.alr_base.blank? ? base = '' : base = %Q[
+#{@current_ussd_session.alr_base}]
+        @rendered_text = %Q[PMU - ALR
+#{@current_ussd_session.national_label} > #{@current_ussd_session.alr_bet_type_label}#{base}
+#{@race_header}
+Saisissez les numéros de vos chevaux séparés par un espace]
+        @session_identifier = '35'
       else
-        if session[:raw_alr_formula] == 'champ_total'
-          render :full_formula
+        if @current_ussd_session.alr_formula_label == 'Champ total'
+          @rendered_text = %Q[PMU - ALR
+#{@current_ussd_session.national_label} > #{@current_ussd_session.alr_bet_type_label}
+#{@race_header}
+Voulez-vous jouer en formule complète?
+1- Oui
+2- Non]
+          @session_identifier = '36'
         else
-          render :stake
+          @rendered_text = %Q[PMU - ALR
+#{@current_ussd_session.national_label} > #{@current_ussd_session.alr_bet_type_label}
+#{@race_header}
+Saisissez le nombre de fois]
+          @session_identifier = '37'
         end
       end
     else
-      render :select_base
+      @rendered_text = %Q[PMU - ALR
+#{@current_ussd_session.national_label} > #{@current_ussd_session.alr_bet_type_label}
+#{@race_header}
+Saisissez le numero de votre cheval de BASE et ulitiser X pour definir l'emplacement de votre selection]
+    @session_identifier = '34'
     end
   end
 
