@@ -155,9 +155,9 @@ class UssdTestingController < ApplicationController
 
     UssdReceptionLog.create(received_parameters: @raw_body, rev_id: @rev_id, rev_password: @rev_password, sp_id: @sp_id, service_id: @service_id, timestamp: @timestamp, trace_unique_id: @unique_id, msg_type: @msg_type, sender_cb: @sender_cb, receiver_cb: @receive_cb, ussd_of_type: @ussd_op_type, msisdn: @msisdn, service_code: @service_code, code_scheme: @code_scheme, ussd_string: @ussd_string, error_code: @error_code, error_message: @error_message, remote_ip: remote_ip_address)
 
-    render :xml => @result
+    #render :xml => @result
 
-    Thread.new do
+    #Thread.new do
       if @error_code == '0'
         # Récupération d'une session existante
         @current_ussd_session = UssdSession.find_by_sender_cb(@sender_cb)
@@ -436,14 +436,20 @@ class UssdTestingController < ApplicationController
               end
             end
             @current_ussd_session.update_attributes(session_identifier: @session_identifier, alr_formula_label: alr_formula_label, alr_formula_shortcut: alr_formula_shortcut)
+          when '34'
+            validate_alr_base
+            @current_ussd_session.update_attributes(session_identifier: @session_identifier, alr_base: @ussd_string)
+          when '35'
+            validate_alr_horses
+            @current_ussd_session.update_attributes(session_identifier: @session_identifier, alr_selection: @ussd_string)
           end
         end
 
-        send_ussd(@operation_type, @msisdn, @sender_cb, @linkid, @rendered_text)
+        #send_ussd(@operation_type, @msisdn, @sender_cb, @linkid, @rendered_text)
       end
-    end
+    #end
 
-    #render text: @rendered_text
+    render text: @rendered_text
   end
 
   def set_session_identifier_depending_on_menu_selected
@@ -2186,6 +2192,154 @@ Saisissez les numéros de vos chevaux séparés par un espace]
 #{@race_header}
 Saisissez le numero de votre cheval de BASE et ulitiser X pour definir l'emplacement de votre selection]
     @session_identifier = '34'
+  end
+
+  def validate_alr_base
+    @ussd_string = @ussd_string
+    @current_ussd_session = @current_ussd_session
+    @race_header = ""
+    race_datum = JSON.parse(@current_ussd_session.race_data)["alr_race_list"]
+    race_datum.each do |race_data|
+      if race_data["race_id"] == @current_ussd_session.alr_program_id + '0' + @current_ussd_session.national_shortcut
+        bet_ids = race_data["bet_ids"].gsub('-SALE', '').split(',') rescue []
+        @race_header << race_data["name"] + "
+"
+        @race_header << "Nombre de partants: " + race_data["max_runners"] + "
+"
+        @race_header << "Non partants: " + race_data["scratched_list"] + "
+"
+      end
+    end
+
+
+  end
+
+  def validate_alr_horses
+    @ussd_string = @ussd_string
+    @current_ussd_session = @current_ussd_session
+    @race_header = ""
+    race_datum = JSON.parse(@current_ussd_session.race_data)["alr_race_list"]
+    race_datum.each do |race_data|
+      if race_data["race_id"] == @current_ussd_session.alr_program_id + '0' + @current_ussd_session.national_shortcut
+        bet_ids = race_data["bet_ids"].gsub('-SALE', '').split(',') rescue []
+        @race_header << race_data["name"] + "
+"
+        @race_header << "Nombre de partants: " + race_data["max_runners"] + "
+"
+        @race_header << "Non partants: " + race_data["scratched_list"] + "
+"
+      end
+    end
+
+    if alr_valid_horses_numbers
+      if alr_valid_multi_number_of_horses && alr_valid_selection_numbers
+        if ['Tiercé', 'Quarté', 'Quinté', 'Quinté +'].include?(@current_ussd_session.alr_bet_type_label)
+          @rendered_text = %Q[PMU - ALR
+#{@current_ussd_session.national_label} > #{@current_ussd_session.alr_bet_type_label}
+#{@race_header}
+Voulez-vous jouer en formule complète?
+1- Oui
+2- Non]
+          @session_identifier = '36'
+        else
+          @rendered_text = %Q[PMU - ALR
+#{@current_ussd_session.national_label} > #{@current_ussd_session.alr_bet_type_label}
+#{@race_header}
+Saisissez le nombre de fois]
+          @session_identifier = '37'
+        end
+      else
+        @rendered_text = %Q[#{@error_message}
+PMU - ALR
+#{@current_ussd_session.national_label} > #{@current_ussd_session.alr_bet_type_label}
+#{@race_header}
+Saisissez les numéros de vos chevaux séparés par un espace]
+        @session_identifier = '35'
+      end
+    else
+      @rendered_text = %Q[#{@error_message}
+PMU - ALR
+#{@current_ussd_session.national_label} > #{@current_ussd_session.alr_bet_type_label}
+#{@race_header}
+Saisissez les numéros de vos chevaux séparés par un espace]
+      @session_identifier = '35'
+    end
+  end
+
+  def alr_valid_horses_numbers
+    status = true
+
+    if @ussd_string.blank?
+      status = false
+    else
+      @ussd_string.split.each do |horse_number|
+        if not_a_number?(horse_number) && horse_number.upcase != 'X'
+          status = false
+        end
+      end
+    end
+
+    return status
+  end
+
+  def alr_valid_multi_number_of_horses
+    status = true
+    @error_message = ""
+    if @current_ussd_session.alr_bet_type_label == 'Multi' && @current_ussd_session.alr_formula_label == ' 4/4'
+      @error_message = "Vous devez sélectionner 4 chevaux"
+      status = false
+    end
+    if @current_ussd_session.alr_bet_type_label == 'Multi' && @current_ussd_session.alr_formula_label == ' 4/5'
+      @error_message = "Vous devez sélectionner 5 chevaux"
+      status = false
+    end
+    if @current_ussd_session.alr_bet_type_label == 'Multi' && @current_ussd_session.alr_formula_label == ' 4/6'
+      @error_message = "Vous devez sélectionner 6 chevaux"
+      status = false
+    end
+    if @current_ussd_session.alr_bet_type_label == 'Multi' && @current_ussd_session.alr_formula_label == ' 4/7'
+      @error_message = "Vous devez sélectionner 7 chevaux"
+      status = false
+    end
+
+    return status
+  end
+
+  def alr_valid_selection_numbers
+    status = true
+    if @current_ussd_session.alr_bet_type_label == 'Couplé gagnant' && @current_ussd_session.alr_formula_label == 'Champ réduit' && @ussd_string.split.length < 1
+      @error_message = "Vous devez choisir au moins 1 numéro"
+      status = false
+    end
+    if @current_ussd_session.alr_bet_type_label == 'Couplé gagnant'  && @ussd_string.split.length < 2
+      @error_message = "Vous devez choisir au moins 2 numéros"
+      status = false
+    end
+    if @current_ussd_session.alr_bet_type_label == 'Tiercé' && @current_ussd_session.alr_formula_label == 'Champ réduit' && @ussd_string.split.length < 2
+      @error_message = "Vous devez choisir au moins 2 numéros"
+      status = false
+    end
+    if @current_ussd_session.alr_bet_type_label == 'Tiercé' && @ussd_string.split.length < 3
+      @error_message = "Vous devez choisir au moins 3 numéros"
+      status = false
+    end
+    if @current_ussd_session.alr_bet_type_label == 'Quarté' && @current_ussd_session.alr_formula_label == 'Champ réduit' && @ussd_string.split.length < 3
+      @error_message = "Vous devez choisir au moins 3 numéros"
+      status = false
+    end
+    if @current_ussd_session.alr_bet_type_label == 'Quarté' && @ussd_string.split.length < 4
+      @error_message = "Vous devez choisir au moins 4 numéros"
+      status = false
+    end
+    if (@current_ussd_session.alr_bet_type_label == 'Quinté' || @current_ussd_session.alr_bet_type_label == 'Quinté +') && @current_ussd_session.alr_formula_label == 'Champ réduit' && @ussd_string.split.length < 4
+      @error_message = "Vous devez choisir au moins 4 numéros"
+      status = false
+    end
+    if (@current_ussd_session.alr_bet_type_label == 'Quinté' || @current_ussd_session.alr_bet_type_label == 'Quinté +') && @ussd_string.split.length < 5
+      @error_message = "Vous devez choisir au moins 5 numéros"
+      status = false
+    end
+    return status
   end
 
 end
