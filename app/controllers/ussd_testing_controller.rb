@@ -410,7 +410,7 @@ class UssdTestingController < ApplicationController
           when '28'
             @account_profile = AccountProfile.find_by_msisdn(@msisdn[-8,8])
             plr_place_bet
-            @current_ussd_session.update_attributes(session_identifier: @session_identifier, plr_number_of_times: @plr_number_of_times, plr_evaluate_bet_request: @plr_evaluate_bet_request + @request_body, plr_evaluate_bet_response: @plr_evaluate_bet_response)
+            @current_ussd_session.update_attributes(session_identifier: @session_identifier, plr_number_of_times: @plr_number_of_times, plr_place_bet_request: @plr_place_bet_request + @body, plr_place_bet_response: @plr_place_bet_response)
           when '30'
             alr_display_bet_type
             @current_ussd_session.update_attributes(session_identifier: @session_identifier, national_label: @national_label, national_shortcut: @national_shortcut, alr_bet_type_menu: @alr_bet_type_menu)
