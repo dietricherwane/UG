@@ -422,14 +422,20 @@ class UssdTestingController < ApplicationController
             if @status
               case @ussd_string
                 when '1'
-
+                  alr_select_horses
+                  alr_formula_label = 'Long champs'
+                  alr_formula_shortcut = 'longchamps'
                 when '2'
-
+                  alr_select_base
+                  alr_formula_label = 'Champ réduit'
+                  alr_formula_shortcut = 'champ_reduit'
                 when '3'
-
+                  alr_select_base
+                  alr_formula_label = 'Champ total'
+                  alr_formula_shortcut = 'champ_total'
               end
             end
-            @current_ussd_session.update_attributes(session_identifier: @session_identifier, alr_bet_type_label: @bet_type_label)
+            @current_ussd_session.update_attributes(session_identifier: @session_identifier, alr_formula_label: alr_formula_label, alr_formula_shortcut: alr_formula_shortcut)
           end
         end
 
@@ -2136,6 +2142,29 @@ Veuillez choisir votre type de pari
 3- Champ total]
       @session_identifier = '32'
     end
+  end
+
+  def alr_select_horses
+    @race_header = ""
+    race_datum = JSON.parse(@current_ussd_session.race_data)["alr_race_list"]
+    race_datum.each do |race_data|
+      if race_data["race_id"] == @current_ussd_session.alr_program_id + '0' + @current_ussd_session.national_shortcut
+        bet_ids = race_data["bet_ids"].gsub('-SALE', '').split(',') rescue []
+        @race_header << race_data["name"] + "
+"
+        @race_header << "Nombre de partants: " + race_data["max_runners"] + "
+"
+        @race_header << "Non partants: " + race_data["scratched_list"] + "
+Veuillez choisir votre type de pari
+"
+      end
+    end
+
+    @rendered_text = %Q[PMU - ALR
+#{@current_ussd_session.national_label} > #{@current_ussd_session.alr_bet_type_label}
+#{@race_header}
+Saisissez les numéros de vos chevaux séparés par un espace]
+    @session_identifier = '35'
   end
 
 end
