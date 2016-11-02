@@ -1840,11 +1840,10 @@ Confirmez en saisissant votre code secret]
         else
           if json_object["error"].blank?
             status = true
-            @rendered_text = %Q[PMU PLR – R#{@current_ussd_session.plr_reunion_number}C#{@current_ussd_session.plr_race_number}
-#{@current_ussd_session.plr_bet_type_label} > #{@current_ussd_session.plr_formula_label}
-#{@current_ussd_session.plr_base.blank? ? '' : "Base: " + @current_ussd_session.plr_base}
-#{@current_ussd_session.plr_selection.blank? ? '' : "Sélection: " + @current_ussd_session.plr_selection}
-N° de ticket: #{json_object["bet"]["ticket_number"]}]
+            @rendered_text = %Q[FELICITATIONS, votre pari a bien été enregistré.
+N° de ticket: #{json_object["bet"]["ticket_number"]}
+REF: #{json_object["bet"]["ref_number"]}
+PMU, PARIE  POUR GAGNER!]
             @session_identifier = '29'
           else
             @rendered_text = %Q[Le pari n'a pas pu être placé.
