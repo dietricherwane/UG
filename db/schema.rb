@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161101230159) do
+ActiveRecord::Schema.define(version: 20161102082901) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -205,6 +205,8 @@ ActiveRecord::Schema.define(version: 20161101230159) do
     t.string   "alr_scratched_list"
     t.string   "alr_combinations"
     t.string   "alr_amount"
+    t.text     "alr_place_bet_request"
+    t.text     "alr_place_bet_response"
   end
 
 end

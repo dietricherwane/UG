@@ -54067,3 +54067,11 @@ Migrating to AddAlrEvalFieldsToUssdSessions (20161101230159)
   [1m[35mSQL (0.5ms)[0m  INSERT INTO "schema_migrations" ("version") VALUES ($1)  [["version", "20161101230159"]]
   [1m[36m (9.6ms)[0m  [1mCOMMIT[0m
   [1m[35mActiveRecord::SchemaMigration Load (1.0ms)[0m  SELECT "schema_migrations".* FROM "schema_migrations"
+  [1m[36mActiveRecord::SchemaMigration Load (31.1ms)[0m  [1mSELECT "schema_migrations".* FROM "schema_migrations"[0m
+Migrating to AddAlrPlaceBetFieldsToUssdSessions (20161102082901)
+  [1m[35m (0.6ms)[0m  BEGIN
+  [1m[36m (137.0ms)[0m  [1mALTER TABLE "ussd_sessions" ADD COLUMN "alr_place_bet_request" text[0m
+  [1m[35m (0.8ms)[0m  ALTER TABLE "ussd_sessions" ADD COLUMN "alr_place_bet_response" text
+  [1m[36mSQL (0.6ms)[0m  [1mINSERT INTO "schema_migrations" ("version") VALUES ($1)[0m  [["version", "20161102082901"]]
+  [1m[35m (24.9ms)[0m  COMMIT
+  [1m[36mActiveRecord::SchemaMigration Load (0.7ms)[0m  [1mSELECT "schema_migrations".* FROM "schema_migrations"[0m
