@@ -2004,9 +2004,9 @@ Veuillez choisir votre type de pari
               @alr_bet_type_menu << "#{custom_index}-tierce "
             end
             if bet_ids.include?('14')
-              @race_details << "#{custom_index+=1}- Tiercé
+              @race_details << "#{custom_index+=1}- Tiercé 2
 "
-              @alr_bet_type_menu << "#{custom_index}-tierce "
+              @alr_bet_type_menu << "#{custom_index}-tierce2 "
             end
             if bet_ids.include?('8')
               @race_details << "#{custom_index+=1}- Quarté
@@ -2079,9 +2079,9 @@ Veuillez choisir votre type de pari
           @alr_bet_type_menu << "#{custom_index}-tierce "
         end
         if bet_ids.include?('14')
-          @race_details << "#{custom_index+=1}- Tiercé
+          @race_details << "#{custom_index+=1}- Tiercé 2
 "
-          @alr_bet_type_menu << "#{custom_index}-tierce "
+          @alr_bet_type_menu << "#{custom_index}-tierce2 "
         end
         if bet_ids.include?('8')
           @race_details << "#{custom_index+=1}- Quarté
@@ -2121,6 +2121,9 @@ Veuillez choisir votre type de pari
         when 'tierce'
           @bet_type_label = 'Tiercé'
           @alr_bet_id = '7'
+        when 'tierce2'
+          @bet_type_label = 'Tiercé 2'
+          @alr_bet_id = '14'
         when 'quarte'
           @bet_type_label = 'Quarté'
           @alr_bet_id = '8'
