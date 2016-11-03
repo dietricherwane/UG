@@ -155,9 +155,9 @@ class UssdTestingController < ApplicationController
 
     UssdReceptionLog.create(received_parameters: @raw_body, rev_id: @rev_id, rev_password: @rev_password, sp_id: @sp_id, service_id: @service_id, timestamp: @timestamp, trace_unique_id: @unique_id, msg_type: @msg_type, sender_cb: @sender_cb, receiver_cb: @receive_cb, ussd_of_type: @ussd_op_type, msisdn: @msisdn, service_code: @service_code, code_scheme: @code_scheme, ussd_string: @ussd_string, error_code: @error_code, error_message: @error_message, remote_ip: remote_ip_address)
 
-    #render :xml => @result
+    render :xml => @result
 
-    #Thread.new do
+    Thread.new do
       if @error_code == '0'
         # Récupération d'une session existante
         @current_ussd_session = UssdSession.find_by_sender_cb(@sender_cb)
@@ -478,11 +478,11 @@ class UssdTestingController < ApplicationController
           end
         end
 
-        #send_ussd(@operation_type, @msisdn, @sender_cb, @linkid, @rendered_text)
+        send_ussd(@operation_type, @msisdn, @sender_cb, @linkid, @rendered_text)
       end
-    #end
+    end
 
-    render text: @rendered_text
+    #render text: @rendered_text
   end
 
   def set_session_identifier_depending_on_menu_selected
@@ -2433,7 +2433,7 @@ Saisissez le nombre de fois]
 
       @alr_evaluate_bet_request = Parameter.first.gateway_url + "/cm3/api/0cad36b144/game/evaluate/#{@current_ussd_session.alr_program_id}/#{@race_id}"
       comma = @current_ussd_session.alr_selection.blank? ? '' : ','
-      items = @current_ussd_session.alr_base.split().join(',') + (@current_ussd_session.alr_base.blank? ? '' : comma) + @current_ussd_session.alr_selection.split().join(',')
+      items = @current_ussd_session.alr_base.to_s.split().join(',') + (@current_ussd_session.alr_base.blank? ? '' : comma) + @current_ussd_session.alr_selection.to_s.split().join(',')
       @body = %Q(
                     {
                       "games":[
