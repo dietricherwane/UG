@@ -2433,7 +2433,7 @@ Saisissez le nombre de fois]
 
       @alr_evaluate_bet_request = Parameter.first.gateway_url + "/cm3/api/0cad36b144/game/evaluate/#{@current_ussd_session.alr_program_id}/#{@race_id}"
       comma = @current_ussd_session.alr_selection.blank? ? '' : ','
-      items = @current_ussd_session.alr_base.to_s + (@current_ussd_session.alr_base.blank? ? '' : comma) + @current_ussd_session.alr_selection.to_s
+      items = @current_ussd_session.alr_base.split().join(',') + (@current_ussd_session.alr_base.blank? ? '' : comma) + @current_ussd_session.alr_selection.split().join(',')
       @body = %Q(
                     {
                       "games":[
