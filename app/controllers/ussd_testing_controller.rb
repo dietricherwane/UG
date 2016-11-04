@@ -1482,7 +1482,8 @@ Veuillez entrer le numéro de réunion]
   def plr_get_reunion
     @get_plr_race_list_request = Parameter.first.parionsdirect_url + "/ussd_pmu/get_plr_race_list"
     @get_plr_race_list_response = RestClient.get(@get_plr_race_list_request) rescue nil
-    @reunions = ""
+    @reunions = []
+    reunion_string = ""
     counter = 0
 
     races = JSON.parse(@current_ussd_session.get_plr_race_list_response) rescue nil
@@ -1491,7 +1492,8 @@ Veuillez entrer le numéro de réunion]
     unless races.blank?
       races.each do |race|
         if !@reunions.include?(race["reunion"])
-          @reunions << "#{counter+=1}- " << race["reunion"] << "
+          @reunions << race["reunion"]
+          reunion_string << "#{counter+=1}- " << race["reunion"] << "
 "
         end
       end
