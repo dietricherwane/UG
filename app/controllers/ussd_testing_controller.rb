@@ -1500,7 +1500,7 @@ Veuillez entrer le numéro de réunion]
     end
 
     @rendered_text = %Q[PMU PLR
-#{@reunions}
+#{reunion_string}
 Veuillez entrer le numéro de réunion]
     @session_identifier = '20'
   end
