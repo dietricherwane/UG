@@ -1491,7 +1491,7 @@ Veuillez entrer le numéro de réunion]
     unless races.blank?
       races.each do |race|
         if !@reunions.include?(race["reunion"])
-          @reunions << "#{counter+=1}- " race["reunion"] << "
+          @reunions << "#{counter+=1}- " << race["reunion"] << "
 "
         end
       end
