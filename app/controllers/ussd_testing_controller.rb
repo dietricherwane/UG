@@ -155,9 +155,9 @@ class UssdTestingController < ApplicationController
 
     UssdReceptionLog.create(received_parameters: @raw_body, rev_id: @rev_id, rev_password: @rev_password, sp_id: @sp_id, service_id: @service_id, timestamp: @timestamp, trace_unique_id: @unique_id, msg_type: @msg_type, sender_cb: @sender_cb, receiver_cb: @receive_cb, ussd_of_type: @ussd_op_type, msisdn: @msisdn, service_code: @service_code, code_scheme: @code_scheme, ussd_string: @ussd_string, error_code: @error_code, error_message: @error_message, remote_ip: remote_ip_address)
 
-    render :xml => @result
+    #render :xml => @result
 
-    Thread.new do
+    #Thread.new do
       if @error_code == '0'
         # Récupération d'une session existante
         @current_ussd_session = UssdSession.find_by_sender_cb(@sender_cb)
@@ -478,11 +478,11 @@ class UssdTestingController < ApplicationController
           end
         end
 
-        send_ussd(@operation_type, @msisdn, @sender_cb, @linkid, @rendered_text)
+        #send_ussd(@operation_type, @msisdn, @sender_cb, @linkid, @rendered_text)
       end
-    end
+    #end
 
-    #render text: @rendered_text
+    render text: @rendered_text
   end
 
   def set_session_identifier_depending_on_menu_selected
@@ -1459,26 +1459,6 @@ Veuillez saisir votre numéro de compte Paymoney.
     end
   end
 
-  def plr_list_reunions
-
-    races = JSON.parse(@current_ussd_session.get_plr_race_list_response) rescue nil
-    races = races["plr_race_list"] rescue nil
-
-    unless races.blank?
-      races.each do |race|
-        if !@reunions.include?(race["reunion"])
-          @reunions << race["reunion"] << "
-"
-        end
-      end
-    end
-    @rendered_text = %Q[PMU PLR - Liste des réunions
-#{@reunions}
-
-Veuillez entrer le numéro de réunion]
-    @session_identifier = '20'
-  end
-
   def plr_get_reunion
     @get_plr_race_list_request = Parameter.first.parionsdirect_url + "/ussd_pmu/get_plr_race_list"
     @get_plr_race_list_response = RestClient.get(@get_plr_race_list_request) rescue nil
@@ -1500,7 +1480,7 @@ Veuillez entrer le numéro de réunion]
     end
 
     @rendered_text = %Q[PMU PLR
-#{reunion_string}
+#{@reunion.count}
 Veuillez entrer le numéro de réunion]
     @session_identifier = '20'
   end
