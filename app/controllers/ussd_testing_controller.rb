@@ -331,12 +331,20 @@ class UssdTestingController < ApplicationController
             @current_ussd_session.update_attributes(session_identifier: @session_identifier, loto_bet_paymoney_password: @ussd_string, loto_place_bet_url: @loto_place_bet_url + @request_body, loto_place_bet_response: @loto_place_bet_response.body, get_gamer_id_request: @get_gamer_id_request, get_gamer_id_response: @get_gamer_id_response.body)
           when '20'
             # Vérification du numéro de réunion entré et sélection de la course
-            plr_get_race
-            @current_ussd_session.update_attributes(session_identifier: @session_identifier, get_plr_race_list_request: @get_plr_race_list_request, get_plr_race_list_response: @get_plr_race_list_response, plr_reunion_number: @ussd_string)
+            if @ussd_string == '99'
+              plr_list_reunions
+            else
+              plr_get_race
+              @current_ussd_session.update_attributes(session_identifier: @session_identifier, get_plr_race_list_request: @get_plr_race_list_request, get_plr_race_list_response: @get_plr_race_list_response, plr_reunion_number: @ussd_string)
+            end
           when '21'
             # Vérification du numéro de course entré
-            plr_game_selection
-            @current_ussd_session.update_attributes(session_identifier: @session_identifier, plr_race_number: @ussd_string)
+            if @ussd_string == '99'
+              plr_list_races
+            else
+              plr_game_selection
+              @current_ussd_session.update_attributes(session_identifier: @session_identifier, plr_race_number: @ussd_string)
+            end
           when '22'
             set_session_identifier_depending_on_plr_game_selection
             if @status
@@ -1459,10 +1467,32 @@ Veuillez saisir votre numéro de compte Paymoney.
     end
   end
 
+  def plr_list_reunions
+
+    races = JSON.parse(@current_ussd_session.get_plr_race_list_response) rescue nil
+    races = races["plr_race_list"] rescue nil
+
+    unless races.blank?
+      races.each do |race|
+        if !@reunions.include?(race["reunion"])
+          @reunions << race["reunion"] << "
+"
+        end
+      end
+    end
+    @rendered_text = %Q[PMU PLR - Liste des réunions
+#{@reunions}
+
+Veuillez entrer le numéro de réunion]
+    @session_identifier = '20'
+  end
+
   def plr_get_reunion
     @rendered_text = %Q[PMU PLR
 
-Veuillez entrer le numéro de réunion]
+Veuillez entrer le numéro de réunion
+
+99- Liste des réunions]
     @session_identifier = '20'
   end
 
@@ -1483,7 +1513,9 @@ Veuillez entrer un numéro de réunion valide]
       else
         @rendered_text = %Q[PMU PLR
 Réunion: R#{@ussd_string}
-Veuillez entrer le numéro de course]
+Veuillez entrer le numéro de course
+
+99- Liste des courses]
         @session_identifier = '21'
       end
     end
