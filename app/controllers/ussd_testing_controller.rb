@@ -234,7 +234,7 @@ class UssdTestingController < ApplicationController
                   @current_ussd_session.update_attributes(session_identifier: @session_identifier, alr_get_current_program_request: @alr_get_current_program_request, alr_get_current_program_response: @alr_get_current_program_response.body, alr_program_id: @alr_program_id, alr_program_date: @alr_program_date, alr_program_status: @alr_program_status, alr_race_ids: @alr_race_ids.to_s, alr_race_list_request: @alr_race_list_request, alr_race_list_response: @alr_race_list_response.body, race_data: @race_data.to_s)
                 when '3'
                   plr_get_reunion
-                  @current_ussd_session.update_attributes(session_identifier: @session_identifier)
+                  @current_ussd_session.update_attributes(session_identifier: @session_identifier, get_plr_race_list_request: @get_plr_race_list_request, get_plr_race_list_response: @get_plr_race_list_response)
                 when '4'
 
               end
@@ -1480,13 +1480,18 @@ Veuillez entrer le numéro de réunion]
   end
 
   def plr_get_reunion
+    @get_plr_race_list_request = Parameter.first.parionsdirect_url + "/ussd_pmu/get_plr_race_list"
+    @get_plr_race_list_response = RestClient.get(@get_plr_race_list_request) rescue nil
+    @reunions = ""
+    counter = 0
+
     races = JSON.parse(@current_ussd_session.get_plr_race_list_response) rescue nil
     races = races["plr_race_list"] rescue nil
 
     unless races.blank?
       races.each do |race|
         if !@reunions.include?(race["reunion"])
-          @reunions << race["reunion"] << "
+          @reunions << "#{counter+=1}- " race["reunion"] << "
 "
         end
       end
