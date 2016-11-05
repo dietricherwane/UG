@@ -1463,7 +1463,7 @@ Veuillez saisir votre numéro de compte Paymoney.
     @get_plr_race_list_request = Parameter.first.parionsdirect_url + "/ussd_pmu/get_plr_race_list"
     @get_plr_race_list_response = RestClient.get(@get_plr_race_list_request) rescue nil
     @reunions = []
-    reunion_string = ""
+    @reunion_string = ""
     counter = 0
 
     races = JSON.parse(@current_ussd_session.get_plr_race_list_response) rescue nil
@@ -1473,14 +1473,14 @@ Veuillez saisir votre numéro de compte Paymoney.
       races.each do |race|
         if !@reunions.include?(race["reunion"])
           @reunions << race["reunion"]
-          reunion_string << "#{counter+=1}- " << race["reunion"] << "
+          @reunion_string << "#{counter+=1}- " << race["reunion"] << "
 "
         end
       end
     end
 
     @rendered_text = %Q[PMU PLR
-#{@reunions.count}
+#{@reunion_string}
 Veuillez entrer le numéro de réunion]
     @session_identifier = '20'
   end
