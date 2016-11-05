@@ -1486,8 +1486,30 @@ Veuillez entrer le numéro de réunion]
   end
 
   def plr_get_race
+    @get_plr_race_list_request = Parameter.first.parionsdirect_url + "/ussd_pmu/get_plr_race_list"
+    @get_plr_race_list_response = RestClient.get(@get_plr_race_list_request) rescue nil
+    @reunions = []
+    @reunion_string = ""
+    @race_string = ""
+    counter = 0
+
+    races = JSON.parse(@current_ussd_session.get_plr_race_list_response) rescue nil
+    races = races["plr_race_list"] rescue nil
+
+    unless races.blank?
+      races.each do |race|
+        @race_string << "#{counter+=1}- " << "Départ: #{race["depart"]}" << " - Course: #{race["course"]}"
+        if !@reunions.include?(race["reunion"])
+          @reunions << race["reunion"]
+          @reunion_string << "#{counter+=1}- " << race["reunion"] << "
+"
+        end
+      end
+    end
+
     if @ussd_string.blank?
       @rendered_text = %Q[PMU PLR
+#{@reunion_string}
 Veuillez entrer le numéro de réunion]
       @session_identifier = '20'
     else
@@ -1497,14 +1519,14 @@ Veuillez entrer le numéro de réunion]
 
       if !@reunions.include?('R' + @ussd_string)
         @rendered_text = %Q[PMU PLR
+#{@reunion_string}
 Veuillez entrer un numéro de réunion valide]
         @session_identifier = '20'
       else
         @rendered_text = %Q[PMU PLR
 Réunion: R#{@ussd_string}
-Veuillez entrer le numéro de course
-
-99- Liste des courses]
+#{@race_string}
+Veuillez entrer le numéro de course]
         @session_identifier = '21'
       end
     end
