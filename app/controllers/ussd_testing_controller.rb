@@ -1503,7 +1503,7 @@ Veuillez entrer le numéro de réunion
           @reunion_string << race["reunion"] << "
 "
         end
-        if race["reunion"] == @ussd_string
+        if race["reunion"] == "R" + @ussd_string
           @race_string << "#{race["course"]}" << " #{race["depart"]}" << "
 "
         end
@@ -1546,7 +1546,7 @@ Réunion: R#{@ussd_string}
 
     unless races.blank?
       races.each do |race|
-        if race["reunion"] == @current_ussd_session.plr_reunion_number
+        if race["reunion"] == "R" + @current_ussd_session.plr_reunion_number
           @race_string << "#{race["course"]}" << " #{race["depart"]}" << "
 "
         end
