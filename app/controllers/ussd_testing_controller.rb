@@ -1498,11 +1498,13 @@ Veuillez entrer le numéro de réunion
 
     unless races.blank?
       races.each do |race|
-        @race_string << "#{race["course"]}" << " #{race["depart"]}" << "
-"
         if !@reunions.include?(race["reunion"])
           @reunions << race["reunion"]
           @reunion_string << race["reunion"] << "
+"
+        end
+        if race["reunion"] == @ussd_string
+          @race_string << "#{race["course"]}" << " #{race["depart"]}" << "
 "
         end
       end
@@ -1544,11 +1546,8 @@ Réunion: R#{@ussd_string}
 
     unless races.blank?
       races.each do |race|
-        @race_string << "#{race["course"]}" << " #{race["depart"]}" << "
-"
-        if !@reunions.include?(race["reunion"])
-          @reunions << race["reunion"]
-          @reunion_string << race["reunion"] << "
+        if race["reunion"] == @current_ussd_session.plr_reunion_number
+          @race_string << "#{race["course"]}" << " #{race["depart"]}" << "
 "
         end
       end
@@ -1557,7 +1556,7 @@ Réunion: R#{@ussd_string}
     if @ussd_string.blank?
       @rendered_text = %Q[PMU PLR
 Veuillez entrer le numéro de course valide
-Réunion: R#{@ussd_string}
+Réunion: R#{@current_ussd_session.plr_reunion_number}
 #{@race_string}]
       @session_identifier = '21'
     else
@@ -1571,7 +1570,7 @@ Réunion: R#{@ussd_string}
       if status == false
         @rendered_text = %Q[PMU PLR
 Veuillez entrer le numéro de course valide
-Réunion: R#{@ussd_string}]
+Réunion: R#{@current_ussd_session.plr_reunion_number}]
       @session_identifier = '21'
       else
         @rendered_text = %Q[PMU PLR
