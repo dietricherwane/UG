@@ -1498,7 +1498,7 @@ Veuillez entrer le numéro de réunion]
 
     unless races.blank?
       races.each do |race|
-        @race_string << "#{counter+=1}- " << "Départ: #{race["depart"]}" << " - Course: #{race["course"]}"
+        @race_string << "C#{race["course"]}" << "#{race["depart"]}"
         if !@reunions.include?(race["reunion"])
           @reunions << race["reunion"]
           @reunion_string << "#{counter+=1}- " << race["reunion"] << "
@@ -1508,7 +1508,7 @@ Veuillez entrer le numéro de réunion]
     end
 
     if @ussd_string.blank?
-      @rendered_text = %Q[PMU PLR 2
+      @rendered_text = %Q[PMU PLR
 #{@reunion_string}
 Veuillez entrer le numéro de réunion]
       @session_identifier = '20'
@@ -1533,9 +1533,29 @@ Veuillez entrer le numéro de course]
   end
 
   def plr_game_selection
+    @reunions = []
+    @reunion_string = ""
+    @race_string = ""
+    counter = 0
+
+    races = JSON.parse(@current_ussd_session.get_plr_race_list_response) rescue nil
+    races = races["plr_race_list"] rescue nil
+
+    unless races.blank?
+      races.each do |race|
+        @race_string << "C#{race["course"]}" << "#{race["depart"]}"
+        if !@reunions.include?(race["reunion"])
+          @reunions << race["reunion"]
+          @reunion_string << "#{counter+=1}- " << race["reunion"] << "
+"
+        end
+      end
+    end
+
     if @ussd_string.blank?
       @rendered_text = %Q[PMU PLR
 Réunion: R#{@ussd_string}
+#{@race_string}
 Veuillez entrer le numéro de course valide]
       @session_identifier = '21'
     else
