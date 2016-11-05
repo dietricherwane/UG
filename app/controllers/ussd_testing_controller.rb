@@ -1480,7 +1480,7 @@ Veuillez saisir votre numéro de compte Paymoney.
     end
 
     @rendered_text = %Q[PMU PLR
-#{@reunion.count}
+#{@reunions.count}
 Veuillez entrer le numéro de réunion]
     @session_identifier = '20'
   end
