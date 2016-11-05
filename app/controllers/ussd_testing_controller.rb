@@ -1473,7 +1473,7 @@ Veuillez saisir votre numéro de compte Paymoney.
       races.each do |race|
         if !@reunions.include?(race["reunion"])
           @reunions << race["reunion"]
-          @reunion_string << "#{counter+=1}- " << race["reunion"] << "
+          @reunion_string << race["reunion"] << "
 "
         end
       end
@@ -1502,7 +1502,7 @@ Veuillez entrer le numéro de réunion]
 "
         if !@reunions.include?(race["reunion"])
           @reunions << race["reunion"]
-          @reunion_string << "#{counter+=1}- " << race["reunion"] << "
+          @reunion_string << race["reunion"] << "
 "
         end
       end
@@ -1548,7 +1548,7 @@ Veuillez entrer le numéro de course]
 "
         if !@reunions.include?(race["reunion"])
           @reunions << race["reunion"]
-          @reunion_string << "#{counter+=1}- " << race["reunion"] << "
+          @reunion_string << race["reunion"] << "
 "
         end
       end
