@@ -1466,7 +1466,7 @@ Veuillez saisir votre numéro de compte Paymoney.
     @reunion_string = ""
     counter = 0
 
-    races = JSON.parse(@current_ussd_session.get_plr_race_list_response) rescue nil
+    races = JSON.parse(@get_plr_race_list_response) rescue nil
     races = races["plr_race_list"] rescue nil
 
     unless races.blank?
@@ -1486,8 +1486,8 @@ Veuillez entrer le numéro de réunion]
   end
 
   def plr_get_race
-    @get_plr_race_list_request = Parameter.first.parionsdirect_url + "/ussd_pmu/get_plr_race_list"
-    @get_plr_race_list_response = RestClient.get(@get_plr_race_list_request) rescue nil
+    #@get_plr_race_list_request = Parameter.first.parionsdirect_url + "/ussd_pmu/get_plr_race_list"
+    #@get_plr_race_list_response = RestClient.get(@get_plr_race_list_request) rescue nil
     @reunions = []
     @reunion_string = ""
     @race_string = ""
