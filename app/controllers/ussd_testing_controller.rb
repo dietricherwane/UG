@@ -1479,7 +1479,7 @@ Veuillez saisir votre numéro de compte Paymoney.
       end
     end
 
-    @rendered_text = %Q[PMU PLR
+    @rendered_text = %Q[PMU PLR 1
 #{@reunion_string}
 Veuillez entrer le numéro de réunion]
     @session_identifier = '20'
@@ -1508,7 +1508,7 @@ Veuillez entrer le numéro de réunion]
     end
 
     if @ussd_string.blank?
-      @rendered_text = %Q[PMU PLR
+      @rendered_text = %Q[PMU PLR 2
 #{@reunion_string}
 Veuillez entrer le numéro de réunion]
       @session_identifier = '20'
