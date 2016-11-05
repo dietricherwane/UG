@@ -1498,7 +1498,8 @@ Veuillez entrer le numéro de réunion]
 
     unless races.blank?
       races.each do |race|
-        @race_string << "C#{race["course"]}" << "#{race["depart"]}"
+        @race_string << "#{race["course"]}" << " #{race["depart"]}" << "
+"
         if !@reunions.include?(race["reunion"])
           @reunions << race["reunion"]
           @reunion_string << "#{counter+=1}- " << race["reunion"] << "
@@ -1543,7 +1544,8 @@ Veuillez entrer le numéro de course]
 
     unless races.blank?
       races.each do |race|
-        @race_string << "C#{race["course"]}" << "#{race["depart"]}"
+        @race_string << "#{race["course"]}" << " #{race["depart"]}" << "
+"
         if !@reunions.include?(race["reunion"])
           @reunions << race["reunion"]
           @reunion_string << "#{counter+=1}- " << race["reunion"] << "
