@@ -1969,7 +1969,7 @@ Confirmez en saisissant votre code secret]
         @bet_modifier = '0'
       end
       if @current_ussd_session.plr_formula_shortcut == 'champ_reduit'
-        if @current_ussd_session.plr_base.split(',').length == 1
+        if @current_ussd_session.plr_base.split().length == 1
           @bet_code = '104'
           @bet_modifier = '0'
         else
@@ -1978,7 +1978,7 @@ Confirmez en saisissant votre code secret]
         end
       end
       if @current_ussd_session.plr_formula_shortcut == 'champ_total'
-        if @current_ussd_session.plr_base.split(',').length == 1
+        if @current_ussd_session.plr_base.split().length == 1
           @bet_code = '103'
           @bet_modifier = '0'
         else
