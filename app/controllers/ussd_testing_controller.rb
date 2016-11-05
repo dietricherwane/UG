@@ -1479,9 +1479,9 @@ Veuillez saisir votre numéro de compte Paymoney.
       end
     end
 
-    @rendered_text = %Q[PMU PLR 1
-#{@reunion_string}
-Veuillez entrer le numéro de réunion]
+    @rendered_text = %Q[PMU PLR
+Veuillez entrer le numéro de réunion
+#{@reunion_string}]
     @session_identifier = '20'
   end
 
@@ -1510,8 +1510,8 @@ Veuillez entrer le numéro de réunion]
 
     if @ussd_string.blank?
       @rendered_text = %Q[PMU PLR
-#{@reunion_string}
-Veuillez entrer le numéro de réunion]
+Veuillez entrer le numéro de réunion
+#{@reunion_string}]
       @session_identifier = '20'
     else
       plr_get_reunions_list
@@ -1520,14 +1520,14 @@ Veuillez entrer le numéro de réunion]
 
       if !@reunions.include?('R' + @ussd_string)
         @rendered_text = %Q[PMU PLR
-#{@reunion_string}
-Veuillez entrer un numéro de réunion valide]
+Veuillez entrer un numéro de réunion valide
+#{@reunion_string}]
         @session_identifier = '20'
       else
         @rendered_text = %Q[PMU PLR
+Veuillez entrer le numéro de course
 Réunion: R#{@ussd_string}
-#{@race_string}
-Veuillez entrer le numéro de course]
+#{@race_string}]
         @session_identifier = '21'
       end
     end
@@ -1556,9 +1556,9 @@ Veuillez entrer le numéro de course]
 
     if @ussd_string.blank?
       @rendered_text = %Q[PMU PLR
+Veuillez entrer le numéro de course valide
 Réunion: R#{@ussd_string}
-#{@race_string}
-Veuillez entrer le numéro de course valide]
+#{@race_string}]
       @session_identifier = '21'
     else
       status = false
@@ -1570,8 +1570,8 @@ Veuillez entrer le numéro de course valide]
 
       if status == false
         @rendered_text = %Q[PMU PLR
-Réunion: R#{@ussd_string}
-Veuillez entrer le numéro de course valide]
+Veuillez entrer le numéro de course valide
+Réunion: R#{@ussd_string}]
       @session_identifier = '21'
       else
         @rendered_text = %Q[PMU PLR
