@@ -2003,7 +2003,7 @@ Confirmez en saisissant votre code secret]
 
     @race_data = @alr_race_list_response.body rescue nil#JSON.parse(@alr_race_list_response.body)["alr_race_list"] rescue nil
 
-    if @alr_program_status != 'ON' || @alr_race_ids.length == 0 || @race_data.blank?
+    if @alr_race_ids.length == 0 || @race_data.blank? #@alr_program_status != 'ON' ||
       @rendered_text = %Q[PMU - ALR - Il n'y a aucun programme disponible
 1- Loto Bonheur
 2- PMU ALR
