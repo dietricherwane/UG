@@ -474,7 +474,7 @@ class UssdTestingController < ApplicationController
           when '38'
             @account_profile = AccountProfile.find_by_msisdn(@msisdn[-8,8])
             alr_place_bet
-            @current_ussd_session.update_attributes(session_identifier: @session_identifier, alr_place_bet_request: @alr_place_bet_request + @body, alr_place_bet_response: @alr_place_bet_response.body, get_gamer_id_request: @get_gamer_id_request, get_gamer_id_response: @get_gamer_id_response)
+            @current_ussd_session.update_attributes(session_identifier: @session_identifier, alr_place_bet_request: @alr_place_bet_request + @body, alr_place_bet_response: @alr_place_bet_response.body, get_gamer_id_request: @get_gamer_id_request, get_gamer_id_response: @get_gamer_id_response.body)
           end
         end
 
