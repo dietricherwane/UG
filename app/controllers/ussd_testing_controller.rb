@@ -2595,7 +2595,7 @@ Veuillez entrer votre mot de passe Paymoney pour valider le pari.]
         @race_id = @current_ussd_session.alr_race_ids.split('-')[@current_ussd_session.national_shortcut.to_i - 1] rescue nil
         @alr_place_bet_request = Parameter.first.gateway_url + "/cm3/api/98d24611fd/ticket/sell/#{@get_gamer_id_response.body}/#{@account_profile.paymoney_account_number}/#{@ussd_string}/#{@current_ussd_session.alr_program_date}/#{@current_ussd_session.alr_program_date}"
         comma = @current_ussd_session.alr_selection.blank? ? '' : ','
-        items = @current_ussd_session.alr_base + (@current_ussd_session.alr_base.blank? ? '' : comma) + @current_ussd_session.alr_selection
+        items = @current_ussd_session.alr_base.to_s + (@current_ussd_session.alr_base.blank? ? '' : comma) + @current_ussd_session.alr_selection.to_s
         @body = %Q(
                       {
                         "program_id":"#{@current_ussd_session.alr_program_id}",
