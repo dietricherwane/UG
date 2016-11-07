@@ -2361,6 +2361,7 @@ Saisissez le nombre de fois]
 Voulez-vous jouer en formule complète?
 1- Oui
 2- Non]
+      @session_identifier = '36'
     end
   end
 
@@ -2436,7 +2437,7 @@ Saisissez le numero de votre cheval de BASE et ulitiser X pour definir l'emplace
 
     if alr_valid_horses_numbers
       if alr_valid_multi_number_of_horses && alr_valid_selection_numbers
-        if ['Tiercé', 'Quarté', 'Quinté', 'Quinté +'].include?(@current_ussd_session.alr_bet_type_label)
+        if ['Tiercé', 'Tiercé 2', 'Quarté', 'Quinté', 'Quinté +'].include?(@current_ussd_session.alr_bet_type_label)
           @rendered_text = %Q[PMU - ALR
 #{@current_ussd_session.national_label} > #{@current_ussd_session.alr_bet_type_label}
 #{@race_header}
@@ -2715,6 +2716,14 @@ Veuillez entrer votre mot de passe Paymoney pour valider le pari.]
       @error_message = "Vous devez choisir au moins 3 numéros"
       status = false
     end
+    if @current_ussd_session.alr_bet_type_label == 'Tiercé 2' && @current_ussd_session.alr_formula_label == 'Champ réduit' && @ussd_string.split.length < 2
+      @error_message = "Vous devez choisir au moins 2 numéros"
+      status = false
+    end
+    if @current_ussd_session.alr_bet_type_label == 'Tiercé 2' && @ussd_string.split.length < 3
+      @error_message = "Vous devez choisir au moins 3 numéros"
+      status = false
+    end
     if @current_ussd_session.alr_bet_type_label == 'Quarté' && @current_ussd_session.alr_formula_label == 'Champ réduit' && @ussd_string.split.length < 3
       @error_message = "Vous devez choisir au moins 3 numéros"
       status = false
@@ -2750,39 +2759,47 @@ Veuillez entrer votre mot de passe Paymoney pour valider le pari.]
       end
     end
 
-    if @current_ussd_session.alr_bet_type_label == 'Couplé gagnant' && @current_ussd_session.alr_formula_label == 'Champ réduit' && @ussd_string.split.length != 2 && !@ussd_string.split.include?('X') && !@ussd_string.split.include?('x')
+    if @current_ussd_session.alr_bet_type_label == 'Couplé gagnant' && @current_ussd_session.alr_formula_label == 'Champ réduit' && @ussd_string.split.length != 2 && !@ussd_string.downcase.split.include?('x') && !@ussd_string.downcase.split.include?('x')
       @error_message = "Vous devez choisir 1 numéro"
       status = false
     end
-    if @current_ussd_session.alr_bet_type_label == 'Couplé gagnant' && @current_ussd_session.alr_formula_label == 'Champ total' && @ussd_string.split.length != 2 && !@ussd_string.split.include?('X') && !@ussd_string.split.include?('x')
+    if @current_ussd_session.alr_bet_type_label == 'Couplé gagnant' && @current_ussd_session.alr_formula_label == 'Champ total' && @ussd_string.split.length != 2 && !@ussd_string.downcase.split.include?('x') && !@ussd_string.downcase.split.include?('x')
       @error_message = "Vous devez choisir 1 numéro"
       status = false
     end
-    if @current_ussd_session.alr_bet_type_label == 'Couplé placé' && @current_ussd_session.alr_formula_label == 'Champ réduit' && @ussd_string.split.length != 2 && !@ussd_string.split.include?('X') && !@ussd_string.split.include?('x')
+    if @current_ussd_session.alr_bet_type_label == 'Couplé placé' && @current_ussd_session.alr_formula_label == 'Champ réduit' && @ussd_string.split.length != 2 && !@ussd_string.downcase.split.include?('x') && !@ussd_string.downcase.split.include?('x')
       @error_message = "Vous devez choisir 1 numéro"
       status = false
     end
-    if @current_ussd_session.alr_bet_type_label == 'Tiercé' && @current_ussd_session.alr_formula_label == 'Champ réduit' && @ussd_string.split.length > 3 && !@ussd_string.split.include?('X')
+    if @current_ussd_session.alr_bet_type_label == 'Tiercé' && @current_ussd_session.alr_formula_label == 'Champ réduit' && @ussd_string.split.length > 3 && !@ussd_string.downcase.split.include?('x')
       @error_message = "Vous devez choisir au plus 2 numéros"
       status = false
     end
-    if @current_ussd_session.alr_bet_type_label == 'Tiercé' && @current_ussd_session.alr_formula_label == 'Champ total' && @ussd_string.split.length > 3 && !@ussd_string.split.include?('X')
+    if @current_ussd_session.alr_bet_type_label == 'Tiercé' && @current_ussd_session.alr_formula_label == 'Champ total' && @ussd_string.split.length > 3 && !@ussd_string.downcase.split.include?('x')
       @error_message = "Vous devez choisir au plus 2 numéros"
       status = false
     end
-    if @current_ussd_session.alr_bet_type_label == 'Quarté' && @current_ussd_session.alr_formula_label == 'Champ réduit' && @ussd_string.split.length > 4 && !@ussd_string.split.include?('X')
+    if @current_ussd_session.alr_bet_type_label == 'Tiercé 2' && @current_ussd_session.alr_formula_label == 'Champ réduit' && @ussd_string.split.length > 3 && !@ussd_string.downcase.split.include?('x')
+      @error_message = "Vous devez choisir au plus 2 numéros"
+      status = false
+    end
+    if @current_ussd_session.alr_bet_type_label == 'Tiercé 2' && @current_ussd_session.alr_formula_label == 'Champ total' && @ussd_string.split.length > 3 && !@ussd_string.downcase.split.include?('x')
+      @error_message = "Vous devez choisir au plus 2 numéros"
+      status = false
+    end
+    if @current_ussd_session.alr_bet_type_label == 'Quarté' && @current_ussd_session.alr_formula_label == 'Champ réduit' && @ussd_string.split.length > 4 && !@ussd_string.downcase.split.include?('x')
       @error_message = "Vous devez choisir au plus 3 numéros"
       status = false
     end
-    if @current_ussd_session.alr_bet_type_label == 'Quarté' && @current_ussd_session.alr_formula_label == 'Champ total' && @ussd_string.split.length > 4 && !@ussd_string.split.include?('X')
+    if @current_ussd_session.alr_bet_type_label == 'Quarté' && @current_ussd_session.alr_formula_label == 'Champ total' && @ussd_string.split.length > 4 && !@ussd_string.downcase.split.include?('x')
       @error_message = "Vous devez choisir au plus 3 numéros"
       status = false
     end
-    if (@current_ussd_session.alr_bet_type_label == 'Quinté' || @current_ussd_session.alr_bet_type_label == 'Quinté +') && @current_ussd_session.alr_formula_label == 'Champ réduit' && @ussd_string.split.length > 5 && !@ussd_string.split.include?('X')
+    if (@current_ussd_session.alr_bet_type_label == 'Quinté' || @current_ussd_session.alr_bet_type_label == 'Quinté +') && @current_ussd_session.alr_formula_label == 'Champ réduit' && @ussd_string.split.length > 5 && !@ussd_string.downcase.split.include?('x')
       @error_message = "Vous devez choisir au plus 4 numéros"
       status = false
     end
-    if (@current_ussd_session.alr_bet_type_label == 'Quinté' || @current_ussd_session.alr_bet_type_label == 'Quinté +') && @ussd_string.split.length > 5 && !@ussd_string.split.include?('X')
+    if (@current_ussd_session.alr_bet_type_label == 'Quinté' || @current_ussd_session.alr_bet_type_label == 'Quinté +') && @ussd_string.split.length > 5 && !@ussd_string.downcase.split.include?('x')
       @error_message = "Vous devez choisir au plus 4 numéros"
       status = false
     end
