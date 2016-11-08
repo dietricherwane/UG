@@ -470,7 +470,7 @@ class UssdTestingController < ApplicationController
             @current_ussd_session.update_attributes(session_identifier: @session_identifier, full_formula: @full_formula)
           when '37'
             alr_evaluate_bet
-            @current_ussd_session.update_attributes(session_identifier: @session_identifier, alr_stake: @alr_stake, alr_evaluate_bet_request: @alr_evaluate_bet_request + @body, alr_evaluate_bet_response: @alr_evaluate_bet_response.body, alr_scratched_list: @alr_scratched_list.to_s, alr_combinations: @alr_combinations.to_s, alr_amount: @alr_amount)
+            @current_ussd_session.update_attributes(session_identifier: @session_identifier, alr_stake: @ussd_string, alr_evaluate_bet_request: @alr_evaluate_bet_request + @body, alr_evaluate_bet_response: @alr_evaluate_bet_response.body, alr_scratched_list: @alr_scratched_list.to_s, alr_combinations: @alr_combinations.to_s, alr_amount: @alr_amount)
           when '38'
             @account_profile = AccountProfile.find_by_msisdn(@msisdn[-8,8])
             alr_place_bet
