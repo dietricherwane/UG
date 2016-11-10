@@ -2635,13 +2635,9 @@ Veuillez entrer votre mot de passe Paymoney pour valider le pari.]
           @session_identifier = '38'
         else
           if json_object["error"].blank?
-            @rendered_text = %Q[Votre ticket a été validé
-#{@current_ussd_session.national_label} > #{@current_ussd_session.alr_bet_type_label}
-#{@race_header}
-#{@current_ussd_session.alr_base.blank? ? '' : "Base: " + @current_ussd_session.alr_base}
-#{@current_ussd_session.alr_selection.blank? ? '' : "Sélection: " + @current_ussd_session.alr_selection}
+            @rendered_text = %Q[FELCITATIONS, votre pari a bien été enregistré.
 Numéro de ticket: #{json_object["bet"]["serial_number"]}
-            ]
+PMU, PARIE  POUR GAGNER!]
             @session_identifier = '39'
           else
             @rendered_text = %Q[Le pari n'a pas pu être pris
@@ -2700,6 +2696,14 @@ Veuillez entrer votre mot de passe Paymoney pour valider le pari.]
 
   def alr_valid_selection_numbers
     status = true
+    unless @current_ussd_session.alr_base.blank?
+      @current_ussd_session.alr_base.split.each do |base_number|
+        if @ussd_string.split.include?(base_number)
+          status = false
+          @error_message = "Veuillez choisir des numéros différents en base et en sélection"
+        end
+      end
+    end
     if @current_ussd_session.alr_bet_type_label == 'Couplé gagnant' && @current_ussd_session.alr_formula_label == 'Champ réduit' && @ussd_string.split.length < 1
       @error_message = "Vous devez choisir au moins 1 numéro"
       status = false
@@ -2759,15 +2763,15 @@ Veuillez entrer votre mot de passe Paymoney pour valider le pari.]
       end
     end
 
-    if @current_ussd_session.alr_bet_type_label == 'Couplé gagnant' && @current_ussd_session.alr_formula_label == 'Champ réduit' && @ussd_string.split.length != 2 && !@ussd_string.downcase.split.include?('x')
+    if @current_ussd_session.alr_bet_type_label == 'Couplé gagnant' && @current_ussd_session.alr_formula_label == 'Champ réduit' && (@ussd_string.split.length != 2 || !@ussd_string.downcase.split.include?('x'))
       @error_message = "Vous devez choisir 2 numéros"
       status = false
     end
-    if @current_ussd_session.alr_bet_type_label == 'Couplé gagnant' && @current_ussd_session.alr_formula_label == 'Champ total' && @ussd_string.split.length != 2 && !@ussd_string.downcase.split.include?('x')
+    if @current_ussd_session.alr_bet_type_label == 'Couplé gagnant' && @current_ussd_session.alr_formula_label == 'Champ total' && (@ussd_string.split.length != 2 || !@ussd_string.downcase.split.include?('x'))
       @error_message = "Vous devez choisir 2 numéros"
       status = false
     end
-    if @current_ussd_session.alr_bet_type_label == 'Couplé placé' && @current_ussd_session.alr_formula_label == 'Champ réduit' && @ussd_string.split.length != 2 && !@ussd_string.downcase.split.include?('x')
+    if @current_ussd_session.alr_bet_type_label == 'Couplé placé' && @current_ussd_session.alr_formula_label == 'Champ réduit' && (@ussd_string.split.length != 2 || !@ussd_string.downcase.split.include?('x'))
       @error_message = "Vous devez choisir 2 numéros"
       status = false
     end
@@ -2795,11 +2799,11 @@ Veuillez entrer votre mot de passe Paymoney pour valider le pari.]
       @error_message = "Vous devez choisir 4 numéros"
       status = false
     end
-    if (@current_ussd_session.alr_bet_type_label == 'Quinté' || @current_ussd_session.alr_bet_type_label == 'Quinté +') && @current_ussd_session.alr_formula_label == 'Champ réduit' && @ussd_string.split.length != 5 && !@ussd_string.downcase.split.include?('x')
+    if (@current_ussd_session.alr_bet_type_label == 'Quinté' || @current_ussd_session.alr_bet_type_label == 'Quinté +') && @current_ussd_session.alr_formula_label == 'Champ réduit' && (@ussd_string.split.length != 5 || !@ussd_string.downcase.split.include?('x'))
       @error_message = "Vous devez choisir 5 numéros"
       status = false
     end
-    if (@current_ussd_session.alr_bet_type_label == 'Quinté' || @current_ussd_session.alr_bet_type_label == 'Quinté +') && @ussd_string.split.length != 5 && !@ussd_string.downcase.split.include?('x')
+    if (@current_ussd_session.alr_bet_type_label == 'Quinté' || @current_ussd_session.alr_bet_type_label == 'Quinté +') && (@ussd_string.split.length != 5 || !@ussd_string.downcase.split.include?('x'))
       @error_message = "Vous devez choisir 5 numéros"
       status = false
     end
