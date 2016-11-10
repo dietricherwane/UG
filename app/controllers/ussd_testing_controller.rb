@@ -1106,7 +1106,7 @@ Veuillez saisir votre numéro de compte Paymoney.
               <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:loc="http://www.csapi.org/schema/parlayx/ussd/notification/v1_0/local">
                 <soapenv:Header/>
                 <soapenv:Body>
-                  <loc:notifyUssdAbortResponse/>
+                  <loc:notifyUssdReceptionResponse></loc:notifyUssdAbortResponse>
                 </soapenv:Body>
               </soapenv:Envelope>
             ]
