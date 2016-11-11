@@ -147,6 +147,55 @@ class UssdTestingController < ApplicationController
     @current_ussd_session.update_attributes(session_identifier: @session_identifier)
   end
 
+  def back_display_loto_draw_day
+    reference_date = "01/01/#{Date.today.year} 19:00:00"
+    @rendered_text = %Q[
+1- Etoile #{(-16 + DateTime.parse(reference_date).upto(DateTime.now).count(&:monday?)).to_s}
+2- Emergence #{(-16 + DateTime.parse(reference_date).upto(DateTime.now).count(&:tuesday?)).to_s}
+3- Fortune #{(-8 + DateTime.parse(reference_date).upto(DateTime.now).count(&:wednesday?)).to_s}
+4- Privilège #{(-16 + DateTime.parse(reference_date).upto(DateTime.now).count(&:thursday?)).to_s}
+5- Solution #{(-17 + DateTime.parse(reference_date).upto(DateTime.now).count(&:friday?)).to_s}
+6- Diamant #{(-8 + DateTime.parse(reference_date).upto(DateTime.now).count(&:saturday?)).to_s}
+0- Retour
+00- Accueil]
+    @session_identifier = '12'
+    @current_ussd_session.update_attributes(session_identifier: @session_identifier)
+  end
+
+  def back_display_bet_selection
+    @rendered_text = %Q[#{@current_ussd_session.draw_day_label}
+
+1- PN - 1 numéro
+2- 2N - 2 numéro
+3- 3N - 3 numéro
+4- 4N - 4 numéro
+5- 5N - 5 numéro]
+    @session_identifier = '13'
+    @current_ussd_session.update_attributes(session_identifier: @session_identifier)
+  end
+
+  def back_display_formula_selection
+    @rendered_text = %Q[Loto bonheur - #{@bet_selection}
+Choisissez votre formule
+
+1- Simple
+2- Perm]
+    if @bet_selection != 'PN'
+      @rendered_text << %Q[
+3- Champ réduit
+4- Champ total]
+    end
+    @session_identifier = '14'
+    @rendered_text << %Q[
+0- Retour
+00- Accueil]
+    @current_ussd_session.update_attributes(session_identifier: @session_identifier)
+  end
+
+  def back_display_base_selection
+
+  end
+
   def back_list_games_menu
     @rendered_text = %Q[
 1- Loto Bonheur
@@ -155,7 +204,7 @@ class UssdTestingController < ApplicationController
 4- SPORTCASH
 0- Retour
 00- Accueil]
-      @session_identifier = '11'
+    @session_identifier = '11'
     @current_ussd_session.update_attributes(session_identifier: @session_identifier)
   end
 
@@ -345,6 +394,10 @@ class UssdTestingController < ApplicationController
             set_session_identifier_depending_on_formula_selected
             if @status
               case @ussd_string
+                when '0'
+                  back_display_bet_selection
+                when '00'
+                  back_home
                 when '1'
                   @formula_label = "Simple"
                   @formula_shortcut = 'simple'
@@ -645,62 +698,83 @@ Choisissez votre formule
         @session_identifier = '16'
       end
     end
+    @rendered_text << %Q[
+0- Retour
+00- Accueil]
   end
 
   def loto_check_base_numbers
     @current_ussd_session = @current_ussd_session
     @ussd_string = @ussd_string
-    if base_numbers_overflow || invalid_base_numbers_range
-      @rendered_text = %Q[#{@error_message}
-Loto bonheur - #{@current_ussd_session.draw_day_label} #{@current_ussd_session.bet_selection} #{@formula_label}
-#{@current_ussd_session.bet_selection == 'PN' ? 'Saisissez votre numéro' : "Saisissez vos numéros séparés d'un espace"} (Entre 1 et 90)
-
-Veuillez entrer votre base.
-]
-      @session_identifier = '15'
-    else
-      if @current_ussd_session.formula_label != 'Champ total'
-        @rendered_text = %Q[Loto bonheur - #{@current_ussd_session.draw_day_label} #{@current_ussd_session.bet_selection} #{@formula_label}
-Base: #{@ussd_string}
-#{@current_ussd_session.bet_selection == 'PN' ? 'Saisissez votre numéro' : "Saisissez vos numéros séparés d'un espace"} (Entre 1 et 90)
-
-Veuillez entrer votre sélection.
-]
-        @session_identifier = '16'
+    case @ussd_string
+      when '0'
+        back_display_formula_selection
+      when '00'
+        back_home
       else
-        @rendered_text = %Q[Loto bonheur - #{@current_ussd_session.draw_day_label} #{@current_ussd_session.bet_selection} #{@formula_label}
+        if base_numbers_overflow || invalid_base_numbers_range
+          @rendered_text = %Q[#{@error_message}
+    Loto bonheur - #{@current_ussd_session.draw_day_label} #{@current_ussd_session.bet_selection} #{@formula_label}
+    #{@current_ussd_session.bet_selection == 'PN' ? 'Saisissez votre numéro' : "Saisissez vos numéros séparés d'un espace"} (Entre 1 et 90)
+
+    Veuillez entrer votre base.
+    ]
+          @session_identifier = '15'
+        else
+          if @current_ussd_session.formula_label != 'Champ total'
+            @rendered_text = %Q[Loto bonheur - #{@current_ussd_session.draw_day_label} #{@current_ussd_session.bet_selection} #{@formula_label}
 Base: #{@ussd_string}
 #{@current_ussd_session.bet_selection == 'PN' ? 'Saisissez votre numéro' : "Saisissez vos numéros séparés d'un espace"} (Entre 1 et 90)
 
-Veuillez entrer votre mise de base.
-]
-        @session_identifier = '17'
-      end
+    Veuillez entrer votre sélection.
+    ]
+            @session_identifier = '16'
+          else
+            @rendered_text = %Q[Loto bonheur - #{@current_ussd_session.draw_day_label} #{@current_ussd_session.bet_selection} #{@formula_label}
+Base: #{@ussd_string}
+#{@current_ussd_session.bet_selection == 'PN' ? 'Saisissez votre numéro' : "Saisissez vos numéros séparés d'un espace"} (Entre 1 et 90)
+
+    Veuillez entrer votre mise de base.
+    ]
+            @session_identifier = '17'
+          end
+        end
     end
   end
 
   def loto_check_selection_numbers
     @current_ussd_session = @current_ussd_session
     @ussd_string = @ussd_string
-    if selection_numbers_overflow || invalid_selection_numbers_range
-      @rendered_text = %Q[#{@error_message}
-Loto bonheur - #{@current_ussd_session.draw_day_label} #{@current_ussd_session.bet_selection} #{@current_ussd_session.formula_label}
-#{!@current_ussd_session.base_field.blank? ? "Base: " + @current_ussd_session.base_field : ""}
-#{@current_ussd_session.bet_selection == 'PN' ? 'Saisissez votre numéro' : "Saisissez vos numéros séparés d'un espace"} (Entre 1 et 90)
+    case @ussd_string
+      when '0'
+        if @current_ussd_session.formula_label != 'Simple' && @current_ussd_session.formula_label != 'Perm'
+          back_display_base_selection
+        else
+          back_display_formula_selection
+        end
+      when '00'
+        back_home
+      else
+        if selection_numbers_overflow || invalid_selection_numbers_range
+          @rendered_text = %Q[#{@error_message}
+    Loto bonheur - #{@current_ussd_session.draw_day_label} #{@current_ussd_session.bet_selection} #{@current_ussd_session.formula_label}
+    #{!@current_ussd_session.base_field.blank? ? "Base: " + @current_ussd_session.base_field : ""}
+    #{@current_ussd_session.bet_selection == 'PN' ? 'Saisissez votre numéro' : "Saisissez vos numéros séparés d'un espace"} (Entre 1 et 90)
 
-Veuillez entrer votre sélection.
-]
-      @session_identifier = '16'
-    else
-      @rendered_text = %Q[Loto bonheur - #{@current_ussd_session.draw_day_label} #{@current_ussd_session.bet_selection} #{@current_ussd_session.formula_label}
-#{!@current_ussd_session.base_field.blank? ? "Base: " + @current_ussd_session.base_field : ""}
-Sélection: #{@ussd_string}
+    Veuillez entrer votre sélection.
+    ]
+          @session_identifier = '16'
+        else
+          @rendered_text = %Q[Loto bonheur - #{@current_ussd_session.draw_day_label} #{@current_ussd_session.bet_selection} #{@current_ussd_session.formula_label}
+    #{!@current_ussd_session.base_field.blank? ? "Base: " + @current_ussd_session.base_field : ""}
+    Sélection: #{@ussd_string}
 
-Veuillez entrer votre mise de base.
-]
-      @selection_field = @ussd_string
-      @session_identifier = '17'
-    end
+    Veuillez entrer votre mise de base.
+    ]
+          @selection_field = @ussd_string
+          @session_identifier = '17'
+        end
+      end
   end
 
   def loto_evaluate_bet
