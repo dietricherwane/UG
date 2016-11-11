@@ -121,6 +121,44 @@ class UssdTestingController < ApplicationController
     render text: stop_session_response.body
   end
 
+  def back_to_home
+    @rendered_text = %Q[
+1- Jeux
+2- Mes paris
+3- Mon solde
+4- Rechargement
+5- Votre service SMS
+6- Mes OTP
+7- Mes comptes]
+    @session_identifier = '5'
+    @current_ussd_session.update_attributes(session_identifier: @session_identifier)
+  end
+
+  def back_list_main_menu
+    @rendered_text = %Q[
+1- Jeux
+2- Mes paris
+3- Mon solde
+4- Rechargement
+5- Votre service SMS
+6- Mes OTP
+7- Mes comptes]
+    @session_identifier = '5'
+    @current_ussd_session.update_attributes(session_identifier: @session_identifier)
+  end
+
+  def back_list_games_menu
+    @rendered_text = %Q[
+1- Loto Bonheur
+2- PMU ALR
+3- PMU PLR
+4- SPORTCASH
+0- Retour
+00- Accueil]
+      @session_identifier = '11'
+    @current_ussd_session.update_attributes(session_identifier: @session_identifier)
+  end
+
   def main_menu
     @raw_body = request.body.read.gsub("ns1:", "").gsub("ns2:", "") rescue nil
     @received_body = (Nokogiri.XML(@raw_body) rescue nil)
@@ -226,6 +264,10 @@ class UssdTestingController < ApplicationController
             set_session_identifier_depending_on_game_selected
             if @status
               case @ussd_string
+                when '0'
+                  back_list_main_menu
+                when '00'
+                  back_home
                 when '1'
                   loto_display_draw_day
                   @current_ussd_session.update_attributes(session_identifier: @session_identifier)
@@ -245,6 +287,10 @@ class UssdTestingController < ApplicationController
             if @status
               reference_date = "01/01/#{Date.today.year} 19:00:00"
               case @ussd_string
+                when '0'
+                  back_list_games_menu
+                when '00'
+                  back_home
                 when '1'
                   @draw_day_label = "Etoile #{(-16 + DateTime.parse(reference_date).upto(DateTime.now).count(&:monday?)).to_s}"
                   @draw_day_shortcut = 'etoile'
@@ -272,6 +318,10 @@ class UssdTestingController < ApplicationController
             set_session_identifier_depending_on_bet_selection_selected
             if @status
               case @ussd_string
+                when '0'
+                  back_display_loto_draw_day
+                when '00'
+                  back_home
                 when '1'
                   @bet_selection = "PN"
                   @bet_selection_shortcut = 'pn'
@@ -504,7 +554,7 @@ class UssdTestingController < ApplicationController
 
   def set_session_identifier_depending_on_draw_day_selected
     @status = false
-    if ['1', '2', '3', '4', '5', '6'].include?(@ussd_string)
+    if ['1', '2', '3', '4', '5', '6', '0', '00'].include?(@ussd_string)
       @status = true
     else
       reference_date = "01/01/#{Date.today.year} 19:00:00"
@@ -521,7 +571,7 @@ class UssdTestingController < ApplicationController
 
   def set_session_identifier_depending_on_bet_selection_selected
     @status = false
-    if ['1', '2', '3', '4', '5'].include?(@ussd_string)
+    if ['1', '2', '3', '4', '5', '0', '00'].include?(@ussd_string)
       @status = true
     else
       @rendered_text = %Q[#{@current_ussd_session.draw_day_label}
@@ -785,13 +835,15 @@ Montant débité: #{@current_ussd_session.stake.split('-')[1]} FCFA. Confirmez e
 1- Loto Bonheur
 2- PMU ALR
 3- PMU PLR
-4- SPORTCASH]
+4- SPORTCASH
+0- Retour
+00- Accueil]
       @session_identifier = '11'
   end
 
   def set_session_identifier_depending_on_game_selected
     @status = false
-    if ['1', '2', '3', '4'].include?(@ussd_string)
+    if ['1', '2', '3', '4', '0', '00'].include?(@ussd_string)
       @status = true
     else
       @rendered_text = %Q[
@@ -1106,7 +1158,7 @@ Veuillez saisir votre numéro de compte Paymoney.
               <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:loc="http://www.csapi.org/schema/parlayx/ussd/notification/v1_0/local">
                 <soapenv:Header/>
                 <soapenv:Body>
-                  <loc:notifyUssdReceptionResponse></loc:notifyUssdAbortResponse>
+                  <loc:notifyUssdAbortResponse/>
                 </soapenv:Body>
               </soapenv:Envelope>
             ]
