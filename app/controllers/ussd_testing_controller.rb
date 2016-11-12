@@ -617,7 +617,9 @@ Choisissez votre formule
 3- Fortune #{(-8 + DateTime.parse(reference_date).upto(DateTime.now).count(&:wednesday?)).to_s}
 4- Privilège #{(-16 + DateTime.parse(reference_date).upto(DateTime.now).count(&:thursday?)).to_s}
 5- Solution #{(-17 + DateTime.parse(reference_date).upto(DateTime.now).count(&:friday?)).to_s}
-6- Diamant #{(-8 + DateTime.parse(reference_date).upto(DateTime.now).count(&:saturday?)).to_s}]
+6- Diamant #{(-8 + DateTime.parse(reference_date).upto(DateTime.now).count(&:saturday?)).to_s}
+0- Retour
+00- Accueil]
       @session_identifier = '12'
     end
   end
@@ -633,7 +635,9 @@ Choisissez votre formule
 2- 2N - 2 numéro
 3- 3N - 3 numéro
 4- 4N - 4 numéro
-5- 5N - 5 numéro]
+5- 5N - 5 numéro
+0- Retour
+00- Accueil]
       @session_identifier = '13'
     end
   end
@@ -653,6 +657,9 @@ Choisissez votre formule
 3- Champ réduit
 4- Champ total]
       end
+      @rendered_text << %Q[
+0- Retour
+00- Accueil]
       @session_identifier = '14'
     end
   end
@@ -664,7 +671,9 @@ Choisissez votre formule
 2- 2N - 2 numéro
 3- 3N - 3 numéro
 4- 4N - 4 numéro
-5- 5N - 5 numéro]
+5- 5N - 5 numéro
+0- Retour
+00- Accueil]
     @session_identifier = '13'
   end
 
@@ -679,6 +688,9 @@ Choisissez votre formule
 3- Champ réduit
 4- Champ total]
     end
+    @rendered_text << %Q[
+0- Retour
+00- Accueil]
     @session_identifier = '14'
   end
 
@@ -714,28 +726,29 @@ Choisissez votre formule
       else
         if base_numbers_overflow || invalid_base_numbers_range
           @rendered_text = %Q[#{@error_message}
-    Loto bonheur - #{@current_ussd_session.draw_day_label} #{@current_ussd_session.bet_selection} #{@formula_label}
-    #{@current_ussd_session.bet_selection == 'PN' ? 'Saisissez votre numéro' : "Saisissez vos numéros séparés d'un espace"} (Entre 1 et 90)
-
-    Veuillez entrer votre base.
-    ]
+Loto bonheur - #{@current_ussd_session.draw_day_label} #{@current_ussd_session.bet_selection} #{@formula_label}
+#{@current_ussd_session.bet_selection == 'PN' ? 'Saisissez votre numéro' : "Saisissez vos numéros séparés d'un espace"} (Entre 1 et 90)
+Veuillez entrer votre base.
+0- Retour
+00- Accueil]
           @session_identifier = '15'
         else
           if @current_ussd_session.formula_label != 'Champ total'
             @rendered_text = %Q[Loto bonheur - #{@current_ussd_session.draw_day_label} #{@current_ussd_session.bet_selection} #{@formula_label}
 Base: #{@ussd_string}
 #{@current_ussd_session.bet_selection == 'PN' ? 'Saisissez votre numéro' : "Saisissez vos numéros séparés d'un espace"} (Entre 1 et 90)
-
-    Veuillez entrer votre sélection.
-    ]
+Veuillez entrer votre sélection.
+0- Retour
+00- Accueil]
             @session_identifier = '16'
           else
             @rendered_text = %Q[Loto bonheur - #{@current_ussd_session.draw_day_label} #{@current_ussd_session.bet_selection} #{@formula_label}
 Base: #{@ussd_string}
 #{@current_ussd_session.bet_selection == 'PN' ? 'Saisissez votre numéro' : "Saisissez vos numéros séparés d'un espace"} (Entre 1 et 90)
 
-    Veuillez entrer votre mise de base.
-    ]
+Veuillez entrer votre mise de base.
+0- Retour
+00- Accueil]
             @session_identifier = '17'
           end
         end
