@@ -215,13 +215,109 @@ Veuillez entrer votre sélection.
   end
 
   def back_evaluate_bet
-    @rendered_text = %Q[Vous vous appretez à prendre un pari: #{@current_ussd_session.draw_day_label} #{@current_ussd_session.bet_selection} #{@current_ussd_session.formula_label}
+    @rendered_text = %Q[Veuillez entrer une mise de base valide
+Loto bonheur - #{@current_ussd_session.draw_day_label} #{@current_ussd_session.bet_selection} #{@current_ussd_session.formula_label}
 #{!@current_ussd_session.base_field.blank? ? "Base: " + @current_ussd_session.base_field : ""}
 #{!@current_ussd_session.selection_field.blank? ? "Sélection: " + @current_ussd_session.selection_field : ""}
-Montant débité: #{@current_ussd_session.stake.split('-')[1]} FCFA. Confirmez en saisissant votre code secret PAYMONEY.
+Veuillez entrer votre mise de base.
 0- Retour
 00- Accueil]
-    @session_identifier = '18'
+    @session_identifier = '17'
+  end
+
+  def back_to_plr_get_reunion
+    @rendered_text = %Q[PMU PLR
+Veuillez entrer le numéro de réunion
+#{@reunion_string}
+0- Retour
+00- Accueil]
+    @session_identifier = '20'
+    @current_ussd_session.update_attributes(session_identifier: @session_identifier)
+  end
+
+  def back_to_plr_get_race
+    @reunions = []
+    @reunion_string = ""
+    @race_string = ""
+    races = JSON.parse(@current_ussd_session.get_plr_race_list_response) rescue nil
+    races = races["plr_race_list"] rescue nil
+
+    unless races.blank?
+      races.each do |race|
+        if race["reunion"] == "R" + @current_ussd_session.plr_reunion_number
+          @race_string << "#{race["course"]}" << " #{race["depart"]}" << "
+"
+        end
+      end
+    end
+    @rendered_text = %Q[PMU PLR
+Réunion: R#{@current_ussd_session.plr_reunion_number}
+#{@race_string}
+0- Retour
+00- Accueil]
+    @session_identifier = '21'
+    @current_ussd_session.update_attributes(session_identifier: @session_identifier)
+  end
+
+  def back_to_plr_gaming_menu
+    @rendered_text = %Q[PMU PLR
+Vous avez sélectionné la course: Réunion: R#{@current_ussd_session.plr_reunion_number} - Course: C#{@current_ussd_session.plr_race_number}
+1- Jouer
+2- Détail des courses
+0- Retour
+00- Accueil]
+    @session_identifier = '22'
+    @current_ussd_session.update_attributes(session_identifier: @session_identifier)
+  end
+
+  def back_to_plr_bet_type
+    @rendered_text = %Q[Réunion: R#{@current_ussd_session.plr_reunion_number} - Course: C#{@current_ussd_session.plr_race_number}
+1- Trio
+2- Jumelé gagnant
+3- Jumelé placé
+4- Simple gagnant
+5- Simple placé
+0- Retour
+00- Accueil]
+    @session_identifier = '23'
+    @current_ussd_session.update_attributes(session_identifier: @session_identifier)
+  end
+
+  def back_to_plr_select_formula
+    @rendered_text = %Q[Réunion: R#{@current_ussd_session.plr_reunion_number} - Course: C#{@current_ussd_session.plr_race_number}
+1- Long champ
+2- Champ réduit
+3- Champ total
+0- Retour
+00- Accueil]
+    @session_identifier = '24'
+    @current_ussd_session.update_attributes(session_identifier: @session_identifier)
+  end
+
+  def back_to_plr_select_base
+    @rendered_text = %Q[Réunion: R#{@current_ussd_session.plr_reunion_number} - Course: C#{@current_ussd_session.plr_race_number}
+Saisissez la base
+0- Retour
+00- Accueil]
+    @session_identifier = '25'
+    @current_ussd_session.update_attributes(session_identifier: @session_identifier)
+  end
+
+  def back_to_plr_select_selection
+    @rendered_text = %Q[Réunion: R#{@current_ussd_session.plr_reunion_number} - Course: C#{@current_ussd_session.plr_race_number}
+Saisissez les numéros de vos chevaux en les séparant par un espace
+0- Retour
+00- Accueil]
+    @session_identifier = '26'
+    @current_ussd_session.update_attributes(session_identifier: @session_identifier)
+  end
+
+  def back_to_plr_select_stake
+    @rendered_text = %Q[Le pari n'a pas pu être évalué
+    Réunion: R#{@current_ussd_session.plr_reunion_number} - Course: C#{@current_ussd_session.plr_race_number}
+    Veuillez saisir le nombre de fois que vous souhaitez miser]
+    @session_identifier = '27'
+    @current_ussd_session.update_attributes(session_identifier: @session_identifier)
   end
 
   def back_list_games_menu
@@ -478,6 +574,10 @@ Montant débité: #{@current_ussd_session.stake.split('-')[1]} FCFA. Confirmez e
             set_session_identifier_depending_on_plr_game_selection
             if @status
               case @ussd_string
+                when '0'
+                  back_to_plr_get_race
+                when '00'
+                  back_list_main_menu
                 when '1'
                   # Affichage des types de paris
                   display_plr_bet_type
@@ -488,10 +588,23 @@ Montant débité: #{@current_ussd_session.stake.split('-')[1]} FCFA. Confirmez e
                   @current_ussd_session.update_attributes(session_identifier: @session_identifier, plr_race_details_request: @plr_race_details_request, plr_race_details_response: @plr_race_details_response)
               end
             end
+          when '22-'
+            case @ussd_string
+              when '0'
+                back_to_plr_get_race
+              when '00'
+                back_list_main_menu
+              else
+                display_plr_race_details
+              end
           when '23'
             set_session_identifier_depending_on_plr_bet_type_selected
             if @status
               case @ussd_string
+                when '0'
+                  back_to_plr_gaming_menu
+                when '00'
+                  back_list_main_menu
                 when '1'
                   @plr_bet_type_label = 'Trio'
                   @plr_bet_type_shortcut = 'trio'
@@ -513,12 +626,18 @@ Montant débité: #{@current_ussd_session.stake.split('-')[1]} FCFA. Confirmez e
                   @plr_bet_type_shortcut = 'simple_place'
                   plr_display_plr_selection
               end
-              @current_ussd_session.update_attributes(session_identifier: @session_identifier, plr_bet_type_label: @plr_bet_type_label, plr_bet_type_shortcut: @plr_bet_type_shortcut)
+              unless ['0', '00'].include?(@ussd_string)
+                @current_ussd_session.update_attributes(session_identifier: @session_identifier, plr_bet_type_label: @plr_bet_type_label, plr_bet_type_shortcut: @plr_bet_type_shortcut)
+              end
             end
           when '24'
             set_session_identifier_depending_on_plr_formula_selected
             if @status
               case @ussd_string
+                when '0'
+                  back_to_plr_bet_type
+                when '00'
+                  back_list_main_menu
                 when '1'
                   @plr_formula_label = 'Long champs'
                   @plr_formula_shortcut = 'long_champs'
@@ -533,7 +652,9 @@ Montant débité: #{@current_ussd_session.stake.split('-')[1]} FCFA. Confirmez e
                   plr_display_plr_base
               end
             end
-            @current_ussd_session.update_attributes(session_identifier: @session_identifier, plr_formula_label: @plr_formula_label, plr_formula_shortcut: @plr_formula_shortcut)
+            unless ['0', '00'].include?(@ussd_string)
+              @current_ussd_session.update_attributes(session_identifier: @session_identifier, plr_formula_label: @plr_formula_label, plr_formula_shortcut: @plr_formula_shortcut)
+            end
           when '25'
             plr_selection_or_stake_depending_on_formula
             @current_ussd_session.update_attributes(session_identifier: @session_identifier, plr_base: @ussd_string)
@@ -1688,7 +1809,9 @@ Veuillez saisir votre numéro de compte Paymoney.
 
     @rendered_text = %Q[PMU PLR
 Veuillez entrer le numéro de réunion
-#{@reunion_string}]
+#{@reunion_string}
+0- Retour
+00- Accueil]
     @session_identifier = '20'
   end
 
@@ -1717,29 +1840,42 @@ Veuillez entrer le numéro de réunion
       end
     end
 
-    if @ussd_string.blank?
-      @rendered_text = %Q[PMU PLR
-Veuillez entrer le numéro de réunion
-#{@reunion_string}]
-      @session_identifier = '20'
-    else
-      plr_get_reunions_list
-      @get_plr_race_list_request = @get_plr_race_list_request
-      @get_plr_race_list_response = @get_plr_race_list_response
-
-      if !@reunions.include?('R' + @ussd_string)
-        @rendered_text = %Q[PMU PLR
-Veuillez entrer un numéro de réunion valide
-#{@reunion_string}]
-        @session_identifier = '20'
+    case @ussd_string
+      when '0'
+        back_list_games_menu
+      when '00'
+        back_list_main_menu
       else
-        @rendered_text = %Q[PMU PLR
+        if @ussd_string.blank?
+          @rendered_text = %Q[PMU PLR
+Veuillez entrer le numéro de réunion
+#{@reunion_string}
+0- Retour
+00- Accueil]
+          @session_identifier = '20'
+        else
+          plr_get_reunions_list
+          @get_plr_race_list_request = @get_plr_race_list_request
+          @get_plr_race_list_response = @get_plr_race_list_response
+
+          if !@reunions.include?('R' + @ussd_string)
+            @rendered_text = %Q[PMU PLR
+Veuillez entrer un numéro de réunion valide
+#{@reunion_string}
+0- Retour
+00- Accueil]
+            @session_identifier = '20'
+          else
+            @rendered_text = %Q[PMU PLR
 Veuillez entrer le numéro de course
 Réunion: R#{@ussd_string}
-#{@race_string}]
-        @session_identifier = '21'
+#{@race_string}
+0- Retour
+00- Accueil]
+            @session_identifier = '21'
+          end
+        end
       end
-    end
   end
 
   def plr_game_selection
@@ -1753,6 +1889,12 @@ Réunion: R#{@ussd_string}
 
     unless races.blank?
       races.each do |race|
+        if !@reunions.include?(race["reunion"])
+          @reunions << race["reunion"]
+          @reunion_string << race["reunion"] << "
+"
+        end
+
         if race["reunion"] == "R" + @current_ussd_session.plr_reunion_number
           @race_string << "#{race["course"]}" << " #{race["depart"]}" << "
 "
@@ -1760,44 +1902,57 @@ Réunion: R#{@ussd_string}
       end
     end
 
-    if @ussd_string.blank?
-      @rendered_text = %Q[PMU PLR
-Veuillez entrer le numéro de course valide
+    case @ussd_string
+      when '0'
+        back_to_plr_get_reunion
+      when '00'
+        back_list_main_menu
+      else
+        if @ussd_string.blank?
+          @rendered_text = %Q[PMU PLR
+Veuillez entrer un numéro de course valide
 Réunion: R#{@current_ussd_session.plr_reunion_number}
-#{@race_string}]
-      @session_identifier = '21'
-    else
-      status = false
-      JSON.parse(@current_ussd_session.get_plr_race_list_response)["plr_race_list"].each do |race|
-        if 'R' + @current_ussd_session.plr_reunion_number == race["reunion"] && ('C' + @ussd_string) == race["course"]
-          status = true
+#{@race_string}
+0- Retour
+00- Accueil]
+          @session_identifier = '21'
+        else
+          status = false
+          JSON.parse(@current_ussd_session.get_plr_race_list_response)["plr_race_list"].each do |race|
+            if 'R' + @current_ussd_session.plr_reunion_number == race["reunion"] && ('C' + @ussd_string) == race["course"]
+              status = true
+            end
+          end
+
+          if status == false
+            @rendered_text = %Q[PMU PLR
+Veuillez entrer un numéro de course valide
+Réunion: R#{@current_ussd_session.plr_reunion_number}
+0- Retour
+00- Accueil]
+          @session_identifier = '21'
+          else
+            @rendered_text = %Q[PMU PLR
+Vous avez sélectionné la course: Réunion: R#{@current_ussd_session.plr_reunion_number} - Course: C#{@ussd_string}
+1- Jouer
+2- Détail des courses
+0- Retour
+00- Accueil]
+            @session_identifier = '22'
+          end
         end
       end
-
-      if status == false
-        @rendered_text = %Q[PMU PLR
-Veuillez entrer le numéro de course valide
-Réunion: R#{@current_ussd_session.plr_reunion_number}]
-      @session_identifier = '21'
-      else
-        @rendered_text = %Q[PMU PLR
-Vous avez sélectionné la course: Réunion: R#{@current_ussd_session.plr_reunion_number} - Course: C#{@ussd_string}
-
-1- Jouer
-2- Détail des courses]
-        @session_identifier = '22'
-      end
-    end
   end
 
   def set_session_identifier_depending_on_plr_game_selection
     @status = false
-    if !['1', '2'].include?(@ussd_string)
+    if !['1', '2', '0', '00'].include?(@ussd_string)
       @rendered_text = %Q[PMU PLR
 Vous avez sélectionné la course: Réunion: R#{@current_ussd_session.plr_reunion_number} - Course: C#{@ussd_string}
-
 1- Jouer
-2- Détail des courses]
+2- Détail des courses
+0- Retour
+00- Accueil]
       @session_identifier = '22'
     else
       @status = true
@@ -1818,8 +1973,11 @@ Vous avez sélectionné la course: Réunion: R#{@current_ussd_session.plr_reunio
 Numéro de course: #{race["numero_course"]} - Départ: #{race["depart"]}
 Réunion: #{race["reunion"]} - Course: #{race["course"]}
 Nombre de partants: #{race["Partants"]}
-Détails: #{race["details"]}]
+Détails: #{race["details"]}
+0- Retour
+00- Accueil]
     end
+    @session_identifier = '22-'
   end
 
   def display_plr_bet_type
@@ -1828,13 +1986,15 @@ Détails: #{race["details"]}]
 2- Jumelé gagnant
 3- Jumelé placé
 4- Simple gagnant
-5- Simple placé]
+5- Simple placé
+0- Retour
+00- Accueil]
     @session_identifier = '23'
   end
 
   def set_session_identifier_depending_on_plr_bet_type_selected
     @status = false
-    if ['1', '2', '3', '4', '5'].include?(@ussd_string)
+    if ['1', '2', '3', '4', '5', '0', '00'].include?(@ussd_string)
       @status = true
     else
       @rendered_text = %Q[Réunion: R#{@current_ussd_session.plr_reunion_number} - Course: C#{@current_ussd_session.plr_race_number}
@@ -1842,20 +2002,24 @@ Détails: #{race["details"]}]
 2- Jumelé gagnant
 3- Jumelé placé
 4- Simple gagnant
-5- Simple placé]
+5- Simple placé
+0- Retour
+00- Accueil]
       @session_identifier = '23'
     end
   end
 
   def set_session_identifier_depending_on_plr_formula_selected
     @status = false
-    if ['1', '2', '3'].include?(@ussd_string)
+    if ['1', '2', '3', '0', '00'].include?(@ussd_string)
       @status = true
     else
       @rendered_text = %Q[Réunion: R#{@current_ussd_session.plr_reunion_number} - Course: C#{@current_ussd_session.plr_race_number}
 1- Long champ
 2- Champ réduit
-3- Champ total]
+3- Champ total
+0- Retour
+00- Accueil]
       @session_identifier = '23'
     end
   end
@@ -1864,48 +2028,73 @@ Détails: #{race["details"]}]
     @rendered_text = %Q[Réunion: R#{@current_ussd_session.plr_reunion_number} - Course: C#{@current_ussd_session.plr_race_number}
 1- Long champ
 2- Champ réduit
-3- Champ total]
+3- Champ total
+0- Retour
+00- Accueil]
     @session_identifier = '24'
   end
 
   def plr_display_plr_selection
     @rendered_text = %Q[Réunion: R#{@current_ussd_session.plr_reunion_number} - Course: C#{@current_ussd_session.plr_race_number}
-Saisissez les numéros de vos chevaux en les séparant par un espace]
+Saisissez les numéros de vos chevaux en les séparant par un espace
+0- Retour
+00- Accueil]
     @session_identifier = '26'
   end
 
   def plr_display_plr_base
     @rendered_text = %Q[Réunion: R#{@current_ussd_session.plr_reunion_number} - Course: C#{@current_ussd_session.plr_race_number}
-Saisissez la base]
+Saisissez la base
+0- Retour
+00- Accueil]
     @session_identifier = '25'
   end
 
   def plr_select_number_of_times
     @ussd_string = @ussd_string
-    if plr_valid_horses_numbers
-      if plr_right_selection
-        if plr_numbers_in_selection_not_in_base
-          @rendered_text = %Q[Réunion: R#{@current_ussd_session.plr_reunion_number} - Course: C#{@current_ussd_session.plr_race_number}
-Veuillez saisir le nombre de fois que vous souhaitez miser]
-          @session_identifier = '27'
+    case @ussd_string
+      when '0'
+        if @current_ussd_session.plr_formula_shortcut == 'champ_reduit'
+          back_to_plr_select_formula
+        else
+          back_to_plr_select_base
+        end
+      when '00'
+        back_list_main_menu
+      else
+        if plr_valid_horses_numbers
+          if plr_right_selection
+            if plr_numbers_in_selection_not_in_base
+              @rendered_text = %Q[Réunion: R#{@current_ussd_session.plr_reunion_number} - Course: C#{@current_ussd_session.plr_race_number}
+Veuillez saisir le nombre de fois que vous souhaitez miser
+0- Retour
+00- Accueil]
+              @session_identifier = '27'
+            else
+              @rendered_text = %Q[#{@error_message}
+Réunion: R#{@current_ussd_session.plr_reunion_number} - Course: C#{@current_ussd_session.plr_race_number}
+Saisissez les numéros de vos chevaux en les séparant par un espace
+0- Retour
+00- Accueil]
+              @session_identifier = '26'
+            end
+          else
+            @rendered_text = %Q[#{@error_message}
+Réunion: R#{@current_ussd_session.plr_reunion_number} - Course: C#{@current_ussd_session.plr_race_number}
+Saisissez les numéros de vos chevaux en les séparant par un espace
+0- Retour
+00- Accueil]
+            @session_identifier = '26'
+          end
         else
           @rendered_text = %Q[#{@error_message}
 Réunion: R#{@current_ussd_session.plr_reunion_number} - Course: C#{@current_ussd_session.plr_race_number}
-Saisissez les numéros de vos chevaux en les séparant par un espace]
+Saisissez les numéros de vos chevaux en les séparant par un espace
+0- Retour
+00- Accueil]
           @session_identifier = '26'
         end
-      else
-        @rendered_text = %Q[#{@error_message}
-Réunion: R#{@current_ussd_session.plr_reunion_number} - Course: C#{@current_ussd_session.plr_race_number}
-Saisissez les numéros de vos chevaux en les séparant par un espace]
-        @session_identifier = '26'
       end
-    else
-      @rendered_text = %Q[#{@error_message}
-Réunion: R#{@current_ussd_session.plr_reunion_number} - Course: C#{@current_ussd_session.plr_race_number}
-Saisissez les numéros de vos chevaux en les séparant par un espace]
-      @session_identifier = '26'
-    end
   end
 
   def plr_valid_horses_numbers
@@ -1984,151 +2173,196 @@ Saisissez les numéros de vos chevaux en les séparant par un espace]
 
   # Controler les numéros de base
   def plr_selection_or_stake_depending_on_formula
-    if @current_ussd_session.plr_formula_shortcut == 'champ_reduit'
-      @rendered_text = %Q[Réunion: R#{@current_ussd_session.plr_reunion_number} - Course: C#{@current_ussd_session.plr_race_number}
-Saisissez les numéros de vos chevaux en les séparant par un espace]
-      @session_identifier = '26'
-    else
-      @rendered_text = %Q[Réunion: R#{@current_ussd_session.plr_reunion_number} - Course: C#{@current_ussd_session.plr_race_number}
-Veuillez saisir le nombre de fois que vous souhaitez miser]
-      @session_identifier = '27'
-    end
+    case @ussd_string
+      when '0'
+        back_to_plr_select_formula
+      when '00'
+        back_list_main_menu
+      else
+        if @current_ussd_session.plr_formula_shortcut == 'champ_reduit'
+          @rendered_text = %Q[Réunion: R#{@current_ussd_session.plr_reunion_number} - Course: C#{@current_ussd_session.plr_race_number}
+Saisissez les numéros de vos chevaux en les séparant par un espace
+0- Retour
+00- Accueil]
+          @session_identifier = '26'
+        else
+          @rendered_text = %Q[Réunion: R#{@current_ussd_session.plr_reunion_number} - Course: C#{@current_ussd_session.plr_race_number}
+Veuillez saisir le nombre de fois que vous souhaitez miser
+0- Retour
+00- Accueil]
+          @session_identifier = '27'
+        end
+      end
   end
 
   def plr_evaluate_bet
     @error_message = ''
-    if @ussd_string.blank? || not_a_number?(@ussd_string)
-      @rendered_text = %Q[Réunion: R#{@current_ussd_session.plr_reunion_number} - Course: C#{@current_ussd_session.plr_race_number}
-Veuillez saisir le nombre de fois que vous souhaitez miser]
-      @session_identifier = '27'
-    else
-      plr_set_bet_code_and_modifier
-      @current_ussd_session = @current_ussd_session
-      @plr_evaluate_bet_request = Parameter.first.gateway_url + "/ail/pmu/api/3c9342cf06/bet/query"
-      @request_body = %Q[
-                    {
-                      "bet_code":"#{@bet_code}",
-                      "bet_modifier":"#{@bet_modifier}",
-                      "selector1":"#{@current_ussd_session.plr_reunion_number}",
-                      "selector2":"#{@current_ussd_session.plr_race_number}",
-                      "repeats":"#{@ussd_string}",
-                      "special_entries":"#{@current_ussd_session.plr_base.blank? ? '' : @current_ussd_session.plr_base.split.join(',')}",
-                      "normal_entries":"#{@current_ussd_session.plr_selection.blank? ? '' : @current_ussd_session.plr_selection.split.join(',')}"
-                    }
-                  ]
-      @plr_evaluate_bet_response = Typhoeus::Request.new(
-        @plr_evaluate_bet_request,
-        method: :post,
-        body: @request_body
-      )
-      @plr_evaluate_bet_response.run
-      @plr_evaluate_bet_response = @plr_evaluate_bet_response.response.body rescue nil
-      json_object = JSON.parse(@plr_evaluate_bet_response) rescue nil
-
-      if json_object.blank?
-        @rendered_text = %Q[Le pari n'a pas pu être évalué
-Réunion: R#{@current_ussd_session.plr_reunion_number} - Course: C#{@current_ussd_session.plr_race_number}
-Veuillez saisir le nombre de fois que vous souhaitez miser]
-        @session_identifier = '27'
+    case @ussd_string
+      when '0'
+        back_to_plr_select_selection
+      when '00'
+        back_list_main_menu
       else
-        if json_object["error"].blank?
-          @rendered_text = %Q[Vous vous apprêtez à prendre un pari PMU PLR
-R#{@current_ussd_session.plr_reunion_number}C#{@current_ussd_session.plr_race_number}
-#{@current_ussd_session.plr_bet_type_label} > #{@current_ussd_session.plr_formula_label}
-#{@current_ussd_session.plr_base.blank? ? '' : "Base: " + @current_ussd_session.plr_base}
-#{@current_ussd_session.plr_selection.blank? ? '' : "Sélection: " + @current_ussd_session.plr_selection}
-Votre pari est estimé à #{json_object["bet"]["bet_cost_amount"]} FCFA.
-Confirmez en saisissant votre code secret]
-          @bet_cost_amount = json_object["bet"]["bet_cost_amount"]
-          @session_identifier = '28'
-        else
-          @rendered_text = %Q[Le pari n'a pas pu être évalué
-Réunion: R#{@current_ussd_session.plr_reunion_number} - Course: C#{@current_ussd_session.plr_race_number}
-Veuillez saisir le nombre de fois que vous souhaitez miser]
+        if @ussd_string.blank? || not_a_number?(@ussd_string)
+          @rendered_text = %Q[Réunion: R#{@current_ussd_session.plr_reunion_number} - Course: C#{@current_ussd_session.plr_race_number}
+    Veuillez saisir le nombre de fois que vous souhaitez miser
+    0- Retour
+    00- Accueil]
           @session_identifier = '27'
-        end
-      end
-    end
-  end
-
-  def plr_place_bet
-    if @ussd_string.blank?
-      @rendered_text = %Q[Vous vous apprêtez à prendre un pari PMU PLR
-R#{@current_ussd_session.plr_reunion_number}C#{@current_ussd_session.plr_race_number}
-#{@current_ussd_session.plr_bet_type_label} > #{@current_ussd_session.plr_formula_label}
-#{@current_ussd_session.plr_base.blank? ? '' : "Base: " + @current_ussd_session.plr_base}
-#{@current_ussd_session.plr_selection.blank? ? '' : "Sélection: " + @current_ussd_session.plr_selection}
-Votre pari est estimé à #{@current_ussd_session.bet_cost_amount} FCFA.
-Confirmez en saisissant votre code secret]
-      @session_identifier = '28'
-    else
-      @get_gamer_id_request = Parameter.first.gateway_url + "/8ba869a7a9c59f3a0/api/users/gamer_id/#{@account_profile.msisdn}"
-      @get_gamer_id_response = Typhoeus.get(@get_gamer_id_request, connecttimeout: 30)
-      if @get_gamer_id_response.body.blank?
-        @rendered_text = %Q[Votre identifiant parieur n'a pas pu être récupéré.
-R#{@current_ussd_session.plr_reunion_number}C#{@current_ussd_session.plr_race_number}
-#{@current_ussd_session.plr_bet_type_label} > #{@current_ussd_session.plr_formula_label}
-#{@current_ussd_session.plr_base.blank? ? '' : "Base: " + @current_ussd_session.plr_base}
-#{@current_ussd_session.plr_selection.blank? ? '' : "Sélection: " + @current_ussd_session.plr_selection}
-Votre pari est estimé à #{@current_ussd_session.bet_cost_amount} FCFA.
-Confirmez en saisissant votre code secret]
-        @session_identifier = '28'
-      else
-        @plr_place_bet_request = Parameter.first.gateway_url + "/ail/pmu/api/dik749742e/bet/place/#{@get_gamer_id_response.body}/#{@account_profile.paymoney_account_number}/#{@ussd_string}"
-        plr_set_bet_code_and_modifier
-
-        @body = %Q[
-                    {
-                      "bet_code":"#{@bet_code}",
-                      "bet_modifier":"#{@bet_modifier}",
-                      "selector1":"#{@current_ussd_session.plr_reunion_number}",
-                      "selector2":"#{@current_ussd_session.plr_race_number}",
-                      "repeats":"#{@current_ussd_session.plr_number_of_times}",
-                      "special_entries":"#{@current_ussd_session.plr_base.blank? ? '' : @current_ussd_session.plr_base.split.join(',') rescue ''}",
-                      "normal_entries":"#{@current_ussd_session.plr_selection.blank? ? '' : @current_ussd_session.plr_selection.split.join(',') rescue ''}",
-                      "race_details":"#{JSON.parse(@current_ussd_session.plr_race_details_response)["plr_race_list"].first["details"] rescue ''}",
-                      "begin_date":"#{ Date.today.strftime('%d-%m-%Y') + ' ' + (JSON.parse(@current_ussd_session.plr_race_details_response)["plr_race_list"].first["depart"].gsub('H', ':') rescue '') + ':00'}",
-                      "end_date":""
-                    }
-                  ]
-        request = Typhoeus::Request.new(
-        @plr_place_bet_request,
-        method: :post,
-        body: @body
-        )
-        request.run
-        @plr_place_bet_response = request.response
-        json_object = JSON.parse(@plr_place_bet_response.body) rescue nil
-        if json_object.blank?
-          @rendered_text = %Q[Le pari n'a pas pu être placé.
-R#{@current_ussd_session.plr_reunion_number}C#{@current_ussd_session.plr_race_number}
-#{@current_ussd_session.plr_bet_type_label} > #{@current_ussd_session.plr_formula_label}
-#{@current_ussd_session.plr_base.blank? ? '' : "Base: " + @current_ussd_session.plr_base}
-#{@current_ussd_session.plr_selection.blank? ? '' : "Sélection: " + @current_ussd_session.plr_selection}
-Votre pari est estimé à #{@current_ussd_session.bet_cost_amount} FCFA.
-Confirmez en saisissant votre code secret]
-          @session_identifier = '28'
         else
-          if json_object["error"].blank?
-            status = true
-            @rendered_text = %Q[FELICITATIONS, votre pari a bien été enregistré.
-N° de ticket: #{json_object["bet"]["ticket_number"]}
-REF: #{json_object["bet"]["ref_number"]}
-PMU, PARIE  POUR GAGNER!]
-            @session_identifier = '29'
+          plr_set_bet_code_and_modifier
+          @current_ussd_session = @current_ussd_session
+          @plr_evaluate_bet_request = Parameter.first.gateway_url + "/ail/pmu/api/3c9342cf06/bet/query"
+          @request_body = %Q[
+                        {
+                          "bet_code":"#{@bet_code}",
+                          "bet_modifier":"#{@bet_modifier}",
+                          "selector1":"#{@current_ussd_session.plr_reunion_number}",
+                          "selector2":"#{@current_ussd_session.plr_race_number}",
+                          "repeats":"#{@ussd_string}",
+                          "special_entries":"#{@current_ussd_session.plr_base.blank? ? '' : @current_ussd_session.plr_base.split.join(',')}",
+                          "normal_entries":"#{@current_ussd_session.plr_selection.blank? ? '' : @current_ussd_session.plr_selection.split.join(',')}"
+                        }
+                      ]
+          @plr_evaluate_bet_response = Typhoeus::Request.new(
+            @plr_evaluate_bet_request,
+            method: :post,
+            body: @request_body
+          )
+          @plr_evaluate_bet_response.run
+          @plr_evaluate_bet_response = @plr_evaluate_bet_response.response.body rescue nil
+          json_object = JSON.parse(@plr_evaluate_bet_response) rescue nil
+
+          if json_object.blank?
+            @rendered_text = %Q[Le pari n'a pas pu être évalué
+    Réunion: R#{@current_ussd_session.plr_reunion_number} - Course: C#{@current_ussd_session.plr_race_number}
+    Veuillez saisir le nombre de fois que vous souhaitez miser]
+            @session_identifier = '27'
           else
-            @rendered_text = %Q[Le pari n'a pas pu être placé.
-R#{@current_ussd_session.plr_reunion_number}C#{@current_ussd_session.plr_race_number}
-#{@current_ussd_session.plr_bet_type_label} > #{@current_ussd_session.plr_formula_label}
-#{@current_ussd_session.plr_base.blank? ? '' : "Base: " + @current_ussd_session.plr_base}
-#{@current_ussd_session.plr_selection.blank? ? '' : "Sélection: " + @current_ussd_session.plr_selection}
-Votre pari est estimé à #{@current_ussd_session.bet_cost_amount} FCFA.
-Confirmez en saisissant votre code secret]
-            @session_identifier = '28'
+            if json_object["error"].blank?
+              @rendered_text = %Q[Vous vous apprêtez à prendre un pari PMU PLR
+    R#{@current_ussd_session.plr_reunion_number}C#{@current_ussd_session.plr_race_number}
+    #{@current_ussd_session.plr_bet_type_label} > #{@current_ussd_session.plr_formula_label}
+    #{@current_ussd_session.plr_base.blank? ? '' : "Base: " + @current_ussd_session.plr_base}
+    #{@current_ussd_session.plr_selection.blank? ? '' : "Sélection: " + @current_ussd_session.plr_selection}
+    Votre pari est estimé à #{json_object["bet"]["bet_cost_amount"]} FCFA.
+    Confirmez en saisissant votre code secret]
+              @bet_cost_amount = json_object["bet"]["bet_cost_amount"]
+              @session_identifier = '28'
+            else
+              @rendered_text = %Q[Le pari n'a pas pu être évalué
+    Réunion: R#{@current_ussd_session.plr_reunion_number} - Course: C#{@current_ussd_session.plr_race_number}
+    Veuillez saisir le nombre de fois que vous souhaitez miser]
+              @session_identifier = '27'
+            end
           end
         end
       end
-    end
+  end
+
+  def plr_place_bet
+    case @ussd_string
+      when '0'
+        back_to_plr_select_stake
+      when '00'
+        back_list_main_menu
+      else
+        if @ussd_string.blank?
+          @rendered_text = %Q[Vous vous apprêtez à prendre un pari PMU PLR
+    R#{@current_ussd_session.plr_reunion_number}C#{@current_ussd_session.plr_race_number}
+    #{@current_ussd_session.plr_bet_type_label} > #{@current_ussd_session.plr_formula_label}
+    #{@current_ussd_session.plr_base.blank? ? '' : "Base: " + @current_ussd_session.plr_base}
+    #{@current_ussd_session.plr_selection.blank? ? '' : "Sélection: " + @current_ussd_session.plr_selection}
+    Votre pari est estimé à #{@current_ussd_session.bet_cost_amount} FCFA.
+    Confirmez en saisissant votre code secret]
+          @session_identifier = '28'
+        else
+          @get_gamer_id_request = Parameter.first.gateway_url + "/8ba869a7a9c59f3a0/api/users/gamer_id/#{@account_profile.msisdn}"
+          @get_gamer_id_response = Typhoeus.get(@get_gamer_id_request, connecttimeout: 30)
+          if @get_gamer_id_response.body.blank?
+            @rendered_text = %Q[Votre identifiant parieur n'a pas pu être récupéré.
+    R#{@current_ussd_session.plr_reunion_number}C#{@current_ussd_session.plr_race_number}
+    #{@current_ussd_session.plr_bet_type_label} > #{@current_ussd_session.plr_formula_label}
+    #{@current_ussd_session.plr_base.blank? ? '' : "Base: " + @current_ussd_session.plr_base}
+    #{@current_ussd_session.plr_selection.blank? ? '' : "Sélection: " + @current_ussd_session.plr_selection}
+    Votre pari est estimé à #{@current_ussd_session.bet_cost_amount} FCFA.
+    Confirmez en saisissant votre code secret]
+            @session_identifier = '28'
+          else
+            @plr_place_bet_request = Parameter.first.gateway_url + "/ail/pmu/api/dik749742e/bet/place/#{@get_gamer_id_response.body}/#{@account_profile.paymoney_account_number}/#{@ussd_string}"
+            plr_set_bet_code_and_modifier
+
+            @body = %Q[
+                        {
+                          "bet_code":"#{@bet_code}",
+                          "bet_modifier":"#{@bet_modifier}",
+                          "selector1":"#{@current_ussd_session.plr_reunion_number}",
+                          "selector2":"#{@current_ussd_session.plr_race_number}",
+                          "repeats":"#{@current_ussd_session.plr_number_of_times}",
+                          "special_entries":"#{@current_ussd_session.plr_base.blank? ? '' : @current_ussd_session.plr_base.split.join(',') rescue ''}",
+                          "normal_entries":"#{@current_ussd_session.plr_selection.blank? ? '' : @current_ussd_session.plr_selection.split.join(',') rescue ''}",
+                          "race_details":"#{JSON.parse(@current_ussd_session.plr_race_details_response)["plr_race_list"].first["details"] rescue ''}",
+                          "begin_date":"#{ Date.today.strftime('%d-%m-%Y') + ' ' + (JSON.parse(@current_ussd_session.plr_race_details_response)["plr_race_list"].first["depart"].gsub('H', ':') rescue '') + ':00'}",
+                          "end_date":""
+                        }
+                      ]
+            request = Typhoeus::Request.new(
+            @plr_place_bet_request,
+            method: :post,
+            body: @body
+            )
+            request.run
+            @plr_place_bet_response = request.response
+            json_object = JSON.parse(@plr_place_bet_response.body) rescue nil
+            if json_object.blank?
+              @rendered_text = %Q[Le pari n'a pas pu être placé.
+    R#{@current_ussd_session.plr_reunion_number}C#{@current_ussd_session.plr_race_number}
+    #{@current_ussd_session.plr_bet_type_label} > #{@current_ussd_session.plr_formula_label}
+    #{@current_ussd_session.plr_base.blank? ? '' : "Base: " + @current_ussd_session.plr_base}
+    #{@current_ussd_session.plr_selection.blank? ? '' : "Sélection: " + @current_ussd_session.plr_selection}
+    Votre pari est estimé à #{@current_ussd_session.bet_cost_amount} FCFA.
+    Confirmez en saisissant votre code secret]
+              @session_identifier = '28'
+            else
+              if json_object["error"].blank?
+                status = true
+                @reunions = []
+                @reunion_string = ""
+                races = JSON.parse(@current_ussd_session.get_plr_race_list_response) rescue nil
+                races = races["plr_race_list"] rescue nil
+
+                unless races.blank?
+                  races.each do |race|
+                    if !@reunions.include?(race["reunion"])
+                      @reunions << race["reunion"]
+                      @reunion_string << race["reunion"] << "
+"
+                    end
+                  end
+                end
+                @rendered_text = %Q[FELICITATIONS, votre pari a bien été enregistré.
+N° de ticket: #{json_object["bet"]["ticket_number"]}
+REF: #{json_object["bet"]["ref_number"]}
+PMU, PARIE  POUR GAGNER!
+Veuillez entrer le numéro de réunion
+#{@reunion_string}
+0- Retour
+00- Accueil]
+                @session_identifier = '20'
+              else
+                @rendered_text = %Q[Le pari n'a pas pu être placé.
+    R#{@current_ussd_session.plr_reunion_number}C#{@current_ussd_session.plr_race_number}
+    #{@current_ussd_session.plr_bet_type_label} > #{@current_ussd_session.plr_formula_label}
+    #{@current_ussd_session.plr_base.blank? ? '' : "Base: " + @current_ussd_session.plr_base}
+    #{@current_ussd_session.plr_selection.blank? ? '' : "Sélection: " + @current_ussd_session.plr_selection}
+    Votre pari est estimé à #{@current_ussd_session.bet_cost_amount} FCFA.
+    Confirmez en saisissant votre code secret]
+                @session_identifier = '28'
+              end
+            end
+          end
+        end
+      end
   end
 
   def plr_set_bet_code_and_modifier
