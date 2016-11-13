@@ -164,12 +164,13 @@ class UssdTestingController < ApplicationController
 
   def back_display_bet_selection
     @rendered_text = %Q[#{@current_ussd_session.draw_day_label}
-
 1- PN - 1 numéro
 2- 2N - 2 numéro
 3- 3N - 3 numéro
 4- 4N - 4 numéro
-5- 5N - 5 numéro]
+5- 5N - 5 numéro
+0- Retour
+00- Accueil]
     @session_identifier = '13'
     @current_ussd_session.update_attributes(session_identifier: @session_identifier)
   end
@@ -185,15 +186,42 @@ Choisissez votre formule
 3- Champ réduit
 4- Champ total]
     end
-    @session_identifier = '14'
     @rendered_text << %Q[
 0- Retour
 00- Accueil]
+    @session_identifier = '14'
     @current_ussd_session.update_attributes(session_identifier: @session_identifier)
   end
 
   def back_display_base_selection
+    @rendered_text = %Q[Loto bonheur - #{@current_ussd_session.draw_day_label} #{@current_ussd_session.bet_selection} #{@formula_label}
+#{@current_ussd_session.bet_selection == 'PN' ? 'Saisissez votre numéro' : "Saisissez vos numéros séparés d'un espace"} (Entre 1 et 90)
+Veuillez entrer votre base.
+0- Retour
+00- Accueil]
+    @session_identifier = '15'
+    @current_ussd_session.update_attributes(session_identifier: @session_identifier)
+  end
 
+  def back_display_selection
+    @rendered_text = %Q[Loto bonheur - #{@current_ussd_session.draw_day_label} #{@current_ussd_session.bet_selection} #{@current_ussd_session.formula_label}
+ #{!@current_ussd_session.base_field.blank? ? "Base: " + @current_ussd_session.base_field : ""}
+ #{@current_ussd_session.bet_selection == 'PN' ? 'Saisissez votre numéro' : "Saisissez vos numéros séparés d'un espace"} (Entre 1 et 90)
+Veuillez entrer votre sélection.
+0- Retour
+00- Accueil]
+    @session_identifier = '16'
+    @current_ussd_session.update_attributes(session_identifier: @session_identifier)
+  end
+
+  def back_evaluate_bet
+    @rendered_text = %Q[Vous vous appretez à prendre un pari: #{@current_ussd_session.draw_day_label} #{@current_ussd_session.bet_selection} #{@current_ussd_session.formula_label}
+#{!@current_ussd_session.base_field.blank? ? "Base: " + @current_ussd_session.base_field : ""}
+#{!@current_ussd_session.selection_field.blank? ? "Sélection: " + @current_ussd_session.selection_field : ""}
+Montant débité: #{@current_ussd_session.stake.split('-')[1]} FCFA. Confirmez en saisissant votre code secret PAYMONEY.
+0- Retour
+00- Accueil]
+    @session_identifier = '18'
   end
 
   def back_list_games_menu
@@ -316,7 +344,7 @@ Choisissez votre formule
                 when '0'
                   back_list_main_menu
                 when '00'
-                  back_home
+                  back_list_main_menu
                 when '1'
                   loto_display_draw_day
                   @current_ussd_session.update_attributes(session_identifier: @session_identifier)
@@ -339,7 +367,7 @@ Choisissez votre formule
                 when '0'
                   back_list_games_menu
                 when '00'
-                  back_home
+                  back_list_main_menu
                 when '1'
                   @draw_day_label = "Etoile #{(-16 + DateTime.parse(reference_date).upto(DateTime.now).count(&:monday?)).to_s}"
                   @draw_day_shortcut = 'etoile'
@@ -359,8 +387,10 @@ Choisissez votre formule
                   @draw_day_label = "Diamant #{(-8 + DateTime.parse(reference_date).upto(DateTime.now).count(&:saturday?)).to_s}"
                   @draw_day_shortcut = 'diamant'
               end
-              loto_display_bet_selection
-              @current_ussd_session.update_attributes(session_identifier: @session_identifier, draw_day_label: @draw_day_label, draw_day_shortcut: @draw_day_shortcut)
+              unless ['0', '00'].include?(@ussd_string)
+                loto_display_bet_selection
+                @current_ussd_session.update_attributes(session_identifier: @session_identifier, draw_day_label: @draw_day_label, draw_day_shortcut: @draw_day_shortcut)
+              end
             end
           # Choix de la sélection
           when '13'
@@ -370,7 +400,7 @@ Choisissez votre formule
                 when '0'
                   back_display_loto_draw_day
                 when '00'
-                  back_home
+                  back_list_main_menu
                 when '1'
                   @bet_selection = "PN"
                   @bet_selection_shortcut = 'pn'
@@ -387,8 +417,10 @@ Choisissez votre formule
                   @bet_selection = "5N"
                   @bet_selection_shortcut = '5n'
               end
-              loto_display_formula_selection
-              @current_ussd_session.update_attributes(session_identifier: @session_identifier, bet_selection: @bet_selection, bet_selection_shortcut: @bet_selection_shortcut)
+              unless ['0', '00'].include?(@ussd_string)
+                loto_display_formula_selection
+                @current_ussd_session.update_attributes(session_identifier: @session_identifier, bet_selection: @bet_selection, bet_selection_shortcut: @bet_selection_shortcut)
+              end
             end
           when '14'
             set_session_identifier_depending_on_formula_selected
@@ -397,7 +429,7 @@ Choisissez votre formule
                 when '0'
                   back_display_bet_selection
                 when '00'
-                  back_home
+                  back_list_main_menu
                 when '1'
                   @formula_label = "Simple"
                   @formula_shortcut = 'simple'
@@ -411,8 +443,10 @@ Choisissez votre formule
                   @formula_label = "Champ total"
                   @formula_shortcut = 'champ_total'
               end
-              loto_display_horse_selection_fields
-              @current_ussd_session.update_attributes(session_identifier: @session_identifier, formula_label: @formula_label, formula_shortcut: @formula_shortcut)
+              unless ['0', '00'].include?(@ussd_string)
+                loto_display_horse_selection_fields
+                @current_ussd_session.update_attributes(session_identifier: @session_identifier, formula_label: @formula_label, formula_shortcut: @formula_shortcut)
+              end
             end
           # Saisie de la base au loto
           when '15'
@@ -431,7 +465,7 @@ Choisissez votre formule
             # Prise du pari à la saisie du mot de passe Paymoney
             @account_profile = AccountProfile.find_by_msisdn(@msisdn[-8,8])
             loto_place_bet
-            @current_ussd_session.update_attributes(session_identifier: @session_identifier, loto_bet_paymoney_password: @ussd_string, loto_place_bet_url: @loto_place_bet_url + @request_body, loto_place_bet_response: @loto_place_bet_response.body, get_gamer_id_request: @get_gamer_id_request, get_gamer_id_response: @get_gamer_id_response.body)
+            @current_ussd_session.update_attributes(session_identifier: @session_identifier, loto_bet_paymoney_password: @ussd_string, loto_place_bet_url: @loto_place_bet_url.to_s + @request_body.to_s, loto_place_bet_response: (@loto_place_bet_response.body rescue nil), get_gamer_id_request: @get_gamer_id_request, get_gamer_id_response: (@get_gamer_id_response.body rescue nil))
           when '20'
             # Vérification du numéro de réunion entré et sélection de la course
             plr_get_race
@@ -630,7 +664,6 @@ Choisissez votre formule
       @status = true
     else
       @rendered_text = %Q[#{@current_ussd_session.draw_day_label}
-
 1- PN - 1 numéro
 2- 2N - 2 numéro
 3- 3N - 3 numéro
@@ -644,12 +677,11 @@ Choisissez votre formule
 
   def set_session_identifier_depending_on_formula_selected
     @status = false
-    if ['1', '2', '3', '4'].include?(@ussd_string)
+    if ['1', '2', '3', '4', '0', '00'].include?(@ussd_string)
       @status = true
     else
       @rendered_text = %Q[Loto bonheur - #{@current_ussd_session.bet_selection}
 Choisissez votre formule
-
 1- Simple
 2- Perm]
       if @bet_selection != 'PN'
@@ -666,7 +698,6 @@ Choisissez votre formule
 
   def loto_display_bet_selection
     @rendered_text = %Q[#{@draw_day_label}
-
 1- PN - 1 numéro
 2- 2N - 2 numéro
 3- 3N - 3 numéro
@@ -722,7 +753,7 @@ Choisissez votre formule
       when '0'
         back_display_formula_selection
       when '00'
-        back_home
+        back_list_main_menu
       else
         if base_numbers_overflow || invalid_base_numbers_range
           @rendered_text = %Q[#{@error_message}
@@ -766,24 +797,24 @@ Veuillez entrer votre mise de base.
           back_display_formula_selection
         end
       when '00'
-        back_home
+        back_list_main_menu
       else
         if selection_numbers_overflow || invalid_selection_numbers_range
           @rendered_text = %Q[#{@error_message}
-    Loto bonheur - #{@current_ussd_session.draw_day_label} #{@current_ussd_session.bet_selection} #{@current_ussd_session.formula_label}
-    #{!@current_ussd_session.base_field.blank? ? "Base: " + @current_ussd_session.base_field : ""}
-    #{@current_ussd_session.bet_selection == 'PN' ? 'Saisissez votre numéro' : "Saisissez vos numéros séparés d'un espace"} (Entre 1 et 90)
-
-    Veuillez entrer votre sélection.
-    ]
+Loto bonheur - #{@current_ussd_session.draw_day_label} #{@current_ussd_session.bet_selection} #{@current_ussd_session.formula_label}
+ #{!@current_ussd_session.base_field.blank? ? "Base: " + @current_ussd_session.base_field : ""}
+ #{@current_ussd_session.bet_selection == 'PN' ? 'Saisissez votre numéro' : "Saisissez vos numéros séparés d'un espace"} (Entre 1 et 90)
+Veuillez entrer votre sélection.
+0- Retour
+00- Accueil]
           @session_identifier = '16'
         else
           @rendered_text = %Q[Loto bonheur - #{@current_ussd_session.draw_day_label} #{@current_ussd_session.bet_selection} #{@current_ussd_session.formula_label}
-    #{!@current_ussd_session.base_field.blank? ? "Base: " + @current_ussd_session.base_field : ""}
-    Sélection: #{@ussd_string}
-
-    Veuillez entrer votre mise de base.
-    ]
+#{!@current_ussd_session.base_field.blank? ? "Base: " + @current_ussd_session.base_field : ""}
+Sélection: #{@ussd_string}
+Veuillez entrer votre mise de base.
+0- Retour
+00- Accueil]
           @selection_field = @ussd_string
           @session_identifier = '17'
         end
@@ -793,105 +824,140 @@ Veuillez entrer votre mise de base.
   def loto_evaluate_bet
     @current_ussd_session = @current_ussd_session
     @ussd_string = @ussd_string
-    if @ussd_string.blank? || not_a_number?(@ussd_string)
-      @rendered_text = %Q[Veuillez entrer une mise de base valide
+    case @ussd_string
+      when '0'
+        back_display_selection
+      when '00'
+        back_list_main_menu
+      else
+        if @ussd_string.blank? || not_a_number?(@ussd_string)
+          @rendered_text = %Q[Veuillez entrer une mise de base valide
 Loto bonheur - #{@current_ussd_session.draw_day_label} #{@current_ussd_session.bet_selection} #{@current_ussd_session.formula_label}
 #{!@current_ussd_session.base_field.blank? ? "Base: " + @current_ussd_session.base_field : ""}
 #{!@current_ussd_session.selection_field.blank? ? "Sélection: " + @current_ussd_session.selection_field : ""}
-
-Veuillez entrer votre mise de base.]
-      @session_identifier = '17'
-    else
-      set_repeats
-      @repeats = @repeats
-      if @repeats > 100000 || @repeats < 100
-        @rendered_text = %Q[Votre pari est estimé à: #{@repeats} FCFA. Le montant de votre pari doit être compris entre 100 et 100 000 FCFA.
-Loto bonheur - #{@current_ussd_session.draw_day_label} #{@current_ussd_session.bet_selection} #{@current_ussd_session.formula_label}
-#{!@current_ussd_session.base_field.blank? ? "Base: " + @current_ussd_session.base_field : ""}
-#{!@current_ussd_session.selection_field.blank? ? "Sélection: " + @current_ussd_session.selection_field : ""}
-
-Veuillez entrer votre mise de base.]
-        @session_identifier = '17'
-      else
-        @rendered_text = %Q[Vous vous appretez à prendre un pari: #{@current_ussd_session.draw_day_label} #{@current_ussd_session.bet_selection} #{@current_ussd_session.formula_label}
-#{!@current_ussd_session.base_field.blank? ? "Base: " + @current_ussd_session.base_field : ""}
-#{!@current_ussd_session.selection_field.blank? ? "Sélection: " + @current_ussd_session.selection_field : ""}
-Montant débité: #{@repeats} FCFA. Confirmez en saisissant votre code secret PAYMONEY.]
-        @session_identifier = '18'
-      end
-    end
-  end
-
-  def loto_place_bet
-    @current_ussd_session = @current_ussd_session
-    if @ussd_string.length != 4 || not_a_number?(@ussd_string)
-      @rendered_text = %Q[Veuillez entrer un code PAYMONEY valide
-Vous vous appretez à prendre un pari: #{@current_ussd_session.draw_day_label} #{@current_ussd_session.bet_selection} #{@current_ussd_session.formula_label}
-#{!@current_ussd_session.base_field.blank? ? "Base: " + @current_ussd_session.base_field : ""}
-#{!@current_ussd_session.selection_field.blank? ? "Sélection: " + @current_ussd_session.selection_field : ""}
-Montant débité: #{@current_ussd_session.stake.split('-')[1]} FCFA. Confirmez en saisissant votre code secret PAYMONEY.]
-      @session_identifier = '18'
-    else
-      @get_gamer_id_request = Parameter.first.gateway_url + "/8ba869a7a9c59f3a0/api/users/gamer_id/#{@account_profile.msisdn}"
-      @get_gamer_id_response = Typhoeus.get(@get_gamer_id_request, connecttimeout: 30)
-      if @get_gamer_id_response.body.blank?
-        @rendered_text = %Q[Votre identifiant parieur n'a pas pu être récupéré.
-Vous vous appretez à prendre un pari: #{@current_ussd_session.draw_day_label} #{@current_ussd_session.bet_selection} #{@current_ussd_session.formula_label}
-#{!@current_ussd_session.base_field.blank? ? "Base: " + @current_ussd_session.base_field : ""}
-#{!@current_ussd_session.selection_field.blank? ? "Sélection: " + @current_ussd_session.selection_field : ""}
-Montant débité: #{@current_ussd_session.stake.split('-')[1]} FCFA. Confirmez en saisissant votre code secret PAYMONEY.]
-        @session_identifier = '18'
-      else
-        @loto_place_bet_url = Parameter.first.gateway_url + "/ail/loto/api/96455396dc/bet/place/#{@get_gamer_id_response.body}/#{@account_profile.paymoney_account_number}/#{@ussd_string}"
-        set_place_loto_bet_request_parameters
-        @request_body = %Q[
-                  {
-                    "bet_code":"#{@bet_code}",
-                    "bet_modifier":"0",
-                    "selector1":"#{@selector1}",
-                    "selector2":"#{@selector2}",
-                    "repeats":"#{@current_ussd_session.stake.split('-')[0]}",
-                    "special_entries":"#{@current_ussd_session.base_field.split().join(',') rescue ''}",
-                    "normal_entries":"#{@current_ussd_session.selection_field.split().join(',') rescue ''}",
-                    "draw_day":"",
-                    "draw_number":"",
-                    "begin_date":"#{@begin_date}",
-                    "end_date":"#{@end_date}",
-                    "basis_amount":"#{@current_ussd_session.stake.split('-')[0]}"
-                  }
-                ]
-        request = Typhoeus::Request.new(
-        @loto_place_bet_url,
-        method: :post,
-        body: @request_body
-        )
-        request.run
-        @loto_place_bet_response = request.response
-
-        json_object = JSON.parse(@loto_place_bet_response.body) rescue nil
-        if json_object.blank?
-          @rendered_text = %Q[Votre pari n'a pas pu etre placé.
-Vous vous appretez à prendre un pari: #{@current_ussd_session.draw_day_label} #{@current_ussd_session.bet_selection} #{@current_ussd_session.formula_label}
-#{!@current_ussd_session.base_field.blank? ? "Base: " + @current_ussd_session.base_field : ""}
-#{!@current_ussd_session.selection_field.blank? ? "Sélection: " + @current_ussd_session.selection_field : ""}
-Montant débité: #{@current_ussd_session.stake.split('-')[1]} FCFA. Confirmez en saisissant votre code secret PAYMONEY.]
-          @session_identifier = '18'
+Veuillez entrer votre mise de base.
+0- Retour
+00- Accueil]
+          @session_identifier = '17'
         else
-          if json_object["error"].blank?
-            @rendered_text = %Q[FELICITATIONS, votre pari a bien été  enregistré. N° ticket : #{json_object["bet"]["ticket_number"]} / Réf. : #{json_object["bet"]["ref_number"]}
-Consultez les résultats le #{@end_date}]
-            @session_identifier = '19'
-          else
-            @rendered_text = %Q[Votre pari n'a pas pu etre placé.
-Vous vous appretez à prendre un pari: #{@current_ussd_session.draw_day_label} #{@current_ussd_session.bet_selection} #{@current_ussd_session.formula_label}
+          set_repeats
+          @repeats = @repeats
+          if @repeats > 100000 || @repeats < 100
+            @rendered_text = %Q[Votre pari est estimé à: #{@repeats} FCFA. Le montant de votre pari doit être compris entre 100 et 100 000 FCFA.
+Loto bonheur - #{@current_ussd_session.draw_day_label} #{@current_ussd_session.bet_selection} #{@current_ussd_session.formula_label}
 #{!@current_ussd_session.base_field.blank? ? "Base: " + @current_ussd_session.base_field : ""}
 #{!@current_ussd_session.selection_field.blank? ? "Sélection: " + @current_ussd_session.selection_field : ""}
-Montant débité: #{@current_ussd_session.stake.split('-')[1]} FCFA. Confirmez en saisissant votre code secret PAYMONEY.]
+Veuillez entrer votre mise de base.
+0- Retour
+00- Accueil]
+            @session_identifier = '17'
+          else
+            @rendered_text = %Q[Vous vous appretez à prendre un pari: #{@current_ussd_session.draw_day_label} #{@current_ussd_session.bet_selection} #{@current_ussd_session.formula_label}
+#{!@current_ussd_session.base_field.blank? ? "Base: " + @current_ussd_session.base_field : ""}
+#{!@current_ussd_session.selection_field.blank? ? "Sélection: " + @current_ussd_session.selection_field : ""}
+Montant débité: #{@repeats} FCFA. Confirmez en saisissant votre code secret PAYMONEY.
+0- Retour
+00- Accueil]
             @session_identifier = '18'
           end
         end
       end
-    end
+  end
+
+  def loto_place_bet
+    @current_ussd_session = @current_ussd_session
+    case @ussd_string
+      when '0'
+        back_evaluate_bet
+      when '00'
+        back_list_main_menu
+      else
+        if @ussd_string.length != 4 || not_a_number?(@ussd_string)
+          @rendered_text = %Q[Veuillez entrer un code PAYMONEY valide
+Vous vous appretez à prendre un pari: #{@current_ussd_session.draw_day_label} #{@current_ussd_session.bet_selection} #{@current_ussd_session.formula_label}
+#{!@current_ussd_session.base_field.blank? ? "Base: " + @current_ussd_session.base_field : ""}
+#{!@current_ussd_session.selection_field.blank? ? "Sélection: " + @current_ussd_session.selection_field : ""}
+Montant débité: #{@current_ussd_session.stake.split('-')[1]} FCFA. Confirmez en saisissant votre code secret PAYMONEY.
+0- Retour
+00- Accueil]
+          @session_identifier = '18'
+        else
+          @get_gamer_id_request = Parameter.first.gateway_url + "/8ba869a7a9c59f3a0/api/users/gamer_id/#{@account_profile.msisdn}"
+          @get_gamer_id_response = Typhoeus.get(@get_gamer_id_request, connecttimeout: 30)
+          if @get_gamer_id_response.body.blank?
+            @rendered_text = %Q[Votre identifiant parieur n'a pas pu être récupéré.
+Vous vous appretez à prendre un pari: #{@current_ussd_session.draw_day_label} #{@current_ussd_session.bet_selection} #{@current_ussd_session.formula_label}
+#{!@current_ussd_session.base_field.blank? ? "Base: " + @current_ussd_session.base_field : ""}
+#{!@current_ussd_session.selection_field.blank? ? "Sélection: " + @current_ussd_session.selection_field : ""}
+Montant débité: #{@current_ussd_session.stake.split('-')[1]} FCFA. Confirmez en saisissant votre code secret PAYMONEY.
+0- Retour
+00- Accueil]
+            @session_identifier = '18'
+          else
+            @loto_place_bet_url = Parameter.first.gateway_url + "/ail/loto/api/96455396dc/bet/place/#{@get_gamer_id_response.body}/#{@account_profile.paymoney_account_number}/#{@ussd_string}"
+            set_place_loto_bet_request_parameters
+            @request_body = %Q[
+                      {
+                        "bet_code":"#{@bet_code}",
+                        "bet_modifier":"0",
+                        "selector1":"#{@selector1}",
+                        "selector2":"#{@selector2}",
+                        "repeats":"#{@current_ussd_session.stake.split('-')[0]}",
+                        "special_entries":"#{@current_ussd_session.base_field.split().join(',') rescue ''}",
+                        "normal_entries":"#{@current_ussd_session.selection_field.split().join(',') rescue ''}",
+                        "draw_day":"",
+                        "draw_number":"",
+                        "begin_date":"#{@begin_date}",
+                        "end_date":"#{@end_date}",
+                        "basis_amount":"#{@current_ussd_session.stake.split('-')[0]}"
+                      }
+                    ]
+            request = Typhoeus::Request.new(
+            @loto_place_bet_url,
+            method: :post,
+            body: @request_body
+            )
+            request.run
+            @loto_place_bet_response = request.response
+
+            json_object = JSON.parse(@loto_place_bet_response.body) rescue nil
+            if json_object.blank?
+              @rendered_text = %Q[Votre pari n'a pas pu etre placé.
+Vous vous appretez à prendre un pari: #{@current_ussd_session.draw_day_label} #{@current_ussd_session.bet_selection} #{@current_ussd_session.formula_label}
+#{!@current_ussd_session.base_field.blank? ? "Base: " + @current_ussd_session.base_field : ""}
+#{!@current_ussd_session.selection_field.blank? ? "Sélection: " + @current_ussd_session.selection_field : ""}
+Montant débité: #{@current_ussd_session.stake.split('-')[1]} FCFA. Confirmez en saisissant votre code secret PAYMONEY.
+0- Retour
+00- Accueil]
+              @session_identifier = '18'
+            else
+              if json_object["error"].blank?
+                reference_date = "01/01/#{Date.today.year} 19:00:00"
+                @rendered_text = %Q[FELICITATIONS, votre pari a bien été  enregistré. N° ticket : #{json_object["bet"]["ticket_number"]} / Réf. : #{json_object["bet"]["ref_number"]}
+Consultez les résultats le #{@end_date}
+1- Etoile #{(-16 + DateTime.parse(reference_date).upto(DateTime.now).count(&:monday?)).to_s}
+2- Emergence #{(-16 + DateTime.parse(reference_date).upto(DateTime.now).count(&:tuesday?)).to_s}
+3- Fortune #{(-8 + DateTime.parse(reference_date).upto(DateTime.now).count(&:wednesday?)).to_s}
+4- Privilège #{(-16 + DateTime.parse(reference_date).upto(DateTime.now).count(&:thursday?)).to_s}
+5- Solution #{(-17 + DateTime.parse(reference_date).upto(DateTime.now).count(&:friday?)).to_s}
+6- Diamant #{(-8 + DateTime.parse(reference_date).upto(DateTime.now).count(&:saturday?)).to_s}
+0- Retour
+00- Accueil]
+                @session_identifier = '12'
+              else
+                @rendered_text = %Q[Votre pari n'a pas pu etre placé.
+Vous vous appretez à prendre un pari: #{@current_ussd_session.draw_day_label} #{@current_ussd_session.bet_selection} #{@current_ussd_session.formula_label}
+#{!@current_ussd_session.base_field.blank? ? "Base: " + @current_ussd_session.base_field : ""}
+#{!@current_ussd_session.selection_field.blank? ? "Sélection: " + @current_ussd_session.selection_field : ""}
+Montant débité: #{@current_ussd_session.stake.split('-')[1]} FCFA. Confirmez en saisissant votre code secret PAYMONEY.
+0- Retour
+00- Accueil]
+                @session_identifier = '18'
+              end
+            end
+          end
+        end
+      end
   end
 
   def set_repeats
@@ -937,7 +1003,9 @@ Montant débité: #{@current_ussd_session.stake.split('-')[1]} FCFA. Confirmez e
 1- Loto Bonheur
 2- PMU ALR
 3- PMU PLR
-4- SPORTCASH]
+4- SPORTCASH
+0- Retour
+00- Accueil]
       @session_identifier = '11'
     end
   end
@@ -950,7 +1018,9 @@ Montant débité: #{@current_ussd_session.stake.split('-')[1]} FCFA. Confirmez e
 3- Fortune #{(-8 + DateTime.parse(reference_date).upto(DateTime.now).count(&:wednesday?)).to_s}
 4- Privilège #{(-16 + DateTime.parse(reference_date).upto(DateTime.now).count(&:thursday?)).to_s}
 5- Solution #{(-17 + DateTime.parse(reference_date).upto(DateTime.now).count(&:friday?)).to_s}
-6- Diamant #{(-8 + DateTime.parse(reference_date).upto(DateTime.now).count(&:saturday?)).to_s}]
+6- Diamant #{(-8 + DateTime.parse(reference_date).upto(DateTime.now).count(&:saturday?)).to_s}
+0- Retour
+00- Accueil]
     @session_identifier = '12'
   end
 
@@ -1025,15 +1095,13 @@ Votre liste d'OTP est vide
       else
         @rendered_text = %Q[
 Votre solde PAYMONEY est de: #{balance rescue 0} FCFA
-
 1- Jeux
 2- Mes paris
 3- Mon solde
 4- Rechargement
 5- Votre service SMS
 6- Mes OTP
-7- Mes comptes
-        ]
+7- Mes comptes]
         @session_identifier = '5'
       end
     end
