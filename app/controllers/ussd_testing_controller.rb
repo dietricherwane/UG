@@ -2366,7 +2366,9 @@ R#{@current_ussd_session.plr_reunion_number}C#{@current_ussd_session.plr_race_nu
 #{@current_ussd_session.plr_base.blank? ? '' : "Base: " + @current_ussd_session.plr_base}
 #{@current_ussd_session.plr_selection.blank? ? '' : "Sélection: " + @current_ussd_session.plr_selection}
 Votre pari est estimé à #{json_object["bet"]["bet_cost_amount"]} FCFA.
-Confirmez en saisissant votre code secret]
+Confirmez en saisissant votre code secret
+0- Retour
+00- Accueil]
               @bet_cost_amount = json_object["bet"]["bet_cost_amount"]
               @session_identifier = '28'
             else
