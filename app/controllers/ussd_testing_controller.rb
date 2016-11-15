@@ -389,14 +389,14 @@ Veuillez choisir votre type de pari
 0- Retour
 00- Accueil]
     @session_identifier = '31'
+    @current_ussd_session.update_attributes(session_identifier: @session_identifier)
   end
 
-  def back_to_alr_bet_type
+  def alr_generic_race_header(current_ussd_session)
     @race_header = ""
-    @race_details = ""
-    race_datum = JSON.parse(@current_ussd_session.race_data)["alr_race_list"]
+    race_datum = JSON.parse(current_ussd_session.race_data)["alr_race_list"]
     race_datum.each do |race_data|
-      if race_data["race_id"] == @current_ussd_session.alr_program_id + '0' + @current_ussd_session.national_shortcut
+      if race_data["race_id"] == current_ussd_session.alr_program_id + '0' + current_ussd_session.national_shortcut
         bet_ids = race_data["bet_ids"].gsub('-SALE', '').split(',') rescue []
         @race_header << race_data["name"] + "
 "
@@ -407,6 +407,13 @@ Veuillez choisir votre type de pari
 "
       end
     end
+
+    return @race_header
+  end
+
+  def back_to_alr_bet_type
+    alr_generic_race_header(@current_ussd_session)
+
     @rendered_text = %Q[PMU - ALR
 #{@current_ussd_session.national_label} > #{@current_ussd_session.alr_bet_type_label}
 #{@race_header}
@@ -416,6 +423,87 @@ Veuillez choisir votre type de pari
 0- Retour
 00- Accueil]
     @session_identifier = '32'
+    @current_ussd_session.update_attributes(session_identifier: @session_identifier)
+  end
+
+  def back_to_alr_multi_selection
+    alr_generic_race_header(@current_ussd_session)
+
+    @rendered_text = %Q[PMU - ALR
+#{@current_ussd_session.national_label} > #{@bet_type_label}
+#{@race_header}
+1- Multi 4/4
+2- Multi 4/5
+3- Multi 4/6
+4- Multi 4/7
+0- Retour
+00- Accueil]
+    @session_identifier = '33'
+    @current_ussd_session.update_attributes(session_identifier: @session_identifier)
+  end
+
+  def back_to_alr_select_formula
+    alr_generic_race_header(@current_ussd_session)
+
+    @rendered_text = %Q[PMU - ALR
+#{@current_ussd_session.national_label} > #{@current_ussd_session.alr_bet_type_label}
+#{@race_header}
+1- Long champ
+2- Champ réduit
+3- Champ total
+0- Retour
+00- Accueil]
+    @session_identifier = '32'
+    @current_ussd_session.update_attributes(session_identifier: @session_identifier)
+  end
+
+  def back_to_alr_select_base
+    alr_generic_race_header(@current_ussd_session)
+
+    @rendered_text = %Q[PMU - ALR
+#{@current_ussd_session.national_label} > #{@current_ussd_session.alr_bet_type_label}
+#{@race_header}
+Saisissez le numero de votre cheval de BASE et utiliser X pour definir l'emplacement de votre selection
+0- Retour
+00- Accueil]
+    @session_identifier = '34'
+    @current_ussd_session.update_attributes(session_identifier: @session_identifier)
+  end
+
+  def back_to_alr_selection
+    @rendered_text = %Q[PMU - ALR
+#{@current_ussd_session.national_label} > #{@current_ussd_session.alr_bet_type_label}
+#{@race_header}
+Saisissez les numéros de vos chevaux séparés par un espace
+0- Retour
+00- Accueil]
+    @session_identifier = '35'
+    @current_ussd_session.update_attributes(session_identifier: @session_identifier)
+  end
+
+  def back_to_alr_full_formula
+    @rendered_text = %Q[PMU - ALR
+#{@current_ussd_session.national_label} > #{@current_ussd_session.alr_bet_type_label}
+#{@race_header}
+Voulez-vous jouer en formule complète?
+1- Oui
+2- Non
+0- Retour
+00- Accueil]
+    @session_identifier = '36'
+    @current_ussd_session.update_attributes(session_identifier: @session_identifier)
+  end
+
+  def back_to_alr_stake
+    @rendered_text = %Q[PMU - ALR
+Le pari n'a pas pu être évalué
+#{@current_ussd_session.national_label} > #{@current_ussd_session.alr_bet_type_label}
+#{@race_header}
+Saisissez le nombre de fois
+0- Retour
+00- Accueil]
+    @session_identifier = '37'
+    @current_ussd_session.update_attributes(session_identifier: @session_identifier)
   end
 
   def back_list_games_menu
@@ -777,10 +865,14 @@ Veuillez choisir votre type de pari
             end
           when '30'
             alr_display_bet_type
-            @current_ussd_session.update_attributes(session_identifier: @session_identifier, national_label: @national_label, national_shortcut: @national_shortcut, alr_bet_type_menu: @alr_bet_type_menu)
+            unless ['0', '00'].include?(@ussd_string)
+              @current_ussd_session.update_attributes(session_identifier: @session_identifier, national_label: @national_label, national_shortcut: @national_shortcut, alr_bet_type_menu: @alr_bet_type_menu)
+            end
           when '31'
             alr_display_formula
-            @current_ussd_session.update_attributes(session_identifier: @session_identifier, alr_bet_type_label: @bet_type_label, alr_bet_id: @alr_bet_id)
+            unless ['0', '00'].include?(@ussd_string)
+              @current_ussd_session.update_attributes(session_identifier: @session_identifier, alr_bet_type_label: @bet_type_label, alr_bet_id: @alr_bet_id)
+            end
           when '32'
             set_session_identifier_depending_on_alr_bet_type_selected
             if @status
@@ -837,20 +929,30 @@ Veuillez choisir votre type de pari
             end
           when '34'
             validate_alr_base
-            @current_ussd_session.update_attributes(session_identifier: @session_identifier, alr_base: @ussd_string)
+            unless ['0', '00'].include?(@ussd_string)
+              @current_ussd_session.update_attributes(session_identifier: @session_identifier, alr_base: @ussd_string)
+            end
           when '35'
             validate_alr_horses
-            @current_ussd_session.update_attributes(session_identifier: @session_identifier, alr_selection: @ussd_string)
+            unless ['0', '00'].include?(@ussd_string)
+              @current_ussd_session.update_attributes(session_identifier: @session_identifier, alr_selection: @ussd_string)
+            end
           when '36'
             alr_set_full_formula
-            @current_ussd_session.update_attributes(session_identifier: @session_identifier, full_formula: @full_formula)
+            unless ['0', '00'].include?(@ussd_string)
+              @current_ussd_session.update_attributes(session_identifier: @session_identifier, full_formula: @full_formula)
+            end
           when '37'
             alr_evaluate_bet
-            @current_ussd_session.update_attributes(session_identifier: @session_identifier, alr_stake: @ussd_string, alr_evaluate_bet_request: @alr_evaluate_bet_request + @body, alr_evaluate_bet_response: @alr_evaluate_bet_response.body, alr_scratched_list: @alr_scratched_list.to_s, alr_combinations: @alr_combinations.to_s, alr_amount: @alr_amount)
+            unless ['0', '00'].include?(@ussd_string)
+              @current_ussd_session.update_attributes(session_identifier: @session_identifier, alr_stake: @ussd_string, alr_evaluate_bet_request: @alr_evaluate_bet_request + @body, alr_evaluate_bet_response: @alr_evaluate_bet_response.body, alr_scratched_list: @alr_scratched_list.to_s, alr_combinations: @alr_combinations.to_s, alr_amount: @alr_amount)
+            end
           when '38'
             @account_profile = AccountProfile.find_by_msisdn(@msisdn[-8,8])
             alr_place_bet
-            @current_ussd_session.update_attributes(session_identifier: @session_identifier, alr_place_bet_request: @alr_place_bet_request + @body, alr_place_bet_response: @alr_place_bet_response.body, get_gamer_id_request: @get_gamer_id_request, get_gamer_id_response: @get_gamer_id_response.body)
+            unless ['0', '00'].include?(@ussd_string)
+              @current_ussd_session.update_attributes(session_identifier: @session_identifier, alr_place_bet_request: @alr_place_bet_request + @body, alr_place_bet_response: @alr_place_bet_response.body, get_gamer_id_request: @get_gamer_id_request, get_gamer_id_response: @get_gamer_id_response.body)
+            end
           end
         end
 
@@ -2355,8 +2457,10 @@ Veuillez saisir le nombre de fois que vous souhaitez miser
 
           if json_object.blank?
             @rendered_text = %Q[Le pari n'a pas pu être évalué
-    Réunion: R#{@current_ussd_session.plr_reunion_number} - Course: C#{@current_ussd_session.plr_race_number}
-    Veuillez saisir le nombre de fois que vous souhaitez miser]
+Réunion: R#{@current_ussd_session.plr_reunion_number} - Course: C#{@current_ussd_session.plr_race_number}
+Veuillez saisir le nombre de fois que vous souhaitez miser
+0- Retour
+00- Accueil]
             @session_identifier = '27'
           else
             if json_object["error"].blank?
@@ -2374,7 +2478,9 @@ Confirmez en saisissant votre code secret
             else
               @rendered_text = %Q[Le pari n'a pas pu être évalué
 Réunion: R#{@current_ussd_session.plr_reunion_number} - Course: C#{@current_ussd_session.plr_race_number}
-Veuillez saisir le nombre de fois que vous souhaitez miser]
+Veuillez saisir le nombre de fois que vous souhaitez miser
+0- Retour
+00- Accueil]
               @session_identifier = '27'
             end
           end
@@ -2955,17 +3061,23 @@ Saisissez le numero de votre cheval de BASE et ulitiser X pour definir l'emplace
       end
     end
 
-    if ['1', '2', '0', '00'].include?(@ussd_string)
-      @ussd_string == '1' ? @full_formula = true : @full_formula = false
-      @rendered_text = %Q[PMU - ALR
+    case @ussd_string
+      when '0'
+        back_to_alr_selection
+      when '00'
+        back_list_main_menu
+      else
+        if ['1', '2'].include?(@ussd_string)
+          @ussd_string == '1' ? @full_formula = true : @full_formula = false
+          @rendered_text = %Q[PMU - ALR
 #{@current_ussd_session.national_label} > #{@current_ussd_session.alr_bet_type_label}
 #{@race_header}
 Saisissez le nombre de fois
 0- Retour
 00- Accueil]
-      @session_identifier = '37'
-    else
-      @rendered_text = %Q[PMU - ALR
+          @session_identifier = '37'
+        else
+          @rendered_text = %Q[PMU - ALR
 #{@current_ussd_session.national_label} > #{@current_ussd_session.alr_bet_type_label}
 #{@race_header}
 Voulez-vous jouer en formule complète?
@@ -2973,14 +3085,15 @@ Voulez-vous jouer en formule complète?
 2- Non
 0- Retour
 00- Accueil]
-      @session_identifier = '36'
-    end
+          @session_identifier = '36'
+        end
+      end
   end
 
   def validate_alr_base
     case @ussd_string
       when '0'
-        back_alr_list_races
+        back_to_alr_select_formula
       when '00'
         back_list_main_menu
       else
@@ -3040,7 +3153,7 @@ Saisissez le nombre de fois
 Saisissez le numero de votre cheval de BASE et utiliser X pour definir l'emplacement de votre selection
 0- Retour
 00- Accueil]
-        @session_identifier = '34'
+          @session_identifier = '34'
         end
       end
   end
@@ -3048,24 +3161,38 @@ Saisissez le numero de votre cheval de BASE et utiliser X pour definir l'emplace
   def validate_alr_horses
     @ussd_string = @ussd_string
     @current_ussd_session = @current_ussd_session
-    @race_header = ""
-    race_datum = JSON.parse(@current_ussd_session.race_data)["alr_race_list"]
-    race_datum.each do |race_data|
-      if race_data["race_id"] == @current_ussd_session.alr_program_id + '0' + @current_ussd_session.national_shortcut
-        bet_ids = race_data["bet_ids"].gsub('-SALE', '').split(',') rescue []
-        @race_header << race_data["name"] + "
-"
-        @race_header << "Nombre de partants: " + race_data["max_runners"] + "
-"
-        @race_header << "Non partants: " + race_data["scratched_list"] + "
-"
-      end
-    end
+    case @ussd_string
+      when '0'
+        if ['champ_reduit', 'champ_total'].include?(@current_ussd_session.alr_formula_shortcut)
+          back_to_alr_select_base
+        else
+          if [' 4/4', ' 4/5', ' 4/6', ' 4/7'].include?(@current_ussd_session.alr_formula_shortcut)
+            back_to_alr_multi_selection
+          else
+            back_to_alr_select_formula
+          end
+        end
+      when '00'
+        back_list_main_menu
+      else
+        @race_header = ""
+        race_datum = JSON.parse(@current_ussd_session.race_data)["alr_race_list"]
+        race_datum.each do |race_data|
+          if race_data["race_id"] == @current_ussd_session.alr_program_id + '0' + @current_ussd_session.national_shortcut
+            bet_ids = race_data["bet_ids"].gsub('-SALE', '').split(',') rescue []
+            @race_header << race_data["name"] + "
+    "
+            @race_header << "Nombre de partants: " + race_data["max_runners"] + "
+    "
+            @race_header << "Non partants: " + race_data["scratched_list"] + "
+    "
+          end
+        end
 
-    if alr_valid_horses_numbers
-      if alr_valid_multi_number_of_horses && alr_valid_selection_numbers
-        if ['Tiercé', 'Tiercé 2', 'Quarté', 'Quinté', 'Quinté +'].include?(@current_ussd_session.alr_bet_type_label)
-          @rendered_text = %Q[PMU - ALR
+        if alr_valid_horses_numbers
+          if alr_valid_multi_number_of_horses && alr_valid_selection_numbers
+            if ['Tiercé', 'Tiercé 2', 'Quarté', 'Quinté', 'Quinté +'].include?(@current_ussd_session.alr_bet_type_label)
+              @rendered_text = %Q[PMU - ALR
 #{@current_ussd_session.national_label} > #{@current_ussd_session.alr_bet_type_label}
 #{@race_header}
 Voulez-vous jouer en formule complète?
@@ -3073,36 +3200,37 @@ Voulez-vous jouer en formule complète?
 2- Non
 0- Retour
 00- Accueil]
-          @session_identifier = '36'
-        else
-          @rendered_text = %Q[PMU - ALR
+              @session_identifier = '36'
+            else
+              @rendered_text = %Q[PMU - ALR
 #{@current_ussd_session.national_label} > #{@current_ussd_session.alr_bet_type_label}
 #{@race_header}
 Saisissez le nombre de fois
 0- Retour
 00- Accueil]
-          @session_identifier = '37'
+              @session_identifier = '37'
+            end
+          else
+            @rendered_text = %Q[#{@error_message}
+PMU - ALR
+#{@current_ussd_session.national_label} > #{@current_ussd_session.alr_bet_type_label}
+#{@race_header}
+Saisissez les numéros de vos chevaux séparés par un espace
+0- Retour
+00- Accueil]
+            @session_identifier = '35'
+          end
+        else
+          @rendered_text = %Q[#{@error_message}
+PMU - ALR
+#{@current_ussd_session.national_label} > #{@current_ussd_session.alr_bet_type_label}
+#{@race_header}
+Saisissez les numéros de vos chevaux séparés par un espace
+0- Retour
+00- Accueil]
+          @session_identifier = '35'
         end
-      else
-        @rendered_text = %Q[#{@error_message}
-PMU - ALR
-#{@current_ussd_session.national_label} > #{@current_ussd_session.alr_bet_type_label}
-#{@race_header}
-Saisissez les numéros de vos chevaux séparés par un espace
-0- Retour
-00- Accueil]
-        @session_identifier = '35'
       end
-    else
-      @rendered_text = %Q[#{@error_message}
-PMU - ALR
-#{@current_ussd_session.national_label} > #{@current_ussd_session.alr_bet_type_label}
-#{@race_header}
-Saisissez les numéros de vos chevaux séparés par un espace
-0- Retour
-00- Accueil]
-      @session_identifier = '35'
-    end
   end
 
   def alr_evaluate_bet
@@ -3121,58 +3249,68 @@ Saisissez les numéros de vos chevaux séparés par un espace
 "
       end
     end
-    if @ussd_string.blank? || not_a_number?(@ussd_string)
-      @rendered_text = %Q[PMU - ALR
+    case @ussd_string
+      when '0'
+        if ['Tiercé', 'Tiercé 2', 'Quarté', 'Quinté', 'Quinté +'].include?(@current_ussd_session.alr_bet_type_label)
+          back_to_alr_full_formula
+        else
+          back_to_alr_selection
+        end
+      when '00'
+        back_list_main_menu
+      else
+        if @ussd_string.blank? || not_a_number?(@ussd_string)
+          @rendered_text = %Q[PMU - ALR
 #{@current_ussd_session.national_label} > #{@current_ussd_session.alr_bet_type_label}
 #{@race_header}
 Saisissez le nombre de fois
 0- Retour
 00- Accueil]
-      @session_identifier = '37'
-    else
-      @program_id = @current_ussd_session.alr_program_id
-      @race_id = @current_ussd_session.alr_race_ids.split('-')[@current_ussd_session.national_shortcut.to_i - 1] rescue nil
+          @session_identifier = '37'
+        else
+          @program_id = @current_ussd_session.alr_program_id
+          @race_id = @current_ussd_session.alr_race_ids.split('-')[@current_ussd_session.national_shortcut.to_i - 1] rescue nil
 
-      @alr_evaluate_bet_request = Parameter.first.gateway_url + "/cm3/api/0cad36b144/game/evaluate/#{@current_ussd_session.alr_program_id}/#{@race_id}"
-      comma = @current_ussd_session.alr_selection.blank? ? '' : ','
-      items = @current_ussd_session.alr_base.to_s.split().join(',') + (@current_ussd_session.alr_base.blank? ? '' : comma) + @current_ussd_session.alr_selection.to_s.split().join(',')
-      @body = %Q(
-                    {
-                      "games":[
+          @alr_evaluate_bet_request = Parameter.first.gateway_url + "/cm3/api/0cad36b144/game/evaluate/#{@current_ussd_session.alr_program_id}/#{@race_id}"
+          comma = @current_ussd_session.alr_selection.blank? ? '' : ','
+          items = @current_ussd_session.alr_base.to_s.split().join(',') + (@current_ussd_session.alr_base.blank? ? '' : comma) + @current_ussd_session.alr_selection.to_s.split().join(',')
+          @body = %Q(
                         {
-                          "game_id":"1",
-                          "bet_id":"#{@current_ussd_session.alr_bet_id}",
-                          "nb_units":"#{@ussd_string}",
-                          "full_box":"#{@current_ussd_session.full_formula == true ? 'TRUE' : 'FALSE'}",
-                          "items":[#{items.gsub(/x/i, %Q/"X"/)}]
+                          "games":[
+                            {
+                              "game_id":"1",
+                              "bet_id":"#{@current_ussd_session.alr_bet_id}",
+                              "nb_units":"#{@ussd_string}",
+                              "full_box":"#{@current_ussd_session.full_formula == true ? 'TRUE' : 'FALSE'}",
+                              "items":[#{items.gsub(/x/i, %Q/"X"/)}]
+                            }
+                          ]
                         }
-                      ]
-                    }
-                  )
-      request = Typhoeus::Request.new(
-        @alr_evaluate_bet_request,
-        method: :post,
-        body: @body
-      )
-      request.run
-      @alr_evaluate_bet_response = request.response
+                      )
+          request = Typhoeus::Request.new(
+            @alr_evaluate_bet_request,
+            method: :post,
+            body: @body
+          )
+          request.run
+          @alr_evaluate_bet_response = request.response
 
-      json_object = JSON.parse(@alr_evaluate_bet_response.body) rescue nil
-      if json_object.blank?
-        @rendered_text = %Q[PMU - ALR
+          json_object = JSON.parse(@alr_evaluate_bet_response.body) rescue nil
+          if json_object.blank?
+            @rendered_text = %Q[PMU - ALR
 Le pari n'a pas pu être évalué
 #{@current_ussd_session.national_label} > #{@current_ussd_session.alr_bet_type_label}
 #{@race_header}
 Saisissez le nombre de fois
 0- Retour
 00- Accueil]
-        @session_identifier = '37'
-      else
-        if json_object["error"].blank?
-          @alr_scratched_list = json_object["evaluations"]["scratched"]
-          @alr_combinations = json_object["evaluations"]["evaluations"].first["nb_combinations"]
-          @alr_amount = json_object["evaluations"]["evaluations"].first["amount"]
-          @rendered_text = %Q[
+            @session_identifier = '37'
+          else
+            if json_object["error"].blank?
+              @alr_scratched_list = json_object["evaluations"]["scratched"]
+              @alr_combinations = json_object["evaluations"]["evaluations"].first["nb_combinations"]
+              @alr_amount = json_object["evaluations"]["evaluations"].first["amount"]
+              @rendered_text = %Q[
 Vous vous apprêtez à prendre un pari PMU ALR
 #{@current_ussd_session.national_label} > #{@current_ussd_session.alr_bet_type_label}
 #{@race_header}
@@ -3182,97 +3320,45 @@ Votre pari est estimé à #{@alr_amount} FCFA
 Veuillez entrer votre mot de passe Paymoney pour valider le pari.
 0- Retour
 00- Accueil]
-          @session_identifier = '38'
-        else
-          @rendered_text = %Q[PMU - ALR
+              @session_identifier = '38'
+            else
+              @rendered_text = %Q[PMU - ALR
 Le pari n'a pas pu être évalué
 #{@current_ussd_session.national_label} > #{@current_ussd_session.alr_bet_type_label}
 #{@race_header}
 Saisissez le nombre de fois
 0- Retour
 00- Accueil]
-          @session_identifier = '37'
+              @session_identifier = '37'
+            end
+          end
         end
       end
-    end
   end
 
   def alr_place_bet
-    if @ussd_string.length != 4 || not_a_number?(@ussd_string)
-      @race_header = ""
-      race_datum = JSON.parse(@current_ussd_session.race_data)["alr_race_list"]
-      race_datum.each do |race_data|
-        if race_data["race_id"] == @current_ussd_session.alr_program_id + '0' + @current_ussd_session.national_shortcut
-          bet_ids = race_data["bet_ids"].gsub('-SALE', '').split(',') rescue []
-          @race_header << race_data["name"] + "
-  "
-          @race_header << "Nombre de partants: " + race_data["max_runners"] + "
-  "
-          @race_header << "Non partants: " + race_data["scratched_list"] + "
-  "
-        end
+    @race_header = ""
+    race_datum = JSON.parse(@current_ussd_session.race_data)["alr_race_list"]
+    race_datum.each do |race_data|
+      if race_data["race_id"] == @current_ussd_session.alr_program_id + '0' + @current_ussd_session.national_shortcut
+        bet_ids = race_data["bet_ids"].gsub('-SALE', '').split(',') rescue []
+        @race_header << race_data["name"] + "
+"
+        @race_header << "Nombre de partants: " + race_data["max_runners"] + "
+"
+        @race_header << "Non partants: " + race_data["scratched_list"] + "
+"
       end
+    end
 
-      @rendered_text = %Q[Vous vous apprêtez à prendre un pari PMU ALR
-#{@current_ussd_session.national_label} > #{@current_ussd_session.alr_bet_type_label}
-#{@race_header}
-#{@current_ussd_session.alr_base.blank? ? '' : "Base: " + @current_ussd_session.alr_base}
-#{@current_ussd_session.alr_selection.blank? ? '' : "Sélection: " + @current_ussd_session.alr_selection}
-Votre pari est estimé à #{@current_ussd_session.alr_amount} FCFA
-Veuillez entrer votre mot de passe Paymoney pour valider le pari.
-0- Retour
-00- Accueil]
-      @session_identifier = '38'
-    else
-      @get_gamer_id_request = Parameter.first.gateway_url + "/8ba869a7a9c59f3a0/api/users/gamer_id/#{@account_profile.msisdn}"
-      @get_gamer_id_response = Typhoeus.get(@get_gamer_id_request, connecttimeout: 30)
-      if @get_gamer_id_response.body.blank?
-        @rendered_text = %Q[Votre identifiant parieur n'a pas pu être récupéré
-Vous vous apprêtez à prendre un pari PMU ALR
-#{@current_ussd_session.national_label} > #{@current_ussd_session.alr_bet_type_label}
-#{@race_header}
-#{@current_ussd_session.alr_base.blank? ? '' : "Base: " + @current_ussd_session.alr_base}
-#{@current_ussd_session.alr_selection.blank? ? '' : "Sélection: " + @current_ussd_session.alr_selection}
-Votre pari est estimé à #{@current_ussd_session.alr_amount} FCFA
-Veuillez entrer votre mot de passe Paymoney pour valider le pari.
-0- Retour
-00- Accueil]
-        @session_identifier = '38'
+    case @ussd_string
+      when '0'
+        back_to_alr_stake
+      when '00'
+        back_list_main_menu
       else
-        @program_id = @current_ussd_session.alr_program_id
-        @race_id = @current_ussd_session.alr_race_ids.split('-')[@current_ussd_session.national_shortcut.to_i - 1] rescue nil
-        @alr_place_bet_request = Parameter.first.gateway_url + "/cm3/api/98d24611fd/ticket/sell/#{@get_gamer_id_response.body}/#{@account_profile.paymoney_account_number}/#{@ussd_string}/#{@current_ussd_session.alr_program_date}/#{@current_ussd_session.alr_program_date}"
-        comma = @current_ussd_session.alr_selection.blank? ? '' : ','
-        items = @current_ussd_session.alr_base.to_s.split().join(',') + (@current_ussd_session.alr_base.blank? ? '' : comma) + @current_ussd_session.alr_selection.to_s.split().join(',')
-        @body = %Q(
-                      {
-                        "program_id":"#{@current_ussd_session.alr_program_id}",
-                        "race_id":"#{@race_id}",
-                        "amount":"#{@current_ussd_session.alr_amount}",
-                        "scratched_list":#{@current_ussd_session.alr_scratched_list},
-                        "wagers":[
-                          {
-                            "bet_id":"#{@current_ussd_session.alr_bet_id}",
-                            "nb_units":"#{@current_ussd_session.alr_stake}",
-                            "nb_combinations":"#{@current_ussd_session.alr_combinations}",
-                            "full_box":"#{@current_ussd_session.full_formula == true ? 'TRUE' : 'FALSE'}",
-                            "selection":[#{items.gsub(/x/i, %Q/"X"/)}]
-                          }
-                        ]
-                      }
-                    )
-        request = Typhoeus::Request.new(
-          @alr_place_bet_request,
-          method: :post,
-          body: @body
-        )
-        request.run
-        @alr_place_bet_response = request.response
-
-        json_object = JSON.parse(@alr_place_bet_response.body) rescue nil
-        if json_object.blank?
-          @rendered_text = %Q[Le pari n'a pas pu être pris
-Vous vous apprêtez à prendre un pari PMU ALR
+        if @ussd_string.length != 4 || not_a_number?(@ussd_string)
+          @rendered_text = %Q[Vous vous apprêtez à prendre un pari PMU ALR
 #{@current_ussd_session.national_label} > #{@current_ussd_session.alr_bet_type_label}
 #{@race_header}
 #{@current_ussd_session.alr_base.blank? ? '' : "Base: " + @current_ussd_session.alr_base}
@@ -3283,15 +3369,10 @@ Veuillez entrer votre mot de passe Paymoney pour valider le pari.
 00- Accueil]
           @session_identifier = '38'
         else
-          if json_object["error"].blank?
-            @rendered_text = %Q[FELCITATIONS, votre pari a bien été enregistré.
-Numéro de ticket: #{json_object["bet"]["serial_number"]}
-PMU, PARIE  POUR GAGNER!
-0- Retour
-00- Accueil]
-            @session_identifier = '39'
-          else
-            @rendered_text = %Q[Le pari n'a pas pu être pris
+          @get_gamer_id_request = Parameter.first.gateway_url + "/8ba869a7a9c59f3a0/api/users/gamer_id/#{@account_profile.msisdn}"
+          @get_gamer_id_response = Typhoeus.get(@get_gamer_id_request, connecttimeout: 30)
+          if @get_gamer_id_response.body.blank?
+            @rendered_text = %Q[Votre identifiant parieur n'a pas pu être récupéré
 Vous vous apprêtez à prendre un pari PMU ALR
 #{@current_ussd_session.national_label} > #{@current_ussd_session.alr_bet_type_label}
 #{@race_header}
@@ -3302,10 +3383,81 @@ Veuillez entrer votre mot de passe Paymoney pour valider le pari.
 0- Retour
 00- Accueil]
             @session_identifier = '38'
+          else
+            @program_id = @current_ussd_session.alr_program_id
+            @race_id = @current_ussd_session.alr_race_ids.split('-')[@current_ussd_session.national_shortcut.to_i - 1] rescue nil
+            @alr_place_bet_request = Parameter.first.gateway_url + "/cm3/api/98d24611fd/ticket/sell/#{@get_gamer_id_response.body}/#{@account_profile.paymoney_account_number}/#{@ussd_string}/#{@current_ussd_session.alr_program_date}/#{@current_ussd_session.alr_program_date}"
+            comma = @current_ussd_session.alr_selection.blank? ? '' : ','
+            items = @current_ussd_session.alr_base.to_s.split().join(',') + (@current_ussd_session.alr_base.blank? ? '' : comma) + @current_ussd_session.alr_selection.to_s.split().join(',')
+            @body = %Q(
+                          {
+                            "program_id":"#{@current_ussd_session.alr_program_id}",
+                            "race_id":"#{@race_id}",
+                            "amount":"#{@current_ussd_session.alr_amount}",
+                            "scratched_list":#{@current_ussd_session.alr_scratched_list},
+                            "wagers":[
+                              {
+                                "bet_id":"#{@current_ussd_session.alr_bet_id}",
+                                "nb_units":"#{@current_ussd_session.alr_stake}",
+                                "nb_combinations":"#{@current_ussd_session.alr_combinations}",
+                                "full_box":"#{@current_ussd_session.full_formula == true ? 'TRUE' : 'FALSE'}",
+                                "selection":[#{items.gsub(/x/i, %Q/"X"/)}]
+                              }
+                            ]
+                          }
+                        )
+            request = Typhoeus::Request.new(
+              @alr_place_bet_request,
+              method: :post,
+              body: @body
+            )
+            request.run
+            @alr_place_bet_response = request.response
+
+            json_object = JSON.parse(@alr_place_bet_response.body) rescue nil
+            if json_object.blank?
+              @rendered_text = %Q[Le pari n'a pas pu être pris
+Vous vous apprêtez à prendre un pari PMU ALR
+#{@current_ussd_session.national_label} > #{@current_ussd_session.alr_bet_type_label}
+#{@race_header}
+#{@current_ussd_session.alr_base.blank? ? '' : "Base: " + @current_ussd_session.alr_base}
+#{@current_ussd_session.alr_selection.blank? ? '' : "Sélection: " + @current_ussd_session.alr_selection}
+Votre pari est estimé à #{@current_ussd_session.alr_amount} FCFA
+Veuillez entrer votre mot de passe Paymoney pour valider le pari.
+0- Retour
+00- Accueil]
+              @session_identifier = '38'
+            else
+              if json_object["error"].blank?
+                races = ""
+                @current_ussd_session.alr_race_ids.split('-').each do |race_id|
+                   races << race_id[-1,1] + " - Nationale" + race_id[-1,1] + "
+            "
+                end
+                @rendered_text = %Q[FELCITATIONS, votre pari a bien été enregistré.
+Numéro de ticket: #{json_object["bet"]["serial_number"]}
+PMU, PARIE  POUR GAGNER!
+#{races}
+0- Retour
+00- Accueil]
+                @session_identifier = '30'
+              else
+                @rendered_text = %Q[Le pari n'a pas pu être pris
+Vous vous apprêtez à prendre un pari PMU ALR
+#{@current_ussd_session.national_label} > #{@current_ussd_session.alr_bet_type_label}
+#{@race_header}
+#{@current_ussd_session.alr_base.blank? ? '' : "Base: " + @current_ussd_session.alr_base}
+#{@current_ussd_session.alr_selection.blank? ? '' : "Sélection: " + @current_ussd_session.alr_selection}
+Votre pari est estimé à #{@current_ussd_session.alr_amount} FCFA
+Veuillez entrer votre mot de passe Paymoney pour valider le pari.
+0- Retour
+00- Accueil]
+                @session_identifier = '38'
+              end
+            end
           end
         end
       end
-    end
   end
 
   def alr_valid_horses_numbers
