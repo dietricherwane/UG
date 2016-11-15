@@ -755,18 +755,26 @@ Veuillez choisir votre type de pari
             end
           when '25'
             plr_selection_or_stake_depending_on_formula
-            @current_ussd_session.update_attributes(session_identifier: @session_identifier, plr_base: @ussd_string)
+            unless ['0', '00'].include?(@ussd_string)
+              @current_ussd_session.update_attributes(session_identifier: @session_identifier, plr_base: @ussd_string)
+            end
           # PLR, sélectionner le nombre de fois
           when '26'
             plr_select_number_of_times
-            @current_ussd_session.update_attributes(session_identifier: @session_identifier, plr_selection: @ussd_string)
+            unless ['0', '00'].include?(@ussd_string)
+              @current_ussd_session.update_attributes(session_identifier: @session_identifier, plr_selection: @ussd_string)
+            end
           when '27'
             plr_evaluate_bet
-            @current_ussd_session.update_attributes(session_identifier: @session_identifier, plr_number_of_times: @ussd_string, plr_evaluate_bet_request: @plr_evaluate_bet_request + @request_body, plr_evaluate_bet_response: @plr_evaluate_bet_response, bet_cost_amount: @bet_cost_amount)
+            unless ['0', '00'].include?(@ussd_string)
+              @current_ussd_session.update_attributes(session_identifier: @session_identifier, plr_number_of_times: @ussd_string, plr_evaluate_bet_request: @plr_evaluate_bet_request + @request_body, plr_evaluate_bet_response: @plr_evaluate_bet_response, bet_cost_amount: @bet_cost_amount)
+            end
           when '28'
             @account_profile = AccountProfile.find_by_msisdn(@msisdn[-8,8])
             plr_place_bet
-            @current_ussd_session.update_attributes(session_identifier: @session_identifier, plr_number_of_times: @plr_number_of_times, plr_place_bet_request: @plr_place_bet_request + @body, plr_place_bet_response: @plr_place_bet_response.body)
+            unless ['0', '00'].include?(@ussd_string)
+              @current_ussd_session.update_attributes(session_identifier: @session_identifier, plr_number_of_times: @plr_number_of_times, plr_place_bet_request: @plr_place_bet_request + @body, plr_place_bet_response: @plr_place_bet_response.body)
+            end
           when '30'
             alr_display_bet_type
             @current_ussd_session.update_attributes(session_identifier: @session_identifier, national_label: @national_label, national_shortcut: @national_shortcut, alr_bet_type_menu: @alr_bet_type_menu)
@@ -2373,6 +2381,7 @@ Veuillez saisir le nombre de fois que vous souhaitez miser]
   end
 
   def plr_place_bet
+    @current_ussd_session = @current_ussd_session
     case @ussd_string
       when '0'
         back_to_plr_select_stake
