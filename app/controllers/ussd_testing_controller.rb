@@ -3432,7 +3432,7 @@ Veuillez entrer votre mot de passe Paymoney pour valider le pari.
                 races = ""
                 @current_ussd_session.alr_race_ids.split('-').each do |race_id|
                    races << race_id[-1,1] + " - Nationale" + race_id[-1,1] + "
-            "
+"
                 end
                 @rendered_text = %Q[FELCITATIONS, votre pari a bien été enregistré.
 Numéro de ticket: #{json_object["bet"]["serial_number"]}
