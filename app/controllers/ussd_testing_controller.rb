@@ -2165,9 +2165,9 @@ Saisissez la base
     case @ussd_string
       when '0'
         if @current_ussd_session.plr_formula_shortcut == 'champ_reduit'
-          back_to_plr_select_formula
-        else
           back_to_plr_select_base
+        else
+          back_to_plr_select_formula
         end
       when '00'
         back_list_main_menu
