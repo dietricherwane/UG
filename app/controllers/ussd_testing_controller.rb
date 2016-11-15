@@ -2317,9 +2317,9 @@ Veuillez saisir le nombre de fois que vous souhaitez miser
       else
         if @ussd_string.blank? || not_a_number?(@ussd_string)
           @rendered_text = %Q[Réunion: R#{@current_ussd_session.plr_reunion_number} - Course: C#{@current_ussd_session.plr_race_number}
-    Veuillez saisir le nombre de fois que vous souhaitez miser
-    0- Retour
-    00- Accueil]
+Veuillez saisir le nombre de fois que vous souhaitez miser
+0- Retour
+00- Accueil]
           @session_identifier = '27'
         else
           plr_set_bet_code_and_modifier
@@ -2353,18 +2353,18 @@ Veuillez saisir le nombre de fois que vous souhaitez miser
           else
             if json_object["error"].blank?
               @rendered_text = %Q[Vous vous apprêtez à prendre un pari PMU PLR
-    R#{@current_ussd_session.plr_reunion_number}C#{@current_ussd_session.plr_race_number}
-    #{@current_ussd_session.plr_bet_type_label} > #{@current_ussd_session.plr_formula_label}
-    #{@current_ussd_session.plr_base.blank? ? '' : "Base: " + @current_ussd_session.plr_base}
-    #{@current_ussd_session.plr_selection.blank? ? '' : "Sélection: " + @current_ussd_session.plr_selection}
-    Votre pari est estimé à #{json_object["bet"]["bet_cost_amount"]} FCFA.
-    Confirmez en saisissant votre code secret]
+R#{@current_ussd_session.plr_reunion_number}C#{@current_ussd_session.plr_race_number}
+#{@current_ussd_session.plr_bet_type_label} > #{@current_ussd_session.plr_formula_label}
+#{@current_ussd_session.plr_base.blank? ? '' : "Base: " + @current_ussd_session.plr_base}
+#{@current_ussd_session.plr_selection.blank? ? '' : "Sélection: " + @current_ussd_session.plr_selection}
+Votre pari est estimé à #{json_object["bet"]["bet_cost_amount"]} FCFA.
+Confirmez en saisissant votre code secret]
               @bet_cost_amount = json_object["bet"]["bet_cost_amount"]
               @session_identifier = '28'
             else
               @rendered_text = %Q[Le pari n'a pas pu être évalué
-    Réunion: R#{@current_ussd_session.plr_reunion_number} - Course: C#{@current_ussd_session.plr_race_number}
-    Veuillez saisir le nombre de fois que vous souhaitez miser]
+Réunion: R#{@current_ussd_session.plr_reunion_number} - Course: C#{@current_ussd_session.plr_race_number}
+Veuillez saisir le nombre de fois que vous souhaitez miser]
               @session_identifier = '27'
             end
           end
