@@ -586,15 +586,21 @@ Saisissez le nombre de fois
           when '8'
             # solde du compte paymoney
             get_paymoney_sold
-            @current_ussd_session.update_attributes(session_identifier: @session_identifier, paymoney_sold_url: @get_paymoney_sold_url, paymoney_sold_response: (@get_paymoney_sold_response.body rescue nil))
+            unless ['0', '00'].include?(@ussd_string)
+              @current_ussd_session.update_attributes(session_identifier: @session_identifier, paymoney_sold_url: @get_paymoney_sold_url, paymoney_sold_response: (@get_paymoney_sold_response.body rescue nil))
+            end
           when '9'
             # affichage de la liste des otp
             get_paymoney_otp
-            @current_ussd_session.update_attributes(session_identifier: @session_identifier, paymoney_otp_url: @get_paymoney_otp_url, paymoney_otp_response: (@get_paymoney_otp_response.body rescue nil))
+            unless ['0', '00'].include?(@ussd_string)
+              @current_ussd_session.update_attributes(session_identifier: @session_identifier, paymoney_otp_url: @get_paymoney_otp_url, paymoney_otp_response: (@get_paymoney_otp_response.body rescue nil))
+            end
           when '10'
             # retour au menu principal ou affichage des otp d'un autre compte
             list_otp_set_session_identifier
-            @current_ussd_session.update_attributes(session_identifier: @session_identifier)
+            unless ['0', '00'].include?(@ussd_string)
+              @current_ussd_session.update_attributes(session_identifier: @session_identifier)
+            end
           when '5'
             set_session_identifier_depending_on_menu_selected
             if @status
@@ -1367,74 +1373,88 @@ Montant débité: #{@current_ussd_session.stake.split('-')[1]} FCFA. Confirmez e
 
   def get_paymoney_password_to_check_sold
     @rendered_text = %Q[Veuillez entrer votre mot de passe PAYMONEY pour consulter votre solde.
-
 1- Solde autre compte
-    ]
+0- Retour
+00- Accueil]
     @session_identifier = '8'
   end
 
   def get_paymoney_password_to_check_otp
-    @rendered_text = %Q[Veuillez entrer votre mot de passe PAYMONEY pour consulter votre liste d'OTP.]
+    @rendered_text = %Q[Veuillez entrer votre mot de passe PAYMONEY pour consulter votre liste d'OTP.
+0- Retour
+00- Accueil]
     @session_identifier = '9'
   end
 
   def get_paymoney_otp
-    if @ussd_string.blank?
-      @rendered_text = %Q[Veuillez entrer votre mot de passe PAYMONEY pour consulter votre liste d'OTP.]
-      @session_identifier = '8'
-    else
-      account_profile = AccountProfile.find_by_msisdn(@msisdn[-8,8])
-      @get_paymoney_otp_url = Parameter.first.paymoney_url + "/PAYMONEY_WALLET/rest/getLastOtp/#{account_profile.paymoney_account_number}/#{@ussd_string}/"
-      @get_paymoney_otp_response = Typhoeus.get(@get_paymoney_otp_url, connecttimeout: 30)
-
-      otps = %Q[{"otps":] + (@get_paymoney_otp_response.body rescue nil) + %Q[}]
-      otps = JSON.parse(otps)["otps"] rescue nil
-
-      if otps.blank?
-        @rendered_text = %Q[
-Votre liste d'OTP est vide
-
-1- OTP autre compte
-0- Retour
-        ]
-        @session_identifier = '10'
+    case @ussd_string
+      when '0'
+        back_to_home
+      when '00'
+        back_to_home
       else
-        otp_string = ""
-        otps.each do |otp|
-          t = Time.at(((otp["otpDate"].to_s)[0..9]).to_i)
-          otp_string << otp["otpPin"] + ' ' + (otp["otpStatus"] == true ? 'Valide' : 'Désactivé') + t.strftime(" %d-%m-%Y ") + t.strftime("%Hh %Mmn") + %Q[
-]
-        end
-        @rendered_text = %Q[
-#{otp_string}
+        if @ussd_string.blank?
+          @rendered_text = %Q[Veuillez entrer votre mot de passe PAYMONEY pour consulter votre liste d'OTP.
+0- Retour
+00- Accueil]
+          @session_identifier = '8'
+        else
+          account_profile = AccountProfile.find_by_msisdn(@msisdn[-8,8])
+          @get_paymoney_otp_url = Parameter.first.paymoney_url + "/PAYMONEY_WALLET/rest/getLastOtp/#{account_profile.paymoney_account_number}/#{@ussd_string}/"
+          @get_paymoney_otp_response = Typhoeus.get(@get_paymoney_otp_url, connecttimeout: 30)
+
+          otps = %Q[{"otps":] + (@get_paymoney_otp_response.body rescue nil) + %Q[}]
+          otps = JSON.parse(otps)["otps"] rescue nil
+
+          if otps.blank?
+            @rendered_text = %Q[Votre liste d'OTP est vide
 1- OTP autre compte
 0- Retour
-        ]
-        @session_identifier = '10'
+00- Accueil]
+            @session_identifier = '10'
+          else
+            otp_string = ""
+            otps.each do |otp|
+              t = Time.at(((otp["otpDate"].to_s)[0..9]).to_i)
+              otp_string << otp["otpPin"] + ' ' + (otp["otpStatus"] == true ? 'Valide' : 'Désactivé') + t.strftime(" %d-%m-%Y ") + t.strftime("%Hh %Mmn") + %Q[
+    ]
+            end
+            @rendered_text = %Q[#{otp_string}
+1- OTP autre compte
+0- Retour
+00- Accueil]
+            @session_identifier = '10'
+          end
+        end
       end
-    end
   end
 
   def get_paymoney_sold
-    if @ussd_string.blank?
-      @rendered_text = %Q[
-      Veuillez entrer votre mot de passe PAYMONEY pour consulter votre solde.
-      ]
-      @session_identifier = '8'
-    else
-      account_profile = AccountProfile.find_by_msisdn(@msisdn[-8,8])
-      @get_paymoney_sold_url = Parameter.first.paymoney_url + "/PAYMONEY_WALLET/rest/solte_compte/#{account_profile.paymoney_account_number}/#{@ussd_string}"
-      @get_paymoney_sold_response = Typhoeus.get(@get_paymoney_sold_url, connecttimeout: 30)
-
-      balance = JSON.parse(@get_paymoney_sold_response.body)["solde"] rescue nil
-      if balance.blank?
-        @rendered_text = %Q[
-        Le mot de passe saisi n'est pas valide.
-        Veuillez entrer votre mot de passe PAYMONEY pour consulter votre solde.
-        ]
-        @session_identifier = '8'
+    case @ussd_string
+      when '0'
+        back_to_home
+      when '00'
+        back_to_home
       else
-        @rendered_text = %Q[
+        if @ussd_string.blank?
+          @rendered_text = %Q[Veuillez entrer votre mot de passe PAYMONEY pour consulter votre solde.
+0- Retour
+00- Accueil]
+          @session_identifier = '8'
+        else
+          account_profile = AccountProfile.find_by_msisdn(@msisdn[-8,8])
+          @get_paymoney_sold_url = Parameter.first.paymoney_url + "/PAYMONEY_WALLET/rest/solte_compte/#{account_profile.paymoney_account_number}/#{@ussd_string}"
+          @get_paymoney_sold_response = Typhoeus.get(@get_paymoney_sold_url, connecttimeout: 30)
+
+          balance = JSON.parse(@get_paymoney_sold_response.body)["solde"] rescue nil
+          if balance.blank?
+            @rendered_text = %Q[Le mot de passe saisi n'est pas valide.
+Veuillez entrer votre mot de passe PAYMONEY pour consulter votre solde.
+0- Retour
+00- Accueil]
+            @session_identifier = '8'
+          else
+            @rendered_text = %Q[
 Votre solde PAYMONEY est de: #{balance rescue 0} FCFA
 1- Jeux
 2- Mes paris
@@ -1443,9 +1463,10 @@ Votre solde PAYMONEY est de: #{balance rescue 0} FCFA
 5- Votre service SMS
 6- Mes OTP
 7- Mes comptes]
-        @session_identifier = '5'
+            @session_identifier = '5'
+          end
+        end
       end
-    end
   end
 
   def list_otp_set_session_identifier
