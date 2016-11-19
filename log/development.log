@@ -54075,3 +54075,11 @@ Migrating to AddAlrPlaceBetFieldsToUssdSessions (20161102082901)
   [1m[36mSQL (0.6ms)[0m  [1mINSERT INTO "schema_migrations" ("version") VALUES ($1)[0m  [["version", "20161102082901"]]
   [1m[35m (24.9ms)[0m  COMMIT
   [1m[36mActiveRecord::SchemaMigration Load (0.7ms)[0m  [1mSELECT "schema_migrations".* FROM "schema_migrations"[0m
+  [1m[36mActiveRecord::SchemaMigration Load (30.9ms)[0m  [1mSELECT "schema_migrations".* FROM "schema_migrations"[0m
+Migrating to AddOtherPaymoneyAccountNumberToUssdSessions (20161119201628)
+  [1m[35m (0.8ms)[0m  BEGIN
+  [1m[36m (358.4ms)[0m  [1mALTER TABLE "ussd_sessions" ADD COLUMN "other_paymoney_account_number" character varying(255)[0m
+  [1m[35m (0.6ms)[0m  ALTER TABLE "ussd_sessions" ADD COLUMN "other_paymoney_account_password" character varying(255)
+  [1m[36mSQL (0.7ms)[0m  [1mINSERT INTO "schema_migrations" ("version") VALUES ($1)[0m  [["version", "20161119201628"]]
+  [1m[35m (15.9ms)[0m  COMMIT
+  [1m[36mActiveRecord::SchemaMigration Load (0.7ms)[0m  [1mSELECT "schema_migrations".* FROM "schema_migrations"[0m

@@ -518,6 +518,23 @@ Saisissez le nombre de fois
     @current_ussd_session.update_attributes(session_identifier: @session_identifier)
   end
 
+  def back_to_get_paymoney_sold
+    @rendered_text = %Q[Veuillez entrer votre mot de passe PAYMONEY pour consulter votre solde.
+1- Solde autre compte
+0- Retour
+00- Accueil]
+    @session_identifier = '8'
+    @current_ussd_session.update_attributes(session_identifier: @session_identifier)
+  end
+
+  def back_to_get_paymoney_other_account_number
+    @rendered_text = %Q[Veuillez entrer le numéro de compte Paymoney dont vous voulez consulter le solde.
+0- Retour
+00- Accueil]
+    @session_identifier = '39'
+    @current_ussd_session.update_attributes(session_identifier: @session_identifier)
+  end
+
   def main_menu
     @raw_body = request.body.read.gsub("ns1:", "").gsub("ns2:", "") rescue nil
     @received_body = (Nokogiri.XML(@raw_body) rescue nil)
@@ -613,6 +630,7 @@ Saisissez le nombre de fois
                 when '3'
                   get_paymoney_password_to_check_sold
                   @current_ussd_session.update_attributes(session_identifier: @session_identifier)
+
                 when '4'
 
                 when '5'
@@ -623,6 +641,16 @@ Saisissez le nombre de fois
                 when '7'
 
               end
+            end
+          when '39'
+            get_paymoney_other_account_number
+            unless ['0', '00'].include?(@ussd_string)
+              @current_ussd_session.update_attributes(session_identifier: @session_identifier, other_paymoney_account_number: @ussd_string)
+            end
+          when '40'
+            get_paymoney_other_account_password
+            unless ['0', '00'].include?(@ussd_string)
+              @current_ussd_session.update_attributes(session_identifier: @session_identifier, other_paymoney_account_password: @ussd_string, paymoney_sold_url: @get_paymoney_sold_url, paymoney_sold_response: (@get_paymoney_sold_response.body rescue nil))
             end
           # Affichage du menu listant les jeux
           when '11'
@@ -1429,6 +1457,67 @@ Montant débité: #{@current_ussd_session.stake.split('-')[1]} FCFA. Confirmez e
       end
   end
 
+  def get_paymoney_other_account_number
+    case @ussd_string
+      when '0'
+        back_to_get_paymoney_sold
+      when '00'
+        back_to_home
+      else
+        if @ussd_string.blank?
+          @rendered_text = %Q[Veuillez entrer le numéro de compte Paymoney dont vous voulez consulter le solde.
+0- Retour
+00- Accueil]
+          @session_identifier = '39'
+        else
+          @rendered_text = %Q[Veuillez entrer le code secret Paymoney du compte dont vous voulez consulter le solde.
+0- Retour
+00- Accueil]
+          @session_identifier = '40'
+        end
+      end
+  end
+
+  def get_paymoney_other_account_password
+    case @ussd_string
+      when '0'
+        back_to_get_paymoney_other_account_number
+      when '00'
+        back_to_home
+      else
+        if @ussd_string.blank?
+          @rendered_text = %Q[Veuillez entrer le code secret Paymoney du compte dont vous voulez consulter le solde.
+0- Retour
+00- Accueil]
+          @session_identifier = '40'
+        else
+          account_profile = AccountProfile.find_by_msisdn(@msisdn[-8,8])
+          @get_paymoney_sold_url = Parameter.first.paymoney_url + "/PAYMONEY_WALLET/rest/solte_compte/#{@current_ussd_session.other_paymoney_account_number}/#{@ussd_string}"
+          @get_paymoney_sold_response = Typhoeus.get(@get_paymoney_sold_url, connecttimeout: 30)
+
+          balance = JSON.parse(@get_paymoney_sold_response.body)["solde"] rescue nil
+          if balance.blank?
+            @rendered_text = %Q[Le mot de passe saisi n'est pas valide.
+Veuillez entrer le code secret Paymoney du compte dont vous voulez consulter le solde.
+0- Retour
+00- Accueil]
+            @session_identifier = '40'
+          else
+            @rendered_text = %Q[
+Le solde PAYMONEY est de: #{balance rescue 0} FCFA
+1- Jeux
+2- Mes paris
+3- Mon solde
+4- Rechargement
+5- Votre service SMS
+6- Mes OTP
+7- Mes comptes]
+            @session_identifier = '5'
+          end
+        end
+      end
+  end
+
   def get_paymoney_sold
     case @ussd_string
       when '0'
@@ -1438,23 +1527,31 @@ Montant débité: #{@current_ussd_session.stake.split('-')[1]} FCFA. Confirmez e
       else
         if @ussd_string.blank?
           @rendered_text = %Q[Veuillez entrer votre mot de passe PAYMONEY pour consulter votre solde.
+1- Solde autre compte
 0- Retour
 00- Accueil]
           @session_identifier = '8'
         else
-          account_profile = AccountProfile.find_by_msisdn(@msisdn[-8,8])
-          @get_paymoney_sold_url = Parameter.first.paymoney_url + "/PAYMONEY_WALLET/rest/solte_compte/#{account_profile.paymoney_account_number}/#{@ussd_string}"
-          @get_paymoney_sold_response = Typhoeus.get(@get_paymoney_sold_url, connecttimeout: 30)
-
-          balance = JSON.parse(@get_paymoney_sold_response.body)["solde"] rescue nil
-          if balance.blank?
-            @rendered_text = %Q[Le mot de passe saisi n'est pas valide.
-Veuillez entrer votre mot de passe PAYMONEY pour consulter votre solde.
+          if @ussd_string == '1'
+            @rendered_text = %Q[Veuillez entrer le numéro de compte Paymoney dont vous voulez consulter le solde.
 0- Retour
 00- Accueil]
-            @session_identifier = '8'
+            @session_identifier = '39'
           else
-            @rendered_text = %Q[
+            account_profile = AccountProfile.find_by_msisdn(@msisdn[-8,8])
+            @get_paymoney_sold_url = Parameter.first.paymoney_url + "/PAYMONEY_WALLET/rest/solte_compte/#{account_profile.paymoney_account_number}/#{@ussd_string}"
+            @get_paymoney_sold_response = Typhoeus.get(@get_paymoney_sold_url, connecttimeout: 30)
+
+            balance = JSON.parse(@get_paymoney_sold_response.body)["solde"] rescue nil
+            if balance.blank?
+              @rendered_text = %Q[Le mot de passe saisi n'est pas valide.
+Veuillez entrer votre mot de passe PAYMONEY pour consulter votre solde.
+1- Solde autre compte
+0- Retour
+00- Accueil]
+              @session_identifier = '8'
+            else
+              @rendered_text = %Q[
 Votre solde PAYMONEY est de: #{balance rescue 0} FCFA
 1- Jeux
 2- Mes paris
@@ -1463,7 +1560,8 @@ Votre solde PAYMONEY est de: #{balance rescue 0} FCFA
 5- Votre service SMS
 6- Mes OTP
 7- Mes comptes]
-            @session_identifier = '5'
+              @session_identifier = '5'
+            end
           end
         end
       end
@@ -3455,7 +3553,7 @@ Veuillez entrer votre mot de passe Paymoney pour valider le pari.
                    races << race_id[-1,1] + " - Nationale" + race_id[-1,1] + "
 "
                 end
-                @rendered_text = %Q[FELCITATIONS, votre pari a bien été enregistré.
+                @rendered_text = %Q[FELICITATIONS, votre pari a bien été enregistré.
 Numéro de ticket: #{json_object["bet"]["serial_number"]}
 PMU, PARIE  POUR GAGNER!
 #{races}
