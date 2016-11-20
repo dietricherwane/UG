@@ -519,7 +519,7 @@ Saisissez le nombre de fois
   end
 
   def back_to_get_paymoney_sold
-    @rendered_text = %Q[Veuillez entrer votre mot de passe PAYMONEY pour consulter votre solde.
+    @rendered_text = %Q[Veuillez entrer votre code secret PAYMONEY pour consulter votre solde.
 1- Solde autre compte
 0- Retour
 00- Accueil]
@@ -532,6 +532,15 @@ Saisissez le nombre de fois
 0- Retour
 00- Accueil]
     @session_identifier = '39'
+    @current_ussd_session.update_attributes(session_identifier: @session_identifier)
+  end
+
+  def back_to_get_paymoney_otp
+    @rendered_text = %Q[Veuillez entrer votre code secret PAYMONEY pour consulter votre liste d'OTP.
+1- OTP autre compte
+0- Retour
+00- Accueil]
+    @session_identifier = '8'
     @current_ussd_session.update_attributes(session_identifier: @session_identifier)
   end
 
@@ -581,11 +590,11 @@ Saisissez le nombre de fois
           UssdSession.create(session_identifier: @session_identifier, sender_cb: @sender_cb, parionsdirect_password_url: @parionsdirect_password_url, parionsdirect_password_response: (@parionsdirect_password_response.body rescue 'ERR'), parionsdirect_password: @password, parionsdirect_salt: @salt)
         else
           case @current_ussd_session.session_identifier
-          # Saisie du mot de passe de création de compte parionsdirect
+          # Saisie du code secret de création de compte parionsdirect
           when '1'
             set_parionsdirect_password
             @current_ussd_session.update_attributes(session_identifier: @session_identifier, creation_pd_password: @creation_pd_password)
-          # Saisie de la confirmation du mot de passe de création de compte parionsdirect
+          # Saisie de la confirmation du code secret de création de compte parionsdirect
           when '3'
             create_parionsdirect_account
             @current_ussd_session.update_attributes(session_identifier: @session_identifier, creation_pd_password_confirmation: @creation_pd_password_confirmation, creation_pd_request: @creation_pd_request, creation_pd_response: (@creation_pd_response.body rescue 'ERR'), pd_account_created: @pd_account_created)
@@ -626,7 +635,8 @@ Saisissez le nombre de fois
                   display_games_menu
                   @current_ussd_session.update_attributes(session_identifier: @session_identifier)
                 when '2'
-
+                  display_bet_games_list
+                  @current_ussd_session.update_attributes(session_identifier: @session_identifier)
                 when '3'
                   get_paymoney_password_to_check_sold
                   @current_ussd_session.update_attributes(session_identifier: @session_identifier)
@@ -639,7 +649,8 @@ Saisissez le nombre de fois
                   get_paymoney_password_to_check_otp
                   @current_ussd_session.update_attributes(session_identifier: @session_identifier)
                 when '7'
-
+                  display_default_paymoney_account
+                  @current_ussd_session.update_attributes(session_identifier: @session_identifier)
               end
             end
           when '39'
@@ -651,6 +662,21 @@ Saisissez le nombre de fois
             get_paymoney_other_account_password
             unless ['0', '00'].include?(@ussd_string)
               @current_ussd_session.update_attributes(session_identifier: @session_identifier, other_paymoney_account_password: @ussd_string, paymoney_sold_url: @get_paymoney_sold_url, paymoney_sold_response: (@get_paymoney_sold_response.body rescue nil))
+            end
+          when '41'
+            get_paymoney_other_otp_account_number
+            unless ['0', '00'].include?(@ussd_string)
+              @current_ussd_session.update_attributes(session_identifier: @session_identifier, other_otp_paymoney_account_number: @ussd_string)
+            end
+          when '42'
+            get_paymoney_other_otp_account_password
+            unless ['0', '00'].include?(@ussd_string)
+              @current_ussd_session.update_attributes(session_identifier: @session_identifier, other_otp_paymoney_account_password: @ussd_string)
+            end
+          when '43'
+            unless ['0', '00'].include?(@ussd_string)
+              set_default_paymoney_account
+              @current_ussd_session.update_attributes(session_identifier: @session_identifier)
             end
           # Affichage du menu listant les jeux
           when '11'
@@ -778,7 +804,7 @@ Saisissez le nombre de fois
             loto_evaluate_bet
             @current_ussd_session.update_attributes(session_identifier: @session_identifier, stake: @ussd_string + '-' + @repeats.to_s)
           when '18'
-            # Prise du pari à la saisie du mot de passe Paymoney
+            # Prise du pari à la saisie du code secret Paymoney
             @account_profile = AccountProfile.find_by_msisdn(@msisdn[-8,8])
             loto_place_bet
             @current_ussd_session.update_attributes(session_identifier: @session_identifier, loto_bet_paymoney_password: @ussd_string, loto_place_bet_url: @loto_place_bet_url.to_s + @request_body.to_s, loto_place_bet_response: (@loto_place_bet_response.body rescue nil), get_gamer_id_request: @get_gamer_id_request, get_gamer_id_response: (@get_gamer_id_response.body rescue nil))
@@ -1366,7 +1392,18 @@ Montant débité: #{@current_ussd_session.stake.split('-')[1]} FCFA. Confirmez e
 4- SPORTCASH
 0- Retour
 00- Accueil]
-      @session_identifier = '11'
+    @session_identifier = '11'
+  end
+
+  def display_bet_games_list
+    @rendered_text = %Q[
+1- Loto Bonheur
+2- PMU ALR
+3- PMU PLR
+4- SPORTCASH
+0- Retour
+00- Accueil]
+    @session_identifier = '44'
   end
 
   def set_session_identifier_depending_on_game_selected
@@ -1400,7 +1437,7 @@ Montant débité: #{@current_ussd_session.stake.split('-')[1]} FCFA. Confirmez e
   end
 
   def get_paymoney_password_to_check_sold
-    @rendered_text = %Q[Veuillez entrer votre mot de passe PAYMONEY pour consulter votre solde.
+    @rendered_text = %Q[Veuillez entrer votre code secret PAYMONEY pour consulter votre solde.
 1- Solde autre compte
 0- Retour
 00- Accueil]
@@ -1408,7 +1445,8 @@ Montant débité: #{@current_ussd_session.stake.split('-')[1]} FCFA. Confirmez e
   end
 
   def get_paymoney_password_to_check_otp
-    @rendered_text = %Q[Veuillez entrer votre mot de passe PAYMONEY pour consulter votre liste d'OTP.
+    @rendered_text = %Q[Veuillez entrer votre code secret PAYMONEY pour consulter votre liste d'OTP.
+1- OTP autre compte
 0- Retour
 00- Accueil]
     @session_identifier = '9'
@@ -1421,38 +1459,85 @@ Montant débité: #{@current_ussd_session.stake.split('-')[1]} FCFA. Confirmez e
       when '00'
         back_to_home
       else
-        if @ussd_string.blank?
-          @rendered_text = %Q[Veuillez entrer votre mot de passe PAYMONEY pour consulter votre liste d'OTP.
+        if @ussd_string == '1'
+          @rendered_text = %Q[Veuillez entrer le numéro de compte PAYMONEY dont vous souhaitez consulter les OTP.
 0- Retour
 00- Accueil]
-          @session_identifier = '8'
+          @session_identifier = '41'
         else
-          account_profile = AccountProfile.find_by_msisdn(@msisdn[-8,8])
-          @get_paymoney_otp_url = Parameter.first.paymoney_url + "/PAYMONEY_WALLET/rest/getLastOtp/#{account_profile.paymoney_account_number}/#{@ussd_string}/"
-          @get_paymoney_otp_response = Typhoeus.get(@get_paymoney_otp_url, connecttimeout: 30)
-
-          otps = %Q[{"otps":] + (@get_paymoney_otp_response.body rescue nil) + %Q[}]
-          otps = JSON.parse(otps)["otps"] rescue nil
-
-          if otps.blank?
-            @rendered_text = %Q[Votre liste d'OTP est vide
+          if @ussd_string.blank?
+            @rendered_text = %Q[Veuillez entrer votre code secret PAYMONEY pour consulter votre liste d'OTP.
 1- OTP autre compte
 0- Retour
 00- Accueil]
-            @session_identifier = '10'
+            @session_identifier = '8'
           else
-            otp_string = ""
-            otps.each do |otp|
-              t = Time.at(((otp["otpDate"].to_s)[0..9]).to_i)
-              otp_string << otp["otpPin"] + ' ' + (otp["otpStatus"] == true ? 'Valide' : 'Désactivé') + t.strftime(" %d-%m-%Y ") + t.strftime("%Hh %Mmn") + %Q[
-    ]
-            end
-            @rendered_text = %Q[#{otp_string}
+            account_profile = AccountProfile.find_by_msisdn(@msisdn[-8,8])
+            @get_paymoney_otp_url = Parameter.first.paymoney_url + "/PAYMONEY_WALLET/rest/getLastOtp/#{account_profile.paymoney_account_number}/#{@ussd_string}/"
+            @get_paymoney_otp_response = Typhoeus.get(@get_paymoney_otp_url, connecttimeout: 30)
+
+            otps = %Q[{"otps":] + (@get_paymoney_otp_response.body rescue nil) + %Q[}]
+            otps = JSON.parse(otps)["otps"] rescue nil
+
+            if otps.blank?
+              @rendered_text = %Q[Votre liste d'OTP est vide
 1- OTP autre compte
 0- Retour
 00- Accueil]
-            @session_identifier = '10'
+              @session_identifier = '10'
+            else
+              otp_string = ""
+              otps.each do |otp|
+                t = Time.at(((otp["otpDate"].to_s)[0..9]).to_i)
+                otp_string << otp["otpPin"] + ' ' + (otp["otpStatus"] == true ? 'Valide' : 'Désactivé') + t.strftime(" %d-%m-%Y ") + t.strftime("%Hh %Mmn") + %Q[
+]
+              end
+              @rendered_text = %Q[#{otp_string}
+1- OTP autre compte
+0- Retour
+00- Accueil]
+              @session_identifier = '10'
+            end
           end
+        end
+      end
+  end
+
+  def display_default_paymoney_account
+    @rendered_text = %Q[Votre compte Paymoney associé est le: #{AccountProfile.find_by_msisdn(@msisdn[-8,8]).paymoney_account_number rescue nil}
+Veuillez entrer un autre numéro de compte Paymoney si vous souhaitez le changer.
+0- Retour
+00- Accueil]
+    @session_identifier = '43'
+  end
+
+  def set_default_paymoney_account
+    case @ussd_string
+      when '0'
+        back_to_home
+      when '00'
+        back_to_home
+      else
+        @check_pw_account_url = Parameter.first.paymoney_url + "/PAYMONEY_WALLET/rest/check2_compte/#{@ussd_string}"
+        @check_pw_account_response = Typhoeus.get(@check_pw_account_url, connecttimeout: 30)
+
+        if !@check_pw_account_response.body.blank? && @check_pw_account_response.body != 'null'
+          @pw_account_number = @ussd_string
+          @pw_account_token = @check_pw_account_response.body
+          # On associe le compte Paymoney du client à son numéro
+          AccountProfile.find_by_msisdn(@msisdn[-8,8]).update_attributes(paymoney_account_number: @pw_account_number)
+          @rendered_text = %Q[Votre compte Paymoney associé est le: #{@ussd_string}
+Veuillez entrer un autre numéro de compte Paymoney si vous souhaitez le changer.
+0- Retour
+00- Accueil]
+          @session_identifier = '43'
+        else
+          @rendered_text = %Q[Le numéro de compte saisi n'est pas valide
+Votre compte Paymoney associé est le: #{AccountProfile.find_by_msisdn(@msisdn[-8,8]).paymoney_account_number rescue nil}
+Veuillez entrer un autre numéro de compte Paymoney si vous souhaitez le changer.
+0- Retour
+00- Accueil]
+          @session_identifier = '43'
         end
       end
   end
@@ -1497,7 +1582,7 @@ Montant débité: #{@current_ussd_session.stake.split('-')[1]} FCFA. Confirmez e
 
           balance = JSON.parse(@get_paymoney_sold_response.body)["solde"] rescue nil
           if balance.blank?
-            @rendered_text = %Q[Le mot de passe saisi n'est pas valide.
+            @rendered_text = %Q[Le code secret saisi n'est pas valide.
 Veuillez entrer le code secret Paymoney du compte dont vous voulez consulter le solde.
 0- Retour
 00- Accueil]
@@ -1518,6 +1603,70 @@ Le solde PAYMONEY est de: #{balance rescue 0} FCFA
       end
   end
 
+  def get_paymoney_other_otp_account_number
+    case @ussd_string
+      when '0'
+        back_to_get_paymoney_otp
+      when '00'
+        back_to_home
+      else
+        if @ussd_string.blank?
+          @rendered_text = %Q[Veuillez entrer le numéro de compte PAYMONEY dont vous souhaitez consulter les OTP.
+0- Retour
+00- Accueil]
+          @session_identifier = '41'
+        else
+          @rendered_text = %Q[Veuillez entrer le code secret Paymoney du compte dont vous voulez consulter les OTP.
+0- Retour
+00- Accueil]
+          @session_identifier = '42'
+        end
+      end
+  end
+
+  def get_paymoney_other_otp_account_password
+    case @ussd_string
+      when '0'
+        back_to_get_paymoney_other_otp_account_number
+      when '00'
+        back_to_home
+      else
+        if @ussd_string.blank?
+          @rendered_text = %Q[Veuillez entrer le code secret Paymoney du compte dont vous voulez consulter les OTP.
+0- Retour
+00- Accueil]
+          @session_identifier = '42'
+        else
+          account_profile = AccountProfile.find_by_msisdn(@msisdn[-8,8])
+          @get_paymoney_otp_url = Parameter.first.paymoney_url + "/PAYMONEY_WALLET/rest/getLastOtp/#{@current_ussd_session.other_otp_paymoney_account_number}/#{@ussd_string}/"
+          @get_paymoney_otp_response = Typhoeus.get(@get_paymoney_otp_url, connecttimeout: 30)
+
+          otps = %Q[{"otps":] + (@get_paymoney_otp_response.body rescue nil) + %Q[}]
+          otps = JSON.parse(otps)["otps"] rescue nil
+
+          if otps.blank?
+            @rendered_text = %Q[Votre liste d'OTP est vide
+Veuillez entrer le numéro de compte PAYMONEY dont vous souhaitez consulter les OTP.
+0- Retour
+00- Accueil]
+            @session_identifier = '41'
+          else
+            otp_string = ""
+            otps.each do |otp|
+              t = Time.at(((otp["otpDate"].to_s)[0..9]).to_i)
+              otp_string << otp["otpPin"] + ' ' + (otp["otpStatus"] == true ? 'Valide' : 'Désactivé') + t.strftime(" %d-%m-%Y ") + t.strftime("%Hh %Mmn") + %Q[
+]
+            end
+            @rendered_text = %Q[Veuillez entrer le numéro de compte PAYMONEY dont vous souhaitez consulter les OTP.
+#{otp_string}
+0- Retour
+00- Accueil]
+            @session_identifier = '41'
+          end
+        end
+      end
+  end
+
   def get_paymoney_sold
     case @ussd_string
       when '0'
@@ -1526,7 +1675,7 @@ Le solde PAYMONEY est de: #{balance rescue 0} FCFA
         back_to_home
       else
         if @ussd_string.blank?
-          @rendered_text = %Q[Veuillez entrer votre mot de passe PAYMONEY pour consulter votre solde.
+          @rendered_text = %Q[Veuillez entrer votre code secret PAYMONEY pour consulter votre solde.
 1- Solde autre compte
 0- Retour
 00- Accueil]
@@ -1544,8 +1693,8 @@ Le solde PAYMONEY est de: #{balance rescue 0} FCFA
 
             balance = JSON.parse(@get_paymoney_sold_response.body)["solde"] rescue nil
             if balance.blank?
-              @rendered_text = %Q[Le mot de passe saisi n'est pas valide.
-Veuillez entrer votre mot de passe PAYMONEY pour consulter votre solde.
+              @rendered_text = %Q[Le code secret saisi n'est pas valide.
+Veuillez entrer votre code secret PAYMONEY pour consulter votre solde.
 1- Solde autre compte
 0- Retour
 00- Accueil]
@@ -1580,19 +1729,19 @@ Votre solde PAYMONEY est de: #{balance rescue 0} FCFA
 
     if password.blank?
       # Le client n'a pas de compte parionsdirect et doit en créer un
-      @rendered_text = %Q[Pour accéder à ce service, créez votre compte de jeu en entrant un mot de passe de 4 caractères.]
+      @rendered_text = %Q[Pour accéder à ce service, créez votre compte de jeu en entrant un code secret de 4 caractères.]
       @session_identifier = '1'
     else
       # Le client a un compte parionsdirect et doit s'authentifier
-      @rendered_text = %Q[Veuillez entrer votre mot de passe parionsdirect.]
+      @rendered_text = %Q[Veuillez entrer votre code secret parionsdirect.]
       @session_identifier = '2'
     end
   end
 
   def check_parionsdirect_password
     if @ussd_string.blank?
-      # Le client n'a pas de compte parionsdirect et entrer un mot de passe pour en créer un
-      @rendered_text = %Q[Veuillez entrer votre mot de passe parionsdirect.]
+      # Le client n'a pas de compte parionsdirect et entrer un code secret pour en créer un
+      @rendered_text = %Q[Veuillez entrer votre code secret parionsdirect.]
       @session_identifier = '2'
     else
       password = Digest::SHA2.hexdigest(@current_ussd_session.parionsdirect_salt + @ussd_string)
@@ -1617,8 +1766,8 @@ Votre solde PAYMONEY est de: #{balance rescue 0} FCFA
           @session_identifier = '5'
         end
       else
-        @rendered_text = %Q[Le mot de passe saisi n'est pas valide.
-Veuillez entrer votre mot de passe parionsdirect.
+        @rendered_text = %Q[Le code secret saisi n'est pas valide.
+Veuillez entrer votre code secret parionsdirect.
           ]
         @session_identifier = '2'
       end
@@ -1658,34 +1807,34 @@ Veuillez saisir votre numéro de compte Paymoney.
     end
   end
 
-  # Création d'un nouveau compte parionsdirect par saisie du mot de passe
+  # Création d'un nouveau compte parionsdirect par saisie du code secret
   def set_parionsdirect_password
-    # L'utilisateur n'a pas saisi de mot de passe, on le ramène au menu précédent
+    # L'utilisateur n'a pas saisi de code secret, on le ramène au menu précédent
     if @ussd_string.blank? || @ussd_string.length != 4
-      # Le client n'a pas de compte parionsdirect et entrer un mot de passe pour en créer un
-      @rendered_text = %Q[Pour accéder à ce service, créez votre compte de jeu en entrant un mot de passe de 4 caractères.]
+      # Le client n'a pas de compte parionsdirect et entrer un code secret pour en créer un
+      @rendered_text = %Q[Pour accéder à ce service, créez votre compte de jeu en entrant un code secret de 4 caractères.]
       @session_identifier = '1'
     else
       @creation_pd_password = @ussd_string
-      # Le client n'a pas de compte parionsdirect et confirmer le mot de passe pour en créer un
-      @rendered_text = %Q[Veuillez confirmer le mot de passe précédemment entré.]
+      # Le client n'a pas de compte parionsdirect et confirmer le code secret pour en créer un
+      @rendered_text = %Q[Veuillez confirmer le code secret précédemment entré.]
       @session_identifier = '3'
     end
   end
 
-  # Création d'un nouveau compte parionsdirect par confirmation du mot de passe et création d'un compte paymoney
+  # Création d'un nouveau compte parionsdirect par confirmation du code secret et création d'un compte paymoney
   def create_parionsdirect_account
-    # L'utilisateur n'a pas saisi de confirmation de mot de passe, on le ramène au menu précédent
+    # L'utilisateur n'a pas saisi de confirmation de code secret, on le ramène au menu précédent
     if @ussd_string.blank? || @ussd_string.length != 4
-      # Le client n'a pas de compte parionsdirect et confirmer le mot de passe pour en créer un
-      @rendered_text = %Q[Veuillez confirmer le mot de passe précédemment entré.]
+      # Le client n'a pas de compte parionsdirect et confirmer le code secret pour en créer un
+      @rendered_text = %Q[Veuillez confirmer le code secret précédemment entré.]
       @session_identifier = '3'
     else
       @creation_pd_password_confirmation = @ussd_string
       # Les mots de passe saisis ne sont pas identiques
       if @current_ussd_session.creation_pd_password != @creation_pd_password_confirmation
-        # Le client n'a pas de compte parionsdirect et confirmer le mot de passe pour en créer un
-        @rendered_text = %Q[Veuillez confirmer le mot de passe précédemment entré.]
+        # Le client n'a pas de compte parionsdirect et confirmer le code secret pour en créer un
+        @rendered_text = %Q[Veuillez confirmer le code secret précédemment entré.]
         @session_identifier = '3'
       else
         @pseudo = "#{Digest::SHA1.hexdigest([DateTime.now.iso8601(6), rand].join).hex.to_s[0..8]}"
@@ -1703,7 +1852,7 @@ Veuillez saisir votre numéro de compte Paymoney.
           @pd_account_created = false
           @rendered_text = %Q[
             Une erreur s'est produite lors de la création du compte PARIONSDIRECT
-            Veuillez confirmer le mot de passe précédemment entré.
+            Veuillez confirmer le code secret précédemment entré.
             ]
           @session_identifier = '3'
         else
@@ -1737,7 +1886,7 @@ Veuillez saisir votre numéro de compte Paymoney.
           @pw_account_created = false
           @rendered_text = %Q[
             Une erreur s'est produite lors de la création du compte Paymoney
-            Veuillez confirmer le mot de passe précédemment entré.
+            Veuillez confirmer le code secret précédemment entré.
             ]
           @session_identifier = '3'
         end
@@ -3436,7 +3585,7 @@ Vous vous apprêtez à prendre un pari PMU ALR
 #{@current_ussd_session.alr_base.blank? ? '' : "Base: " + @current_ussd_session.alr_base}
 #{@current_ussd_session.alr_selection.blank? ? '' : "Sélection: " + @current_ussd_session.alr_selection}
 Votre pari est estimé à #{@alr_amount} FCFA
-Veuillez entrer votre mot de passe Paymoney pour valider le pari.
+Veuillez entrer votre code secret Paymoney pour valider le pari.
 0- Retour
 00- Accueil]
               @session_identifier = '38'
@@ -3483,7 +3632,7 @@ Saisissez le nombre de fois
 #{@current_ussd_session.alr_base.blank? ? '' : "Base: " + @current_ussd_session.alr_base}
 #{@current_ussd_session.alr_selection.blank? ? '' : "Sélection: " + @current_ussd_session.alr_selection}
 Votre pari est estimé à #{@current_ussd_session.alr_amount} FCFA
-Veuillez entrer votre mot de passe Paymoney pour valider le pari.
+Veuillez entrer votre code secret Paymoney pour valider le pari.
 0- Retour
 00- Accueil]
           @session_identifier = '38'
@@ -3498,7 +3647,7 @@ Vous vous apprêtez à prendre un pari PMU ALR
 #{@current_ussd_session.alr_base.blank? ? '' : "Base: " + @current_ussd_session.alr_base}
 #{@current_ussd_session.alr_selection.blank? ? '' : "Sélection: " + @current_ussd_session.alr_selection}
 Votre pari est estimé à #{@current_ussd_session.alr_amount} FCFA
-Veuillez entrer votre mot de passe Paymoney pour valider le pari.
+Veuillez entrer votre code secret Paymoney pour valider le pari.
 0- Retour
 00- Accueil]
             @session_identifier = '38'
@@ -3542,7 +3691,7 @@ Vous vous apprêtez à prendre un pari PMU ALR
 #{@current_ussd_session.alr_base.blank? ? '' : "Base: " + @current_ussd_session.alr_base}
 #{@current_ussd_session.alr_selection.blank? ? '' : "Sélection: " + @current_ussd_session.alr_selection}
 Votre pari est estimé à #{@current_ussd_session.alr_amount} FCFA
-Veuillez entrer votre mot de passe Paymoney pour valider le pari.
+Veuillez entrer votre code secret Paymoney pour valider le pari.
 0- Retour
 00- Accueil]
               @session_identifier = '38'
@@ -3568,7 +3717,7 @@ Vous vous apprêtez à prendre un pari PMU ALR
 #{@current_ussd_session.alr_base.blank? ? '' : "Base: " + @current_ussd_session.alr_base}
 #{@current_ussd_session.alr_selection.blank? ? '' : "Sélection: " + @current_ussd_session.alr_selection}
 Votre pari est estimé à #{@current_ussd_session.alr_amount} FCFA
-Veuillez entrer votre mot de passe Paymoney pour valider le pari.
+Veuillez entrer votre code secret Paymoney pour valider le pari.
 0- Retour
 00- Accueil]
                 @session_identifier = '38'
