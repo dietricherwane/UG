@@ -674,8 +674,8 @@ Saisissez le nombre de fois
               @current_ussd_session.update_attributes(session_identifier: @session_identifier, other_otp_paymoney_account_password: @ussd_string)
             end
           when '43'
+            set_default_paymoney_account
             unless ['0', '00'].include?(@ussd_string)
-              set_default_paymoney_account
               @current_ussd_session.update_attributes(session_identifier: @session_identifier)
             end
           # Affichage du menu listant les jeux
