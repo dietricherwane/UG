@@ -678,6 +678,39 @@ Saisissez le nombre de fois
             unless ['0', '00'].include?(@ussd_string)
               @current_ussd_session.update_attributes(session_identifier: @session_identifier)
             end
+          when '44'
+            set_session_identifier_depending_game_list_selected
+            if @status
+              case @ussd_string
+                when '0'
+                  back_list_main_menu
+                when '00'
+                  back_list_main_menu
+                when '1'
+                  list_loto_bets
+                when '2'
+                  list_plr_bets
+                when '3'
+                  list_alr_bets
+                when '4'
+                  list_sportcash_bets
+              end
+            end
+            unless ['0', '00'].include?(@ussd_string)
+              @current_ussd_session.update_attributes(session_identifier: @session_identifier, loto_bets_list_request: @loto_bets_list_request, loto_bets_list_request: @loto_bets_list_response, plr_bets_list_request: @plr_bets_list_request, plr_bets_list_request: @plr_bets_list_response, ale_bets_list_request: @alr_bets_list_request, alr_bets_list_request: @alr_bets_list_response, spc_bets_list_request: @spc_bets_list_request, spc_bets_list_request: @spc_bets_list_response)
+            end
+          when '45'
+            return_to_games_bets_list
+            @current_ussd_session.update_attributes(session_identifier: @session_identifier)
+          when '46'
+            return_to_games_bets_list
+            @current_ussd_session.update_attributes(session_identifier: @session_identifier)
+          when '47'
+            return_to_games_bets_list
+            @current_ussd_session.update_attributes(session_identifier: @session_identifier)
+          when '48'
+            return_to_games_bets_list
+            @current_ussd_session.update_attributes(session_identifier: @session_identifier)
           # Affichage du menu listant les jeux
           when '11'
             set_session_identifier_depending_on_game_selected
@@ -1059,12 +1092,101 @@ Saisissez le nombre de fois
     end
   end
 
+  def list_loto_bets
+    @loto_bets_list_request = Parameter.first.gateway_url + "/ail/loto/ussd/064482ec4/gamer/bets/list/#{@msisdn[-8,8]}"
+    @loto_bets_list_response = RestClient.get(@loto_bets_list_request) rescue nil
+    bets_string = ""
+
+    bets = JSON.parse(@loto_bets_list_response) rescue nil
+    bets = bets["bets"] rescue nil
+    unless bets.blank?
+      bets.each do |bet|
+        bets_string << %Q{Statut: #{bet["bet_status"]} - N° ticket: #{bet["ticket_number"]} - N° ref.: #{bet["ref_number"]}
+}
+      end
+    end
+
+    @rendered_text = %Q[Loto Bonheur
+Liste des paris
+#{bets_string}
+0- Retour
+00- Accueil]
+    @session_identifier = '45'
+  end
+
+  def list_plr_bets
+    @plr_bets_list_request = Parameter.first.gateway_url + "/ail/pmu/ussd/064582ec4/gamer/bets/list/#{@msisdn[-8,8]}"
+    @plr_bets_list_response = RestClient.get(@plr_bets_list_request) rescue nil
+    bets_string = ""
+
+    bets = JSON.parse(@plr_bets_list_response) rescue nil
+    bets = bets["bets"] rescue nil
+    unless bets.blank?
+      bets.each do |bet|
+        bets_string << %Q{Statut: #{bet["bet_status"]} - N° ticket: #{bet["ticket_number"]} - N° ref.: #{bet["ref_number"]}
+}
+      end
+    end
+
+    @rendered_text = %Q[PMU PLR
+Liste des paris
+#{bets_string}
+0- Retour
+00- Accueil]
+    @session_identifier = '46'
+  end
+
+  def list_alr_bets
+    @alr_bets_list_request = Parameter.first.gateway_url + "/ail/pmu_alr/ussd/064582ec2/gamer/bets/list/#{@msisdn[-8,8]}"
+    @alr_bets_list_response = RestClient.get(@alr_bets_list_request) rescue nil
+    bets_string = ""
+
+    bets = JSON.parse(@alr_bets_list_response) rescue nil
+    bets = bets["bets"] rescue nil
+    unless bets.blank?
+      bets.each do |bet|
+        bets_string << %Q{Statut: #{bet["bet_status"]} - N° ticket: #{bet["serial_number"]}
+}
+      end
+    end
+
+    @rendered_text = %Q[PMU ALR
+Liste des paris
+#{bets_string}
+0- Retour
+00- Accueil]
+    @session_identifier = '47'
+  end
+
+  def list_sportcash_bets
+    @spc_bets_list_request = Parameter.first.gateway_url + "/ail/sportcash/ussd/064582ec8/gamer/bets/list/#{@msisdn[-8,8]}"
+    @spc_bets_list_response = RestClient.get(@spc_bets_list_request) rescue nil
+    bets_string = ""
+
+    bets = JSON.parse(@spc_bets_list_response) rescue nil
+    bets = bets["bets"] rescue nil
+    unless bets.blank?
+      bets.each do |bet|
+        bets_string << %Q{Statut: #{bet["bet_status"]} - N° ticket: #{bet["ticket_id"]}
+}
+      end
+    end
+
+    @rendered_text = %Q[SPORTCASH
+Liste des paris
+#{bets_string}
+0- Retour
+00- Accueil]
+    @session_identifier = '48'
+  end
+
   def set_session_identifier_depending_on_bet_selection_selected
     @status = false
     if ['1', '2', '3', '4', '5', '0', '00'].include?(@ussd_string)
       @status = true
     else
-      @rendered_text = %Q[#{@current_ussd_session.draw_day_label}
+      @rendered_text = %Q[Loto Bonheur
+#{@current_ussd_session.draw_day_label}
 1- PN - 1 numéro
 2- 2N - 2 numéro
 3- 3N - 3 numéro
@@ -1396,7 +1518,7 @@ Montant débité: #{@current_ussd_session.stake.split('-')[1]} FCFA. Confirmez e
   end
 
   def display_bet_games_list
-    @rendered_text = %Q[
+    @rendered_text = %Q[Mes paris
 1- Loto Bonheur
 2- PMU ALR
 3- PMU PLR
@@ -1404,6 +1526,45 @@ Montant débité: #{@current_ussd_session.stake.split('-')[1]} FCFA. Confirmez e
 0- Retour
 00- Accueil]
     @session_identifier = '44'
+  end
+
+  def return_to_games_bets_list
+    if @ussd_string == '0'
+      @rendered_text = %Q[Mes paris
+1- Loto Bonheur
+2- PMU ALR
+3- PMU PLR
+4- SPORTCASH
+0- Retour
+00- Accueil]
+      @session_identifier = '44'
+    else
+      @rendered_text = %Q[
+1- Jeux
+2- Mes paris
+3- Mon solde
+4- Rechargement
+5- Votre service SMS
+6- Mes OTP
+7- Mes comptes]
+      @session_identifier = '5'
+    end
+  end
+
+  def set_session_identifier_depending_game_list_selected
+    @status = false
+    if ['1', '2', '3', '4', '0', '00'].include?(@ussd_string)
+      @status = true
+    else
+      @rendered_text = %Q[Mes paris
+1- Loto Bonheur
+2- PMU ALR
+3- PMU PLR
+4- SPORTCASH
+0- Retour
+00- Accueil]
+    @session_identifier = '44'
+    end
   end
 
   def set_session_identifier_depending_on_game_selected
