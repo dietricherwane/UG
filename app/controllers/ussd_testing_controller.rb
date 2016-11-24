@@ -689,9 +689,9 @@ Saisissez le nombre de fois
                 when '1'
                   list_loto_bets
                 when '2'
-                  list_plr_bets
-                when '3'
                   list_alr_bets
+                when '3'
+                  list_plr_bets
                 when '4'
                   list_sportcash_bets
               end
@@ -1894,7 +1894,7 @@ Votre solde PAYMONEY est de: #{balance rescue 0} FCFA
       @session_identifier = '1'
     else
       # Le client a un compte parionsdirect et doit s'authentifier
-      @rendered_text = %Q[Veuillez entrer votre code secret parionsdirect.]
+      @rendered_text = %Q[Veuillez entrer votre mot de passe parionsdirect.]
       @session_identifier = '2'
     end
   end
@@ -1902,7 +1902,7 @@ Votre solde PAYMONEY est de: #{balance rescue 0} FCFA
   def check_parionsdirect_password
     if @ussd_string.blank?
       # Le client n'a pas de compte parionsdirect et entrer un code secret pour en créer un
-      @rendered_text = %Q[Veuillez entrer votre code secret parionsdirect.]
+      @rendered_text = %Q[Veuillez entrer votre mot de passe parionsdirect.]
       @session_identifier = '2'
     else
       password = Digest::SHA2.hexdigest(@current_ussd_session.parionsdirect_salt + @ussd_string)
@@ -1928,7 +1928,7 @@ Votre solde PAYMONEY est de: #{balance rescue 0} FCFA
         end
       else
         @rendered_text = %Q[Le code secret saisi n'est pas valide.
-Veuillez entrer votre code secret parionsdirect.
+Veuillez entrer votre mot de passe parionsdirect.
           ]
         @session_identifier = '2'
       end
