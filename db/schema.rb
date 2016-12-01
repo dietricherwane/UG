@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161124114735) do
+ActiveRecord::Schema.define(version: 20161201080557) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -219,6 +219,10 @@ ActiveRecord::Schema.define(version: 20161124114735) do
     t.text     "alr_bets_list_response"
     t.text     "spc_bets_list_request"
     t.text     "spc_bets_list_response"
+    t.text     "list_sportcash_sports_request"
+    t.text     "list_sportcash_sports_response"
+    t.string   "sportcash_sport_label"
+    t.string   "sportcash_sport_code"
   end
 
 end

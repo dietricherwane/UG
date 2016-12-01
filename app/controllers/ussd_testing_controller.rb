@@ -730,7 +730,8 @@ Saisissez le nombre de fois
                   plr_get_reunion
                   @current_ussd_session.update_attributes(session_identifier: @session_identifier, get_plr_race_list_request: @get_plr_race_list_request, get_plr_race_list_response: @get_plr_race_list_response)
                 when '4'
-
+                  sportcash_main_menu
+                  @current_ussd_session.update_attributes(session_identifier: @session_identifier)
               end
             end
           # Choix du jour de tirage
@@ -1046,6 +1047,22 @@ Saisissez le nombre de fois
             unless ['0', '00'].include?(@ussd_string)
               @current_ussd_session.update_attributes(session_identifier: @session_identifier, alr_place_bet_request: @alr_place_bet_request + @body, alr_place_bet_response: @alr_place_bet_response.body, get_gamer_id_request: @get_gamer_id_request, get_gamer_id_response: @get_gamer_id_response.body)
             end
+          when '49'
+            set_session_identifier_sportcash_main_menu_selected
+            if @status
+              case @ussd_string
+                when '0'
+                  back_list_games_menu
+                when '00'
+                  back_list_main_menu
+                when '1'
+
+                when '2'
+                  list_sportcash_sports
+                  @current_ussd_session.update_attributes(session_identifier: @session_identifier, list_sportcash_sports_request: @list_sportcash_sports_request, list_sportcash_sports_response: @list_sportcash_sports_response, list_spc_sport: @sports_trash)
+              end
+            end
+
           end
         end
 
@@ -4043,6 +4060,56 @@ Veuillez entrer votre code secret Paymoney pour valider le pari.
     end
 
     return status
+  end
+
+  def sportcash_main_menu
+    @rendered_text = %Q[SPORTCASH
+1- Jouer
+2- Consulter les matchs du jour
+
+0- Retour
+00- Accueil]
+    @session_identifier = '49'
+  end
+
+  def set_session_identifier_sportcash_main_menu_selected
+    @status = false
+    if ['1', '2', '0', '00'].include?(@ussd_string)
+      @status = true
+    else
+      @rendered_text = %Q[SPORTCASH
+1- Jouer
+2- Consulter les sports
+
+0- Retour
+00- Accueil]
+      @session_identifier = '49'
+    end
+  end
+
+  def list_sportcash_sports
+    @list_sportcash_sports_request = Parameter.first.parionsdirect_url + "/ussd_spc/get_list_sport"
+    @list_sportcash_sports_response = RestClient.get(@list_sportcash_sports_request) rescue ''
+    sports_string = ""
+    @sports_trash = "{"
+    counter = 0
+
+    sports = JSON.parse('{"sports":' + @list_sportcash_sports_response + '}') rescue nil
+    sports = bets["sports"] rescue nil
+    unless sports.blank?
+      sports.each do |sport|
+        counter += 1
+        sports_string << counter + %Q[#{sport["Description"]}-#{sport["Code"]}
+]
+        @sports_trash << %Q["#{sport["Description"]}":"#{sport["Code"]},"]
+      end
+    end
+    @sports_trash = @sports_trash.chop + "}"
+    @rendered_text = %Q[SPORTCASH - Liste des sports
+#{sports_string}
+0- Retour
+00- Accueil]
+    @session_identifier = '50'
   end
 
 end
