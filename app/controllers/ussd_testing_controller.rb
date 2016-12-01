@@ -4065,7 +4065,7 @@ Veuillez entrer votre code secret Paymoney pour valider le pari.
   def sportcash_main_menu
     @rendered_text = %Q[SPORTCASH
 1- Jouer
-2- Consulter les matchs du jour
+2- Consulter les sports
 
 0- Retour
 00- Accueil]
