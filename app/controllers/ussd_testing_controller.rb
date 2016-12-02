@@ -1059,10 +1059,9 @@ Saisissez le nombre de fois
 
                 when '2'
                   list_sportcash_sports
-                  @current_ussd_session.update_attributes(session_identifier: @session_identifier, list_sportcash_sports_request: @list_sportcash_sports_request, list_sportcash_sports_response: @list_sportcash_sports_response, list_spc_sport: @sports_trash)
               end
             end
-
+            @current_ussd_session.update_attributes(session_identifier: @session_identifier, list_sportcash_sports_request: @list_sportcash_sports_request, list_sportcash_sports_response: @list_sportcash_sports_response, list_spc_sport: @sports_trash)
           end
         end
 
@@ -4094,8 +4093,8 @@ Veuillez entrer votre code secret Paymoney pour valider le pari.
     @sports_trash = "{"
     counter = 0
 
-    sports = JSON.parse('{"sports":' + @list_sportcash_sports_response + '}') rescue nil
-    sports = bets["sports"] rescue nil
+    sports = JSON.parse('{"sports":' + @list_sportcash_sports_response + '}') #rescue nil
+    sports = bets["sports"] #rescue nil
     unless sports.blank?
       sports.each do |sport|
         counter += 1
