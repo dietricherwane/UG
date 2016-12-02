@@ -54121,3 +54121,10 @@ Migrating to AddListSpcSportsTrash (20161201080557)
   [1m[36mSQL (0.8ms)[0m  [1mINSERT INTO "schema_migrations" ("version") VALUES ($1)[0m  [["version", "20161201080557"]]
   [1m[35m (40.1ms)[0m  COMMIT
   [1m[36mActiveRecord::SchemaMigration Load (0.8ms)[0m  [1mSELECT "schema_migrations".* FROM "schema_migrations"[0m
+  [1m[36mActiveRecord::SchemaMigration Load (30.7ms)[0m  [1mSELECT "schema_migrations".* FROM "schema_migrations"[0m
+Migrating to AddListSpcSportsToUssdSessions (20161202090700)
+  [1m[35m (0.5ms)[0m  BEGIN
+  [1m[36m (137.8ms)[0m  [1mALTER TABLE "ussd_sessions" ADD COLUMN "list_spc_sport" text[0m
+  [1m[35mSQL (0.7ms)[0m  INSERT INTO "schema_migrations" ("version") VALUES ($1)  [["version", "20161202090700"]]
+  [1m[36m (18.6ms)[0m  [1mCOMMIT[0m
+  [1m[35mActiveRecord::SchemaMigration Load (0.7ms)[0m  SELECT "schema_migrations".* FROM "schema_migrations"
