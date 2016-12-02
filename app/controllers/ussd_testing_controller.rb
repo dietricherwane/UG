@@ -4098,9 +4098,9 @@ Veuillez entrer votre code secret Paymoney pour valider le pari.
     unless sports.blank?
       sports.each do |sport|
         counter += 1
-        sports_string << counter + %Q[#{sport["Description"]}-#{sport["Code"].to_s}
+        sports_string << counter.to_s + %Q[#{sport["Description"]}-#{sport["Code"]}
 ]
-        @sports_trash << %Q["#{sport["Description"]}":"#{sport["Code"].to_s},"]
+        @sports_trash << %Q["#{sport["Description"]}":"#{sport["Code"]},"]
       end
     end
     @sports_trash = @sports_trash.chop + "}"
