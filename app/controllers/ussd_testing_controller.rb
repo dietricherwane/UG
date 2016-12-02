@@ -580,7 +580,7 @@ Saisissez le nombre de fois
 
     #render :xml => @result
 
-    #Thread.new do
+    Thread.new do
       if @error_code == '0'
         # Récupération d'une session existante
         @current_ussd_session = UssdSession.find_by_sender_cb(@sender_cb)
@@ -1067,9 +1067,9 @@ Saisissez le nombre de fois
 
         send_ussd(@operation_type, @msisdn, @sender_cb, @linkid, @rendered_text)
       end
-    #end
+    end
 
-    render text: @rendered_text
+    #render text: @rendered_text
   end
 
   def set_session_identifier_depending_on_menu_selected
@@ -4098,7 +4098,7 @@ Veuillez entrer votre code secret Paymoney pour valider le pari.
     unless sports.blank?
       sports.each do |sport|
         counter += 1
-        sports_string << counter.to_s + %Q[#{sport["Description"]}-#{sport["Code"]}
+        sports_string << counter.to_s + '- ' + %Q[#{sport["Description"]}-#{sport["Code"]}
 ]
         @sports_trash << %Q["#{sport["Description"]}":"#{sport["Code"]},"]
       end
