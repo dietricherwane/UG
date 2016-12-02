@@ -4094,7 +4094,7 @@ Veuillez entrer votre code secret Paymoney pour valider le pari.
     counter = 0
 
     sports = JSON.parse('{"sports":' + @list_sportcash_sports_response + '}') #rescue nil
-    sports = bets["sports"] #rescue nil
+    sports = sports["sports"] #rescue nil
     unless sports.blank?
       sports.each do |sport|
         counter += 1
