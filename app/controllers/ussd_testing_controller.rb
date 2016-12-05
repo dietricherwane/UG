@@ -4157,9 +4157,9 @@ Veuillez entrer votre code secret Paymoney pour valider le pari.
       unless tournaments.blank?
         tournaments.each do |tournament|
           counter += 1
-          tournaments_string << counter.to_s + '- ' + %Q[#{tournaments["Descrition_Tourn"]}
+          tournaments_string << counter.to_s + '- ' + %Q[#{tournament["Descrition_Tourn"]}
 ]
-          @tournaments_trash << %Q["#{tournaments["Descrition_Tourn"]}":"#{tournaments["Code_Tournois"]}",]
+          @tournaments_trash << %Q["#{tournament["Descrition_Tourn"]}":"#{tournament["Code_Tournois"]}",]
         end
       end
       @tournaments_trash = @tournaments_trash.chop + "}"
