@@ -1056,9 +1056,9 @@ Saisissez le nombre de fois
                 when '00'
                   back_list_main_menu
                 when '1'
-
-                when '2'
                   list_sportcash_sports
+                when '2'
+
               end
             end
             @current_ussd_session.update_attributes(session_identifier: @session_identifier, list_sportcash_sports_request: @list_sportcash_sports_request, list_sportcash_sports_response: @list_sportcash_sports_response, list_spc_sport: @sports_trash)
@@ -4063,8 +4063,13 @@ Veuillez entrer votre code secret Paymoney pour valider le pari.
 
   def sportcash_main_menu
     @rendered_text = %Q[SPORTCASH
-1- Jouer
-2- Consulter les sports
+1- Sport
+2- Top matchs
+3- Dernière minute
+4- Opportunités
+5- Lives
+6- Calendrier
+7- Jouer
 
 0- Retour
 00- Accueil]
@@ -4073,12 +4078,17 @@ Veuillez entrer votre code secret Paymoney pour valider le pari.
 
   def set_session_identifier_sportcash_main_menu_selected
     @status = false
-    if ['1', '2', '0', '00'].include?(@ussd_string)
+    if ['1', '2', '3', '4', '5', '6', '7', '0', '00'].include?(@ussd_string)
       @status = true
     else
       @rendered_text = %Q[SPORTCASH
-1- Jouer
-2- Consulter les sports
+1- Sport
+2- Top matchs
+3- Dernière minute
+4- Opportunités
+5- Lives
+6- Calendrier
+7- Jouer
 
 0- Retour
 00- Accueil]
