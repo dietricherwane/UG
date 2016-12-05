@@ -527,6 +527,21 @@ Saisissez le nombre de fois
     @current_ussd_session.update_attributes(session_identifier: @session_identifier)
   end
 
+  def back_to_list_spc_main_menu
+    @rendered_text = %Q[SPORTCASH
+1- Sport
+2- Top matchs
+3- Dernière minute
+4- Opportunités
+5- Lives
+6- Calendrier
+7- Jouer
+0- Retour
+00- Accueil]
+    @session_identifier = '49'
+    @current_ussd_session.update_attributes(session_identifier: @session_identifier)
+  end
+
   def back_to_get_paymoney_other_account_number
     @rendered_text = %Q[Veuillez entrer le numéro de compte Paymoney dont vous voulez consulter le solde.
 0- Retour
@@ -578,9 +593,9 @@ Saisissez le nombre de fois
 
     UssdReceptionLog.create(received_parameters: @raw_body, rev_id: @rev_id, rev_password: @rev_password, sp_id: @sp_id, service_id: @service_id, timestamp: @timestamp, trace_unique_id: @unique_id, msg_type: @msg_type, sender_cb: @sender_cb, receiver_cb: @receive_cb, ussd_of_type: @ussd_op_type, msisdn: @msisdn, service_code: @service_code, code_scheme: @code_scheme, ussd_string: @ussd_string, error_code: @error_code, error_message: @error_message, remote_ip: remote_ip_address)
 
-    #render :xml => @result
+    render :xml => @result
 
-    #Thread.new do
+    Thread.new do
       if @error_code == '0'
         # Récupération d'une session existante
         @current_ussd_session = UssdSession.find_by_sender_cb(@sender_cb)
@@ -1070,9 +1085,9 @@ Saisissez le nombre de fois
 
         send_ussd(@operation_type, @msisdn, @sender_cb, @linkid, @rendered_text)
       end
-    #end
+    end
 
-    render text: @rendered_text
+    #render text: @rendered_text
   end
 
   def set_session_identifier_depending_on_menu_selected
@@ -4124,51 +4139,58 @@ Veuillez entrer votre code secret Paymoney pour valider le pari.
   end
 
   def set_session_identifier_depending_on_spc_sports_list_selected
-    sport_name = JSON.parse(@current_ussd_session.list_spc_sport).assoc(@ussd_string)[1].split('-')[0] rescue nil
-    @spc_tournament_list_request = Parameter.first.parionsdirect_url + "/ussd_spc/get_tournaments_by_sport/#{sport_name}"
-    @spc_tournament_list_response = RestClient.get(@spc_tournament_list_request) rescue ''
-    if (JSON.parse(@spc_tournament_list_response)["Status"] rescue nil) == "ERROR"
-      @list_sportcash_sports_request = Parameter.first.parionsdirect_url + "/ussd_spc/get_list_sport"
-      @list_sportcash_sports_response = RestClient.get(@list_sportcash_sports_request) rescue ''
-      sports_string = ""
-      counter = 0
+    case @ussd_string
+      when '0'
+        back_to_list_spc_main_menu
+      when '00'
+        back_list_main_menu
+      else
+        sport_name = JSON.parse(@current_ussd_session.list_spc_sport).assoc(@ussd_string)[1].split('-')[0] rescue nil
+        @spc_tournament_list_request = Parameter.first.parionsdirect_url + "/ussd_spc/get_tournaments_by_sport/#{sport_name}"
+        @spc_tournament_list_response = RestClient.get(@spc_tournament_list_request) rescue ''
+        if (JSON.parse(@spc_tournament_list_response)["Status"] rescue nil) == "ERROR"
+          @list_sportcash_sports_request = Parameter.first.parionsdirect_url + "/ussd_spc/get_list_sport"
+          @list_sportcash_sports_response = RestClient.get(@list_sportcash_sports_request) rescue ''
+          sports_string = ""
+          counter = 0
 
-      sports = JSON.parse('{"sports":' + @list_sportcash_sports_response + '}') rescue nil
-      sports = sports["sports"] rescue nil
-      unless sports.blank?
-        sports.each do |sport|
-          counter += 1
-          sports_string << counter.to_s + '- ' + %Q[#{sport["Description"]}
-]
+          sports = JSON.parse('{"sports":' + @list_sportcash_sports_response + '}') rescue nil
+          sports = sports["sports"] rescue nil
+          unless sports.blank?
+            sports.each do |sport|
+              counter += 1
+              sports_string << counter.to_s + '- ' + %Q[#{sport["Description"]}
+    ]
+            end
+          end
+          @rendered_text = %Q[SPORTCASH - Liste des sports
+    #{sports_string}
+    0- Retour
+    00- Accueil]
+          @session_identifier = '50'
+        else
+          tournaments_string = ""
+          @tournaments_trash = "{"
+          counter = 0
+
+          tournaments = JSON.parse('{"tournaments":' + @spc_tournament_list_response + '}') rescue nil
+          tournaments = tournaments["tournaments"] rescue nil
+          unless tournaments.blank?
+            tournaments.each do |tournament|
+              counter += 1
+              tournaments_string << counter.to_s + '- ' + %Q[#{tournament["Descrition_Tourn"]}
+    ]
+              @tournaments_trash << %Q["#{counter.to_s}":"#{tournament["Descrition_Tourn"]}-#{tournament["Code_Tournois"]}",]
+            end
+          end
+          @tournaments_trash = @tournaments_trash.chop + "}"
+          @rendered_text = %Q[SPORTCASH
+    #{tournaments_string}
+    0- Retour
+    00- Accueil]
+          @session_identifier = '51'
         end
       end
-      @rendered_text = %Q[SPORTCASH - Liste des sports
-#{sports_string}
-0- Retour
-00- Accueil]
-      @session_identifier = '50'
-    else
-      tournaments_string = ""
-      @tournaments_trash = "{"
-      counter = 0
-
-      tournaments = JSON.parse('{"tournaments":' + @spc_tournament_list_response + '}') rescue nil
-      tournaments = tournaments["tournaments"] rescue nil
-      unless tournaments.blank?
-        tournaments.each do |tournament|
-          counter += 1
-          tournaments_string << counter.to_s + '- ' + %Q[#{tournament["Descrition_Tourn"]}
-]
-          @tournaments_trash << %Q["#{tournament["Descrition_Tourn"]}":"#{tournament["Code_Tournois"]}",]
-        end
-      end
-      @tournaments_trash = @tournaments_trash.chop + "}"
-      @rendered_text = %Q[SPORTCASH
-#{tournaments_string}
-0- Retour
-00- Accueil]
-      @session_identifier = '51'
-    end
   end
 
 end
