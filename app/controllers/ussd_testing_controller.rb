@@ -4259,7 +4259,7 @@ Veuillez entrer votre code secret Paymoney pour valider le pari.
               counter += 1
               events_string << counter.to_s + '- ' + %Q[#{event["Description_match"]} (#{event["Palcode"]}-#{event["Codevts"]})
 ]
-              @events_trash << %Q["#{counter.to_s}":"#{tournament["Description_match"]}-#{event["Palcode"]}-#{event["Codevts"]}",]
+              @events_trash << %Q["#{counter.to_s}":"#{event["Description_match"]}-#{event["Palcode"]}-#{event["Codevts"]}",]
             end
           end
           @events_trash = @events_trash.chop + "}"
