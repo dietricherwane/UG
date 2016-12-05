@@ -1079,7 +1079,7 @@ Saisissez le nombre de fois
             @current_ussd_session.update_attributes(session_identifier: @session_identifier, list_sportcash_sports_request: @list_sportcash_sports_request, list_sportcash_sports_response: @list_sportcash_sports_response, list_spc_sport: @sports_trash)
           when '50'
             set_session_identifier_depending_on_spc_sports_list_selected
-            @current_ussd_session.update_attributes(session_identifier: @session_identifier, tournaments_trash: @tournaments_trash, spc_tournament_list_request: @spc_tournament_list_request, spc_tournament_list_response: @spc_tournament_list_response)
+            @current_ussd_session.update_attributes(session_identifier: @session_identifier, tournaments_trash: @tournaments_trash, spc_tournament_list_request: @spc_tournament_list_request, spc_tournament_list_response: @spc_tournament_list_response, spc_sport_label: (@sport_name[0] rescue nil),spc_sport_code: (@sport_name[1] rescue nil))
           end
         end
 
@@ -4145,8 +4145,8 @@ Veuillez entrer votre code secret Paymoney pour valider le pari.
       when '00'
         back_list_main_menu
       else
-        sport_name = JSON.parse(@current_ussd_session.list_spc_sport).assoc(@ussd_string)[1].split('-')[0] rescue nil
-        @spc_tournament_list_request = Parameter.first.parionsdirect_url + "/ussd_spc/get_tournaments_by_sport/#{sport_name}"
+        @sport_name = JSON.parse(@current_ussd_session.list_spc_sport).assoc(@ussd_string)[1].split('-') rescue nil
+        @spc_tournament_list_request = Parameter.first.parionsdirect_url + "/ussd_spc/get_tournaments_by_sport/#{@sport_name[0]}"
         @spc_tournament_list_response = RestClient.get(@spc_tournament_list_request) rescue ''
         if (JSON.parse(@spc_tournament_list_response)["Status"] rescue nil) == "ERROR"
           @list_sportcash_sports_request = Parameter.first.parionsdirect_url + "/ussd_spc/get_list_sport"
@@ -4164,9 +4164,9 @@ Veuillez entrer votre code secret Paymoney pour valider le pari.
             end
           end
           @rendered_text = %Q[SPORTCASH - Liste des sports
-    #{sports_string}
-    0- Retour
-    00- Accueil]
+#{sports_string}
+0- Retour
+00- Accueil]
           @session_identifier = '50'
         else
           tournaments_string = ""
@@ -4179,15 +4179,15 @@ Veuillez entrer votre code secret Paymoney pour valider le pari.
             tournaments.each do |tournament|
               counter += 1
               tournaments_string << counter.to_s + '- ' + %Q[#{tournament["Descrition_Tourn"]}
-    ]
+]
               @tournaments_trash << %Q["#{counter.to_s}":"#{tournament["Descrition_Tourn"]}-#{tournament["Code_Tournois"]}",]
             end
           end
           @tournaments_trash = @tournaments_trash.chop + "}"
           @rendered_text = %Q[SPORTCASH
-    #{tournaments_string}
-    0- Retour
-    00- Accueil]
+#{tournaments_string}
+0- Retour
+00- Accueil]
           @session_identifier = '51'
         end
       end
