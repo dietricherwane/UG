@@ -4089,7 +4089,6 @@ Veuillez entrer votre code secret Paymoney pour valider le pari.
 5- Lives
 6- Calendrier
 7- Jouer
-
 0- Retour
 00- Accueil]
       @session_identifier = '49'
@@ -4108,7 +4107,7 @@ Veuillez entrer votre code secret Paymoney pour valider le pari.
     unless sports.blank?
       sports.each do |sport|
         counter += 1
-        sports_string << counter.to_s + '- ' + %Q[#{sport["Description"]}-#{sport["Code"]}
+        sports_string << counter.to_s + '- ' + %Q[#{sport["Description"]}
 ]
         @sports_trash << %Q["#{sport["Description"]}":"#{sport["Code"]},"]
       end
