@@ -4164,7 +4164,7 @@ Veuillez entrer votre code secret Paymoney pour valider le pari.
       end
       @tournaments_trash = @tournaments_trash.chop + "}"
       @rendered_text = %Q[SPORTCASH
-#{tournaments_string_string}
+#{tournaments_string}
 0- Retour
 00- Accueil]
       @session_identifier = '51'
