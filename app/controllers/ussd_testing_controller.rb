@@ -4124,7 +4124,7 @@ Veuillez entrer votre code secret Paymoney pour valider le pari.
   end
 
   def set_session_identifier_depending_on_spc_sports_list_selected
-    sport_name = JSON.parse(@current_ussd_session.list_spc_sport).assoc(@ussd_string)[1] rescue nil
+    sport_name = JSON.parse(@current_ussd_session.list_spc_sport).assoc(@ussd_string)[1].split('-')[0] rescue nil
     @spc_tournament_list_request = Parameter.first.parionsdirect_url + "/ussd_spc/get_tournaments_by_sport/#{sport_name}"
     @spc_tournament_list_response = RestClient.get(@spc_tournament_list_request) rescue ''
     if (JSON.parse(@spc_tournament_list_response)["Status"] rescue nil) == "ERROR"
