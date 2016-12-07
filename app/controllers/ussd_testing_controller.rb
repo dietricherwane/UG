@@ -568,7 +568,6 @@ Saisissez le nombre de fois
   def back_to_list_spc_tournaments
     @spc_event_list_request = Parameter.first.parionsdirect_url + "/ussd_spc/get_event_by_tourn_sport/#{@current_ussd_session.spc_sport_label}/#{@current_ussd_session.spc_tournament_code}"
     @spc_event_list_response = RestClient.get(@spc_event_list_request) rescue ''
-    if (JSON.parse(@spc_event_list_response)["Status"] rescue nil) == "ERROR"
       tournaments_string = ""
       counter = 0
 
