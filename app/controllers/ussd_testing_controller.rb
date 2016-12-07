@@ -565,6 +565,30 @@ Saisissez le nombre de fois
     @current_ussd_session.update_attributes(session_identifier: @session_identifier)
   end
 
+  def back_to_list_spc_tournaments
+    @spc_event_list_request = Parameter.first.parionsdirect_url + "/ussd_spc/get_event_by_tourn_sport/#{@current_ussd_session.spc_sport_label}/#{@current_ussd_session.spc_tournament_code}"
+    @spc_event_list_response = RestClient.get(@spc_event_list_request) rescue ''
+    if (JSON.parse(@spc_event_list_response)["Status"] rescue nil) == "ERROR"
+      tournaments_string = ""
+      counter = 0
+
+      tournaments = JSON.parse('{"tournaments":' + @spc_tournament_list_response + '}') rescue nil
+      tournaments = tournaments["tournaments"] rescue nil
+      unless tournaments.blank?
+        tournaments.each do |tournament|
+          counter += 1
+          tournaments_string << counter.to_s + '- ' + %Q[#{tournament["Descrition_Tourn"]}
+  ]
+        end
+      end
+      @rendered_text = %Q[SPORTCASH
+#{tournaments_string}
+0- Retour
+00- Accueil]
+    @session_identifier = '51'
+    @current_ussd_session.update_attributes(session_identifier: @session_identifier)
+  end
+
   def back_to_get_paymoney_other_account_number
     @rendered_text = %Q[Veuillez entrer le numéro de compte Paymoney dont vous voulez consulter le solde.
 0- Retour
@@ -1106,6 +1130,9 @@ Saisissez le nombre de fois
           when '51'
             set_session_identifier_depending_on_spc_sport_selected
             @current_ussd_session.update_attributes(session_identifier: @session_identifier, events_trash: @events_trash, spc_event_list_request: @spc_event_list_request, spc_event_list_response: @spc_event_list_response, spc_tournament_label: (@tournament[0] rescue nil), spc_tournament_code: (@tournament[1] rescue nil))
+          when '52'
+            set_session_identifier_depending_on_spc_event_selected
+            @current_ussd_session.update_attributes(session_identifier: @session_identifier, spc_bet_type_trash: @spc_bet_type_trash, spc_bet_type_request: @spc_bet_type_request, spc_bet_type_response: @spc_bet_type_response, spc_event_description: (@event[0] rescue nil), spc_event_pal_code: (@event[1] rescue nil), spc_event_code: (@event[2] rescue nil))
           end
         end
 
@@ -4268,6 +4295,62 @@ Veuillez entrer votre code secret Paymoney pour valider le pari.
 0- Retour
 00- Accueil]
           @session_identifier = '52'
+        end
+      end
+  end
+
+  def set_session_identifier_depending_on_spc_event_selected
+    @event = JSON.parse(@current_ussd_session.events_trash).assoc(@ussd_string)[1].split('-') rescue nil
+    case @ussd_string
+      when '0'
+        back_to_list_spc_tournaments
+      when '00'
+        back_list_main_menu
+      else
+        @spc_bet_type_request = Parameter.first.parionsdirect_url + "http://parionsdirect.ci/ussd_spc/get_event_markets/#{@event[2] rescue 0}"
+        @spc_bet_type_response = RestClient.get(@spc_bet_type_request) rescue ''
+        if (JSON.parse(@spc_bet_type_response)["Status"] rescue nil) == "ERROR"
+          @spc_event_list_request = Parameter.first.parionsdirect_url + "/ussd_spc/get_event_by_tourn_sport/#{@current_ussd_session.spc_sport_label}/#{@current_ussd_session.spc_tournament_code}"
+          @spc_event_list_response = RestClient.get(@spc_event_list_request) rescue ''
+          events_string = ""
+          counter = 0
+
+          events = JSON.parse('{"events":' + @spc_event_list_response + '}') rescue nil
+          events = events["events"] rescue nil
+          unless events.blank?
+            events.each do |event|
+              counter += 1
+              events_string << counter.to_s + '- ' + %Q[#{event["Description_match"]} (#{event["Palcode"]}-#{event["Codevts"]})
+]
+            end
+          end
+          @rendered_text = %Q[SPORTCASH
+#{events_string}
+0- Retour
+00- Accueil]
+          @session_identifier = '52'
+        else
+          bet_types_string = ""
+          @bet_types_trash = "{"
+          counter = 0
+
+          bet_types = JSON.parse('{"bet_types":' + @spc_bet_type_response + '}') rescue nil
+          bet_types = bet_types["bet_types"] rescue nil
+          unless bet_types.blank?
+            bet_types.each do |bet_type|
+              counter += 1
+              bet_types_string << counter.to_s + '- ' + %Q[#{bet_type["Bet_description"]}
+]
+              @bet_types_trash << %Q["#{counter.to_s}":"#{bet_type["Bet_code"]}-#{bet_type["Bet_description"]}-#{bet_type["Statut"]}",]
+            end
+          end
+          @bet_types = @bet_types_trash.chop + "}"
+          @rendered_text = %Q[#{@event[0] rescue ''}
+Faites vos pronostics. Choisissez votre pari :
+#{bet_types_string}
+0- Retour
+00- Accueil]
+          @session_identifier = '53'
         end
       end
   end
