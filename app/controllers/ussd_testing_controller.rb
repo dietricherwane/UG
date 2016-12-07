@@ -4179,7 +4179,7 @@ Veuillez entrer votre code secret Paymoney pour valider le pari.
         counter += 1
         sports_string << counter.to_s + '- ' + %Q[#{sport["Description"]}
 ]
-        @sports_trash << %Q["#{counter.to_s}":"#{sport["Description"]}-#{sport["Code"]}",]
+        @sports_trash << %Q["#{counter.to_s}":"#{sport["Description"]}|#{sport["Code"]}",]
       end
     end
     @sports_trash = @sports_trash.chop + "}"
@@ -4197,7 +4197,7 @@ Veuillez entrer votre code secret Paymoney pour valider le pari.
       when '00'
         back_list_main_menu
       else
-        @sport_name = JSON.parse(@current_ussd_session.list_spc_sport).assoc(@ussd_string)[1].split('-') rescue nil
+        @sport_name = JSON.parse(@current_ussd_session.list_spc_sport).assoc(@ussd_string)[1].split('|') rescue nil
         @spc_tournament_list_request = Parameter.first.parionsdirect_url + "/ussd_spc/get_tournaments_by_sport/#{@sport_name[0]}"
         @spc_tournament_list_response = RestClient.get(@spc_tournament_list_request) rescue ''
         if (JSON.parse(@spc_tournament_list_response)["Status"] rescue nil) == "ERROR"
@@ -4232,7 +4232,7 @@ Veuillez entrer votre code secret Paymoney pour valider le pari.
               counter += 1
               tournaments_string << counter.to_s + '- ' + %Q[#{tournament["Descrition_Tourn"]}
 ]
-              @tournaments_trash << %Q["#{counter.to_s}":"#{tournament["Descrition_Tourn"]}-#{tournament["Code_Tournois"]}",]
+              @tournaments_trash << %Q["#{counter.to_s}":"#{tournament["Descrition_Tourn"]}|#{tournament["Code_Tournois"]}",]
             end
           end
           @tournaments_trash = @tournaments_trash.chop + "}"
@@ -4246,7 +4246,7 @@ Veuillez entrer votre code secret Paymoney pour valider le pari.
   end
 
   def set_session_identifier_depending_on_spc_sport_selected
-    @tournament = JSON.parse(@current_ussd_session.tournaments_trash).assoc(@ussd_string)[1].split('-') rescue nil
+    @tournament = JSON.parse(@current_ussd_session.tournaments_trash).assoc(@ussd_string)[1].split('|') rescue nil
     case @ussd_string
       when '0'
         back_to_list_spc_sports
@@ -4285,7 +4285,7 @@ Veuillez entrer votre code secret Paymoney pour valider le pari.
               counter += 1
               events_string << counter.to_s + '- ' + %Q[#{event["Description_match"]} (#{event["Palcode"]}-#{event["Codevts"]})
 ]
-              @events_trash << %Q["#{counter.to_s}":"#{event["Description_match"]}-#{event["Palcode"]}-#{event["Codevts"]}",]
+              @events_trash << %Q["#{counter.to_s}":"#{event["Description_match"]}|#{event["Palcode"]}|#{event["Codevts"]}",]
             end
           end
           @events_trash = @events_trash.chop + "}"
@@ -4299,14 +4299,14 @@ Veuillez entrer votre code secret Paymoney pour valider le pari.
   end
 
   def set_session_identifier_depending_on_spc_event_selected
-    @event = JSON.parse(@current_ussd_session.events_trash).assoc(@ussd_string)[1].split('-') rescue nil
+    @event = JSON.parse(@current_ussd_session.events_trash).assoc(@ussd_string)[1].split('|') rescue nil
     case @ussd_string
       when '0'
         back_to_list_spc_tournaments
       when '00'
         back_list_main_menu
       else
-        @spc_bet_type_request = Parameter.first.parionsdirect_url + "http://parionsdirect.ci/ussd_spc/get_event_markets/#{@event[2] rescue 0}"
+        @spc_bet_type_request = Parameter.first.parionsdirect_url + "/ussd_spc/get_event_markets/#{@event[2] rescue 0}"
         @spc_bet_type_response = RestClient.get(@spc_bet_type_request) rescue ''
         if (JSON.parse(@spc_bet_type_response)["Status"] rescue nil) == "ERROR"
           @spc_event_list_request = Parameter.first.parionsdirect_url + "/ussd_spc/get_event_by_tourn_sport/#{@current_ussd_session.spc_sport_label}/#{@current_ussd_session.spc_tournament_code}"
@@ -4340,7 +4340,7 @@ Veuillez entrer votre code secret Paymoney pour valider le pari.
               counter += 1
               bet_types_string << counter.to_s + '- ' + %Q[#{bet_type["Bet_description"]}
 ]
-              @bet_types_trash << %Q["#{counter.to_s}":"#{bet_type["Bet_code"]}-#{bet_type["Bet_description"]}-#{bet_type["Statut"]}",]
+              @bet_types_trash << %Q["#{counter.to_s}":"#{bet_type["Bet_code"]}|#{bet_type["Bet_description"]}|#{bet_type["Statut"]}",]
             end
           end
           @bet_types = @bet_types_trash.chop + "}"
