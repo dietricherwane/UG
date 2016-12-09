@@ -4423,7 +4423,7 @@ Faites vos pronostics. Choisissez votre pari :
           unless draws.blank?
             draws.each do |draw|
               counter += 1
-              draws_string << counter.to_s + '- ' + %Q[#{draw["Bet_description"]}:#{draw["Odd"]}
+              draw_string << counter.to_s + '- ' + %Q[#{draw["Bet_description"]}:#{draw["Odd"]}
 ]
               @draw_trash << %Q["#{counter.to_s}":"#{draw["Bet_description"]}|#{draw["Odd"]}",]
             end
@@ -4432,7 +4432,7 @@ Faites vos pronostics. Choisissez votre pari :
           @rendered_text = %Q[SPORTCASH
 #{@current_ussd_session.spc_event_description}
 Faites vos pronostics. Choisissez votre cote:
-#{draws_string}
+#{draw_string}
 0- Retour
 00- Accueil]
           @session_identifier = '53'
