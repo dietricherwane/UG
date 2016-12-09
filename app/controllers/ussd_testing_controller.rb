@@ -4253,7 +4253,7 @@ Veuillez entrer votre code secret Paymoney pour valider le pari.
       when '00'
         back_list_main_menu
       else
-        @spc_event_list_request = Parameter.first.parionsdirect_url + "/ussd_spc/get_event_by_tourn_sport/#{@current_ussd_session.spc_sport_label}/#{@ussd_string}"
+        @spc_event_list_request = Parameter.first.parionsdirect_url + "/ussd_spc/get_event_by_tourn_sport/#{@current_ussd_session.spc_sport_label}/#{@tournament[1]}"
         @spc_event_list_response = RestClient.get(@spc_event_list_request) rescue ''
         if (JSON.parse(@spc_event_list_response)["Status"] rescue nil) == "ERROR"
           tournaments_string = ""
