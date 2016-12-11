@@ -121,6 +121,48 @@ class UssdTestingController < ApplicationController
     render text: stop_session_response.body
   end
 
+  def exit_menu
+    url = '196.201.33.108:8310/SendUssdService/services/SendUssd'
+    sp_id = '2250110000460'
+    service_id = '225012000003070'
+    password = 'bmeB500'
+    timestamp = DateTime.now.strftime('%Y%m%d%H%M%S')
+    sp_password = Digest::MD5.hexdigest(sp_id + password + timestamp)
+
+    request_body = %Q[
+      <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:loc="http://www.csapi.org/schema/osg/ussd/notification_manager/v1_0/local">
+        <soapenv:Header>
+          <tns:RequestSOAPHeader xmlns:tns="http://www.huawei.com.cn/schema/common/v2_1">
+            <tns:spId>#{sp_id}</tns:spId>
+            <tns:spPassword>#{sp_password}</tns:spPassword>
+            <tns:serviceId>#{service_id}</tns:serviceId>
+            <tns:timeStamp>#{timestamp}</tns:timeStamp>
+            <tns:OA>8613300000010</tns:OA>
+            <tns:FA>8613300000010</tns:FA>
+          </tns:RequestSOAPHeader>
+        </soapenv:Header>
+        <soapenv:Body>
+          <loc:sendUssdAbort>
+            <loc:senderCB>306909975</loc:senderCB>
+            <loc:receiveCB>286652700</loc:receiveCB>
+            <loc:abortReason>sp abort</loc:abortReason>
+          </loc:sendUssdAbort>
+        </soapenv:Body>
+      </soapenv:Envelope>
+    ]
+
+    exit_session_response = Typhoeus.post(url, body: request_body, connecttimeout: 30)
+
+    nokogiri_response = (Nokogiri.XML(exit_session_response.body) rescue nil)
+
+    error_code = nokogiri_response.xpath('//soapenv:Fault').at('faultcode').content rescue nil
+    error_message = nokogiri_response.xpath('//soapenv:Fault').at('faultstring').content rescue nil
+
+    MtnStartSessionLog.create(operation_type: "Exit session", request_url: url, request_log: request_body, response_log: exit_session_response.body, request_code: exit_session_response.code, total_time: exit_session_response.total_time, request_headers: exit_session_response.headers.to_s, error_code: error_code, error_message: error_message)
+
+    render text: '0'
+  end
+
   def back_to_home
     @rendered_text = %Q[
 1- Jeux
@@ -672,10 +714,40 @@ Saisissez le nombre de fois
         @current_ussd_session = UssdSession.find_by_sender_cb(@sender_cb)
 
         if @current_ussd_session.blank?
-          authenticate_or_create_parionsdirect_account(@msisdn)
-          UssdSession.create(session_identifier: @session_identifier, sender_cb: @sender_cb, parionsdirect_password_url: @parionsdirect_password_url, parionsdirect_password_response: (@parionsdirect_password_response.body rescue 'ERR'), parionsdirect_password: @password, parionsdirect_salt: @salt)
+          display_mtn_welcome_menu
+          UssdSession.create(session_identifier: @session_identifier, sender_cb: @sender_cb)
         else
           case @current_ussd_session.session_identifier
+          when '-10'
+            select_action_depending_on_mtn_menu_selection
+            if @status
+              case @ussd_string
+                when '1'
+                  authenticate_or_create_parionsdirect_account(@msisdn)
+                  @current_ussd_session.update_attributes(session_identifier: @session_identifier, parionsdirect_password_url: @parionsdirect_password_url, parionsdirect_password_response: (@parionsdirect_password_response.body rescue 'ERR'), parionsdirect_password: @password, parionsdirect_salt: @salt)
+                when '2'
+                  display_mtn_terms_and_conditions
+                  @current_ussd_session.update_attributes(session_identifier: @session_identifier)
+                when '3'
+                  exit_menu
+              end
+            end
+          when '-9'
+            select_action_depending_on_mtn_terms_and_conditions_selection
+            if @status
+              case @ussd_string
+                when '0'
+                  display_mtn_welcome_menu
+                when '00'
+                  exit_menu
+                else
+                  display_mtn_terms_and_conditions
+                  @current_ussd_session.update_attributes(session_identifier: @session_identifier)
+              end
+            end
+          when '0'
+            #authenticate_or_create_parionsdirect_account(@msisdn)
+            #UssdSession.create(session_identifier: @session_identifier, sender_cb: @sender_cb)
           # Saisie du code secret de création de compte parionsdirect
           when '1'
             set_parionsdirect_password
@@ -1168,6 +1240,37 @@ Saisissez le nombre de fois
     end
 
     #render text: @rendered_text
+  end
+
+  def display_mtn_welcome_menu
+    @rendered_text = %Q[BIENVENUE DANS LE MENU LONACI:
+En continuant le processus, vous certifiez avoir +18
+1- Continuez
+2- Voir termes et conditions
+3- Quitter]
+    @session_identifier = '-10'
+  end
+
+  def select_action_depending_on_mtn_menu_selection
+    @status = false
+    if ['1', '2', '3'].include?(@ussd_string)
+      @status = true
+    else
+      @rendered_text = %Q[BIENVENUE DANS LE MENU LONACI:
+En continuant le processus, vous certifiez avoir +18
+1- Continuez
+2- Voir termes et conditions
+3- Quitter]
+      @session_identifier = '-10'
+    end
+  end
+
+  def display_mtn_terms_and_conditions
+    @rendered_text = %Q[LONACI-TERMES ET CONDITIONS
+
+0- Retour
+00- Quitter]
+    @session_identifier = '-9'
   end
 
   def set_session_identifier_depending_on_menu_selected
