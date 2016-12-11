@@ -160,7 +160,7 @@ class UssdTestingController < ApplicationController
 
     MtnStartSessionLog.create(operation_type: "Exit session", request_url: url, request_log: request_body, response_log: exit_session_response.body, request_code: exit_session_response.code, total_time: exit_session_response.total_time, request_headers: exit_session_response.headers.to_s, error_code: error_code, error_message: error_message)
 
-    render text: '0'
+    #render text: '0'
   end
 
   def back_to_home
