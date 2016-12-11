@@ -121,7 +121,7 @@ class UssdTestingController < ApplicationController
     render text: stop_session_response.body
   end
 
-  def exit_menu
+  def exit_menu(sender_cb)
     url = '196.201.33.108:8310/SendUssdService/services/SendUssd'
     sp_id = '2250110000460'
     service_id = '225012000003070'
@@ -143,8 +143,8 @@ class UssdTestingController < ApplicationController
         </soapenv:Header>
         <soapenv:Body>
           <loc:sendUssdAbort>
-            <loc:senderCB>306909975</loc:senderCB>
-            <loc:receiveCB>286652700</loc:receiveCB>
+            <loc:senderCB>#{sender_cb}</loc:senderCB>
+            <loc:receiveCB>#{sender_cb}</loc:receiveCB>
             <loc:abortReason>sp abort</loc:abortReason>
           </loc:sendUssdAbort>
         </soapenv:Body>
@@ -729,7 +729,7 @@ Saisissez le nombre de fois
                   display_mtn_terms_and_conditions
                   @current_ussd_session.update_attributes(session_identifier: @session_identifier)
                 when '3'
-                  exit_menu
+                  exit_menu(@sender_cb)
               end
             end
           when '-9'
@@ -738,8 +738,9 @@ Saisissez le nombre de fois
               case @ussd_string
                 when '0'
                   display_mtn_welcome_menu
+                  @current_ussd_session.update_attributes(session_identifier: @session_identifier)
                 when '00'
-                  exit_menu
+                  exit_menu(@sender_cb)
                 else
                   display_mtn_terms_and_conditions
                   @current_ussd_session.update_attributes(session_identifier: @session_identifier)
