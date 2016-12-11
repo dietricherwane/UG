@@ -786,6 +786,7 @@ Saisissez le nombre de fois
                   @current_ussd_session.update_attributes(session_identifier: @session_identifier)
                 when '2'
                   display_parions_direct_gaming_chanels
+                  @current_ussd_session.update_attributes(session_identifier: @session_identifier)
                 when '3'
                   display_mtn_home_menu_terms_and_conditions
                   @current_ussd_session.update_attributes(session_identifier: @session_identifier)
