@@ -164,28 +164,20 @@ class UssdTestingController < ApplicationController
   end
 
   def back_to_home
-    @rendered_text = %Q[
-1- Jeux
-2- Mes paris
-3- Mon solde
-4- Rechargement
-5- Votre service SMS
-6- Mes OTP
-7- Mes comptes]
-    @session_identifier = '5'
+    @rendered_text = %Q[BIENVENUE DANS LE MENU LONACI:
+1- Recharger compte de jeux
+2- Jouer
+3- Termes et conditions]
+    @session_identifier = '5--'
     @current_ussd_session.update_attributes(session_identifier: @session_identifier)
   end
 
   def back_list_main_menu
-    @rendered_text = %Q[
-1- Jeux
-2- Mes paris
-3- Mon solde
-4- Rechargement
-5- Votre service SMS
-6- Mes OTP
-7- Mes comptes]
-    @session_identifier = '5'
+    @rendered_text = %Q[BIENVENUE DANS LE MENU LONACI:
+1- Recharger compte de jeux
+2- Jouer
+3- Termes et conditions]
+    @session_identifier = '5--'
     @current_ussd_session.update_attributes(session_identifier: @session_identifier)
   end
 
@@ -746,6 +738,24 @@ Saisissez le nombre de fois
                   @current_ussd_session.update_attributes(session_identifier: @session_identifier)
               end
             end
+          when '-11'
+            select_action_depending_on_mtn_home_menu_terms_and_conditions_selection
+            if @status
+              case @ussd_string
+                when '0'
+                  @rendered_text = %Q[BIENVENUE DANS LE MENU LONACI:
+1- Recharger compte de jeux
+2- Jouer
+3- Termes et conditions]
+                  @session_identifier = '5--'
+                  @current_ussd_session.update_attributes(session_identifier: @session_identifier)
+                when '00'
+                  exit_menu(@sender_cb)
+                else
+                  display_mtn_home_menu_terms_and_conditions
+                  @current_ussd_session.update_attributes(session_identifier: @session_identifier)
+              end
+            end
           when '0'
             #authenticate_or_create_parionsdirect_account(@msisdn)
             #UssdSession.create(session_identifier: @session_identifier, sender_cb: @sender_cb)
@@ -767,7 +777,34 @@ Saisissez le nombre de fois
           when '4-'
             create_paymoney_account
             @current_ussd_session.update_attributes(session_identifier: @session_identifier, creation_pw_request: @creation_pw_request, creation_pw_response: (@creation_pw_response.body rescue 'ERR'), pw_account_created: @pw_account_created)
-           # Sélection d'un élément du menu
+          when '5--'
+            select_action_depending_on_mtn_main_menu_selection
+            if @status
+              case @ussd_string
+                when '1'
+                  reload_paymoney_with_mtn_money
+                  @current_ussd_session.update_attributes(session_identifier: @session_identifier)
+                when '2'
+                  display_parions_direct_gaming_chanels
+                when '3'
+                  display_mtn_home_menu_terms_and_conditions
+                  @current_ussd_session.update_attributes(session_identifier: @session_identifier)
+              end
+            end
+          when '6--'
+            select_action_depending_on_mtn_main_menu_selection
+            if @status
+              case @ussd_string
+                when '1'
+                  display_parions_direct_main_ussd_menu
+                  @current_ussd_session.update_attributes(session_identifier: @session_identifier)
+                when '2'
+                  display_parions_direct_web_link
+                when '3'
+                  display_parions_direct_apk_link
+              end
+            end
+          # Sélection d'un élément du menu
           when '8'
             # solde du compte paymoney
             get_paymoney_sold
@@ -1279,12 +1316,33 @@ En continuant le processus, vous certifiez avoir +18
     end
   end
 
+  def select_action_depending_on_mtn_home_menu_terms_and_conditions_selection
+    @status = false
+    if ['0', '00'].include?(@ussd_string)
+      @status = true
+    else
+      @rendered_text = %Q[LONACI-TERMES ET CONDITIONS
+
+0- Retour
+00- Quitter]
+      @session_identifier = '-11'
+    end
+  end
+
   def display_mtn_terms_and_conditions
     @rendered_text = %Q[LONACI-TERMES ET CONDITIONS
 
 0- Retour
 00- Quitter]
     @session_identifier = '-9'
+  end
+
+  def display_mtn_home_menu_terms_and_conditions
+    @rendered_text = %Q[LONACI-TERMES ET CONDITIONS
+
+0- Retour
+00- Quitter]
+    @session_identifier = '-11'
   end
 
   def set_session_identifier_depending_on_menu_selected
@@ -1301,6 +1359,19 @@ En continuant le processus, vous certifiez avoir +18
 6- Mes OTP
 7- Mes comptes]
       @session_identifier = '5'
+    end
+  end
+
+  def select_action_depending_on_mtn_main_menu_selection
+    @status = false
+    if ['1', '2', '3'].include?(@ussd_string)
+      @status = true
+    else
+      @rendered_text = %Q[BIENVENUE DANS LE MENU LONACI:
+1- Recharger compte de jeux
+2- Jouer
+3- Termes et conditions]
+      @session_identifier = '5--'
     end
   end
 
@@ -2141,21 +2212,14 @@ Votre solde PAYMONEY est de: #{balance rescue 0} FCFA
         existing_paymoney_account = AccountProfile.find_by_msisdn(@msisdn[-8,8])
         # On vérifie que le client n'a pas déjà de compte Paymoney associé à son numéro
         if existing_paymoney_account.blank?
-          @rendered_text = %Q[
-            Veuillez saisir votre numéro de compte Paymoney.
-            ]
+          @rendered_text = %Q[Veuillez saisir votre numéro de compte Paymoney.]
           @session_identifier = '4'
         else
-          @rendered_text = %Q[
-1- Jeux
-2- Mes paris
-3- Mon solde
-4- Rechargement
-5- Votre service SMS
-6- Mes OTP
-7- Mes comptes
-          ]
-          @session_identifier = '5'
+          @rendered_text = %Q[BIENVENUE DANS LE MENU LONACI:
+1- Recharger compte de jeux
+2- Jouer
+3- Termes et conditions]
+          @session_identifier = '5--'
         end
       else
         @rendered_text = %Q[Le code secret saisi n'est pas valide.
@@ -2180,20 +2244,14 @@ Veuillez entrer votre mot de passe parionsdirect.
         @pw_account_token = @check_pw_account_response.body
         # On associe le compte Paymoney du client à son numéro
         AccountProfile.find_by_msisdn(@msisdn[-8,8]).update_attributes(paymoney_account_number: @pw_account_number) rescue AccountProfile.create(msisdn: @msisdn[-8,8], paymoney_account_number: @pw_account_number) rescue nil
-        @rendered_text = %Q[
-1- Jeux
-2- Mes paris
-3- Mon solde
-4- Rechargement
-5- Votre service SMS
-6- Mes OTP
-7- Mes comptes
-          ]
-        @session_identifier = '5'
+        @rendered_text = %Q[BIENVENUE DANS LE MENU LONACI:
+1- Recharger compte de jeux
+2- Jouer
+3- Termes et conditions]
+        @session_identifier = '5--'
       else
         @rendered_text = %Q[Le compte Paymoney fourni n'a pas été trouvé.
-Veuillez saisir votre numéro de compte Paymoney.
-          ]
+Veuillez saisir votre numéro de compte Paymoney.]
         @session_identifier = '4'
       end
     end
@@ -2243,17 +2301,14 @@ Veuillez saisir votre numéro de compte Paymoney.
         if pd_account.blank? || !pd_account["errors"].blank?
           @pd_account_created = false
           @rendered_text = %Q[
-            Une erreur s'est produite lors de la création du compte PARIONSDIRECT
-            Veuillez confirmer le code secret précédemment entré.
-            ]
+Une erreur s'est produite lors de la création du compte PARIONSDIRECT
+Veuillez confirmer le code secret précédemment entré.]
           @session_identifier = '3'
         else
           @pd_account_created = true
-          @rendered_text = %Q[
-            Votre compte de jeu PARIONSDIRECT a été créé avec succès. Pour jouer, il vous faut un compte PAYMONEY. Avez vous un compte PAYMONEY?
-            1- Oui
-            2- Non
-            ]
+          @rendered_text = %Q[Votre compte de jeu PARIONSDIRECT a été créé avec succès. Pour jouer, il vous faut un compte PAYMONEY. Avez vous un compte PAYMONEY?
+1- Oui
+2- Non]
           @session_identifier = '4-'
         end
       end
@@ -2270,16 +2325,12 @@ Veuillez saisir votre numéro de compte Paymoney.
         # Le compte paymoney a été créé
         if (paymoney_account["errors"] rescue nil).blank?
           @pw_account_created = true
-          @rendered_text = %Q[
-            Vous allez recevoir un SMS avec  les détails de votre portemonnaie de jeux PAYMONEY.
-            ]
+          @rendered_text = %Q[Vous allez recevoir un SMS avec  les détails de votre portemonnaie de jeux PAYMONEY.]
           @session_identifier = '4'
         else
           @pw_account_created = false
-          @rendered_text = %Q[
-            Une erreur s'est produite lors de la création du compte Paymoney
-            Veuillez confirmer le code secret précédemment entré.
-            ]
+          @rendered_text = %Q[Une erreur s'est produite lors de la création du compte Paymoney
+Veuillez confirmer le code secret précédemment entré.]
           @session_identifier = '3'
         end
       else
@@ -2288,11 +2339,9 @@ Veuillez saisir votre numéro de compte Paymoney.
         @session_identifier = '4'
       end
     else
-      @rendered_text = %Q[
-        Votre compte de jeu PARIONSDIRECT a été créé avec succès. Pour jouer, il vous faut un compte PAYMONEY. Avez vous un compte PAYMONEY?
-        1- Oui
-        2- Non
-        ]
+      @rendered_text = %Q[Votre compte de jeu PARIONSDIRECT a été créé avec succès. Pour jouer, il vous faut un compte PAYMONEY. Avez vous un compte PAYMONEY?
+1- Oui
+2- Non]
       @session_identifier = '4-'
     end
   end
@@ -4555,6 +4604,42 @@ Faites vos pronostics. Choisissez votre cote:
           @session_identifier = '53'
         end
       end
+  end
+
+  def display_parions_direct_web_link
+    @rendered_text = %Q[Canal de jeux - WEB
+www.parionsdirect.ci]
+  end
+
+  def display_parions_direct_apk_link
+    @rendered_text = %Q[Canal de jeux - APPLICATION
+www.parionsdirect.ci/apk]
+  end
+
+  def display_parions_direct_main_ussd_menu
+    @rendered_text = %Q[1- Jeux
+2- Mes paris
+3- Mon solde
+4- Rechargement
+5- Votre service SMS
+6- Mes OTP
+7- Mes comptes]
+    @session_identifier = '5'
+  end
+
+  def display_parions_direct_gaming_chanels
+    @rendered_text = %Q[Choisissez votre canal de jeux
+1- USSD
+2- WEB: www.parionsdirect.ci
+3- ANDROID: www.parionsdirect.ci/apk
+4- APPLE: www.parionsdirect.ci/ios]
+    @session_identifier = '6--'
+  end
+
+  def reload_paymoney_with_mtn_money
+    @rendered_text = %Q[1- Recharger mon compte
+2- Recharger autre compte]
+    @session_identifier = '7--'
   end
 
 end
