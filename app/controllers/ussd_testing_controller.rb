@@ -1266,6 +1266,19 @@ En continuant le processus, vous certifiez avoir +18
     end
   end
 
+  def select_action_depending_on_mtn_terms_and_conditions_selection
+    @status = false
+    if ['0', '00'].include?(@ussd_string)
+      @status = true
+    else
+      @rendered_text = %Q[LONACI-TERMES ET CONDITIONS
+
+0- Retour
+00- Quitter]
+    @session_identifier = '-9'
+    end
+  end
+
   def display_mtn_terms_and_conditions
     @rendered_text = %Q[LONACI-TERMES ET CONDITIONS
 
