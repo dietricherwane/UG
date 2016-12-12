@@ -4633,6 +4633,11 @@ www.parionsdirect.ci]
 www.parionsdirect.ci/apk]
   end
 
+  def display_parions_direct_windows_phone_link
+    @rendered_text = %Q[Canal de jeux - APPLICATION
+www.parionsdirect.ci/windows-phone]
+  end
+
   def display_parions_direct_main_ussd_menu
     @rendered_text = %Q[1- Jeux
 2- Mes paris
