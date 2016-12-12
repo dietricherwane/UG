@@ -4624,17 +4624,17 @@ Faites vos pronostics. Choisissez votre cote:
   end
 
   def display_parions_direct_web_link
-    @rendered_text = %Q[Canal de jeux - WEB
+    @rendered_text = %Q[Cliquez pour télécharger
 www.parionsdirect.ci]
   end
 
   def display_parions_direct_apk_link
-    @rendered_text = %Q[Canal de jeux - APPLICATION
+    @rendered_text = %Q[Cliquez pour télécharger
 www.parionsdirect.ci/apk]
   end
 
   def display_parions_direct_windows_phone_link
-    @rendered_text = %Q[Canal de jeux - APPLICATION
+    @rendered_text = %Q[Cliquez pour télécharger
 www.parionsdirect.ci/windows-phone]
   end
 
