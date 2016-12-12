@@ -807,6 +807,24 @@ Saisissez le nombre de fois
                   display_parions_direct_windows_phone_link
               end
             end
+          when '7--'
+            display_mtn_reload_instructions_depending_on_reloading_menu_selection
+            if @status
+              case @ussd_string
+                when '1'
+                  enter_mtn_reload_amount
+                  @current_ussd_session.update_attributes(session_identifier: @session_identifier)
+                when '2'
+                  enter_other_account_mtn_reload_account_number
+                  @current_ussd_session.update_attributes(session_identifier: @session_identifier)
+              end
+            end
+          when '8--'
+            get_reload_account
+            @current_ussd_session.update_attributes(session_identifier: @session_identifier, reload_account: @ussd_string)
+          when '9--'
+            proceed_reloading
+            @current_ussd_session.update_attributes(session_identifier: @session_identifier, reload_amount: @ussd_string, reload_request: @reload_request, reload_response: @reload_response)
           # Sélection d'un élément du menu
           when '8'
             # solde du compte paymoney
@@ -1389,6 +1407,17 @@ En continuant le processus, vous certifiez avoir +18
 3- ANDROID
 4- WINDOWS]
       @session_identifier = '6--'
+    end
+  end
+
+  def display_mtn_reload_instructions_depending_on_reloading_menu_selection
+    @status = false
+    if ['1', '2'].include?(@ussd_string)
+      @status = true
+    else
+      @rendered_text = %Q[1- Recharger mon compte
+2- Recharger autre compte]
+      @session_identifier = '7--'
     end
   end
 
@@ -4634,7 +4663,7 @@ www.parionsdirect.ci/apk]
   end
 
   def display_parions_direct_windows_phone_link
-    @rendered_text = %Q[Cliquez pour télécharger
+    @rendered_text  = %Q[Cliquez pour télécharger
 www.parionsdirect.ci/windows-phone]
   end
 
@@ -4662,6 +4691,59 @@ www.parionsdirect.ci/windows-phone]
     @rendered_text = %Q[1- Recharger mon compte
 2- Recharger autre compte]
     @session_identifier = '7--'
+  end
+
+  def enter_other_account_mtn_reload_account_number
+    @rendered_text = %Q[Saisissez le numéro de compte PAYMONEY à recharger
+0- Retour]
+    @session_identifier = '8--'
+  end
+
+  def enter_mtn_reload_amount
+    @rendered_text = %Q[Saisissez le montant du rechargement
+0- Retour]
+    @session_identifier = '9--'
+  end
+
+  def get_reload_account
+    @check_pw_account_url = Parameter.first.paymoney_url + "/PAYMONEY_WALLET/rest/check2_compte/#{@ussd_string}"
+    @check_pw_account_response = Typhoeus.get(@check_pw_account_url, connecttimeout: 30)
+
+    if !@check_pw_account_response.body.blank? && @check_pw_account_response.body != 'null'
+      @rendered_text = %Q[Saisissez le montant du rechargement
+0- Retour]
+      @session_identifier = '9--'
+    else
+      @rendered_text = %Q[Saisissez le numéro de compte PAYMONEY à recharger
+0- Retour]
+      @session_identifier = '8--'
+    end
+  end
+
+  def proceed_reloading
+    if not_a_number?(@ussd_string)
+      @rendered_text = %Q[Le montant du rechargement n'est pas valide
+Saisissez le montant du rechargement
+0- Retour]
+      @session_identifier = '9--'
+    else
+      @reload_request = "http://41.189.40.193:6968/MTNCI/ussd/reload/8f90aaece362b6d83b6887cc19067433/75592949-2b13-4175-b811-3caf75687355/#{Digest::SHA1.hexdigest([DateTime.now.iso8601(6), rand].join).hex.to_s[0..8]}/225#{@msisdn}/#{@ussd_string}/XOF/#{@current_ussd_session.reload_account.blank? ? AccountProfile.find_by_msisdn(@msisdn[-8,8]).paymoney_account_number : @current_ussd_session.reload_account}"
+      @reload_response = RestClient.get(@reload_request) rescue ''
+
+      if @reload_response == true
+        @rendered_text = %Q[Votre compte de jeu a été recharge avec succes. Montant : 1000FCFA.
+Solde : XXX FCFA
+Merci d'utiliser MTN Mobile Money
+1- Recharger mon compte
+2- Recharger autre compte]
+        @session_identifier = '7--'
+      else
+        @rendered_text = %Q[La transaction a échoué, Veuillez réessayer
+Saisissez le montant du rechargement
+0- Retour]
+        @session_identifier = '9--'
+      end
+    end
   end
 
 end
