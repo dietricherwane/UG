@@ -793,7 +793,7 @@ Saisissez le nombre de fois
               end
             end
           when '6--'
-            select_action_depending_on_mtn_main_menu_selection
+            select_action_depending_on_mtn_gaming_channel_menu_selection
             if @status
               case @ussd_string
                 when '1'
@@ -803,6 +803,8 @@ Saisissez le nombre de fois
                   display_parions_direct_web_link
                 when '3'
                   display_parions_direct_apk_link
+                when '4'
+                  display_parions_direct_windows_phone_link
               end
             end
           # Sélection d'un élément du menu
@@ -1373,6 +1375,20 @@ En continuant le processus, vous certifiez avoir +18
 2- Jouer
 3- Termes et conditions]
       @session_identifier = '5--'
+    end
+  end
+
+  def select_action_depending_on_mtn_gaming_channel_menu_selection
+    @status = false
+    if ['1', '2', '3', '4'].include?(@ussd_string)
+      @status = true
+    else
+      @rendered_text = %Q[Choisissez votre canal de jeux
+1- USSD
+2- WEB
+3- ANDROID
+4- WINDOWS]
+      @session_identifier = '6--'
     end
   end
 
@@ -4631,9 +4647,9 @@ www.parionsdirect.ci/apk]
   def display_parions_direct_gaming_chanels
     @rendered_text = %Q[Choisissez votre canal de jeux
 1- USSD
-2- WEB: www.parionsdirect.ci
-3- ANDROID: www.parionsdirect.ci/apk
-4- APPLE: www.parionsdirect.ci/ios]
+2- WEB
+3- ANDROID
+4- WINDOWS]
     @session_identifier = '6--'
   end
 
