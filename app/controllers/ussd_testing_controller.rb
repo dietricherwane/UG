@@ -870,8 +870,17 @@ Saisissez le nombre de fois
                 when '7'
                   display_default_paymoney_account
                   @current_ussd_session.update_attributes(session_identifier: @session_identifier)
+                when '8'
+                  enter_mtn_unload_amount
+                  @current_ussd_session.update_attributes(session_identifier: @session_identifier)
               end
             end
+          when '10--'
+            get_unload_amount
+            @current_ussd_session.update_attributes(session_identifier: @session_identifier, unload_amount: @ussd_string)
+          when '11--'
+            proceed_unloading
+            @current_ussd_session.update_attributes(session_identifier: @session_identifier, unload_request: @unload_request, unload_response: @unload_response)
           when '39'
             get_paymoney_other_account_number
             unless ['0', '00'].include?(@ussd_string)
@@ -1380,7 +1389,8 @@ En continuant le processus, vous certifiez avoir +18
 4- Rechargement
 5- Votre service SMS
 6- Mes OTP
-7- Mes comptes]
+7- Mes comptes
+8- Déchargement]
       @session_identifier = '5'
     end
   end
@@ -4729,7 +4739,7 @@ Saisissez le montant du rechargement
 0- Retour]
       @session_identifier = '9--'
     else
-      #@reload_request = "http://41.189.40.193:6968/MTNCI/ussd/reload/8f90aaece362b6d83b6887cc19067433/75592949-2b13-4175-b811-3caf75687355/#{Digest::SHA1.hexdigest([DateTime.now.iso8601(6), rand].join).hex.to_s[0..8]}/225#{@msisdn}/#{@ussd_string}/XOF/#{@current_ussd_session.reload_account.blank? ? AccountProfile.find_by_msisdn(@msisdn[-8,8]).paymoney_account_number : @current_ussd_session.reload_account}"
+      #@reload_request = "http://41.189.40.193:6968/MTNCI/ussd/reload/8f90aaece362b6d83b6887cc19067433/75592949-2b13-4175-b811-3caf75687355/#{Digest::SHA1.hexdigest([DateTime.now.iso8601(6), rand].join).hex.to_s[0..8]}/225#{@msisdn[-8,8]}/#{@ussd_string}/XOF/#{@current_ussd_session.reload_account.blank? ? AccountProfile.find_by_msisdn(@msisdn[-8,8]).paymoney_account_number : @current_ussd_session.reload_account}"
       @reload_request = "http://41.189.40.193:6968/MTNCI/ussd/reload/8f90aaece362b6d83b6887cc19067433/75592949-2b13-4175-b811-3caf75687355/#{Digest::SHA1.hexdigest([DateTime.now.iso8601(6), rand].join).hex.to_s[0..8]}/22545349536/#{@ussd_string}/XOF/#{@current_ussd_session.reload_account.blank? ? AccountProfile.find_by_msisdn(@msisdn[-8,8]).paymoney_account_number : @current_ussd_session.reload_account}"
       @reload_response = RestClient.get(@reload_request) rescue ''
 
@@ -4741,6 +4751,47 @@ Saisissez le montant du rechargement
 Saisissez le montant du rechargement.
 0- Retour]
         @session_identifier = '9--'
+      end
+    end
+  end
+
+  def enter_mtn_unload_amount
+    @rendered_text = %Q[Saisissez le montant du déchargement
+0- Retour]
+    @session_identifier = '10--'
+  end
+
+  def get_unload_amount
+    if not_a_number?(@ussd_string)
+      @rendered_text = %Q[Le montant du déchargement n'est pas valide
+Saisissez le montant du déchargement
+0- Retour]
+      @session_identifier = '10--'
+    else
+      @rendered_text = %Q[Veuillez saisir le code secret de votre compte de jeu]
+      @session_identifier = '11--'
+    end
+  end
+
+  def proceed_unloading
+    if not_a_number?(@ussd_string)
+      @rendered_text = %Q[Le montant du déchargement n'est pas valide
+Saisissez le montant du déchargement
+0- Retour]
+      @session_identifier = '10--'
+    else
+      #@unload_request = "http://41.189.40.193:6968/MTNCI/ussd/unload/8f90aaece362b6d83b6887cc19067433/75592949-2b13-4175-b811-3caf75687002/#{Digest::SHA1.hexdigest([DateTime.now.iso8601(6), rand].join).hex.to_s[0..8]}/225#{@msisdn[-8,8]}/#{@current_ussd_session.unload_amount}/XOF/#{@current_ussd_session.unload_account.blank? ? AccountProfile.find_by_msisdn(@msisdn[-8,8]).paymoney_account_number : @current_ussd_session.unload_account}/#{@ussd_string}"
+      @unload_request = "http://41.189.40.193:6968/MTNCI/ussd/unload/8f90aaece362b6d83b6887cc19067433/75592949-2b13-4175-b811-3caf75687002/#{Digest::SHA1.hexdigest([DateTime.now.iso8601(6), rand].join).hex.to_s[0..8]}/22545349536/#{@current_ussd_session.unload_amount}/XOF/#{@current_ussd_session.unload_account.blank? ? AccountProfile.find_by_msisdn(@msisdn[-8,8]).paymoney_account_number : @current_ussd_session.unload_account}/#{@ussd_string}"
+      @reload_response = RestClient.get(@reload_request) rescue ''
+
+      if @reload_response == '1'
+        @rendered_text = %Q[Votre MTN Money a été rechargé avec succès. Montant : #{@current_ussd_session.unload_amount} FCFA.]
+        @session_identifier = '11--'
+      else
+        @rendered_text = %Q[La transaction a échoué, Veuillez réessayer
+Saisissez le montant du déchargement
+0- Retour]
+        @session_identifier = '10--'
       end
     end
   end
