@@ -857,9 +857,11 @@ Saisissez le nombre de fois
                 when '3'
                   get_paymoney_password_to_check_sold
                   @current_ussd_session.update_attributes(session_identifier: @session_identifier)
-
                 when '4'
-
+                  @rendered_text = %Q[1- Recharger mon compte
+2- Recharger autre compte]
+                  @session_identifier = '7--'
+                  @current_ussd_session.update_attributes(session_identifier: @session_identifier)
                 when '5'
 
                 when '6'
