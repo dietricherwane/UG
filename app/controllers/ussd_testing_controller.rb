@@ -1906,7 +1906,8 @@ Montant débité: #{@current_ussd_session.stake.split('-')[1]} FCFA. Confirmez e
 4- Rechargement
 5- Votre service SMS
 6- Mes OTP
-7- Mes comptes]
+7- Mes comptes
+8- Déchargement]
       @session_identifier = '5'
     end
   end
@@ -2117,7 +2118,8 @@ Le solde PAYMONEY est de: #{balance rescue 0} FCFA
 4- Rechargement
 5- Votre service SMS
 6- Mes OTP
-7- Mes comptes]
+7- Mes comptes
+8- Déchargement]
             @session_identifier = '5'
           end
         end
@@ -2229,7 +2231,8 @@ Votre solde PAYMONEY est de: #{balance rescue 0} FCFA
 4- Rechargement
 5- Votre service SMS
 6- Mes OTP
-7- Mes comptes]
+7- Mes comptes
+8- Déchargement]
               @session_identifier = '5'
             end
           end
@@ -4686,7 +4689,8 @@ www.parionsdirect.ci/windows-phone]
 4- Rechargement
 5- Votre service SMS
 6- Mes OTP
-7- Mes comptes]
+7- Mes comptes
+8- Déchargement]
     @session_identifier = '5'
   end
 
