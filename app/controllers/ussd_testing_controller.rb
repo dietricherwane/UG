@@ -4788,8 +4788,8 @@ Saisissez le montant du déchargement
       @unload_request = "http://41.189.40.193:6968/MTNCI/ussd/unload/8f90aaece362b6d83b6887cc19067433/75592949-2b13-4175-b811-3caf75687002/#{Digest::SHA1.hexdigest([DateTime.now.iso8601(6), rand].join).hex.to_s[0..8]}/22545349536/#{@current_ussd_session.unload_amount}/XOF/#{@current_ussd_session.unload_account.blank? ? AccountProfile.find_by_msisdn(@msisdn[-8,8]).paymoney_account_number : @current_ussd_session.unload_account}/#{@ussd_string}"
       @reload_response = RestClient.get(@reload_request) rescue ''
 
-      if @reload_response == '1'
-        @rendered_text = %Q[Votre MTN Money a été rechargé avec succès. Montant : #{@current_ussd_session.unload_amount} FCFA.]
+      if @reload_response == '2'
+        @rendered_text = %Q[Votre rechargement est en cours de traitement. Montant : #{@current_ussd_session.unload_amount} FCFA.]
         @session_identifier = '11--'
       else
         @rendered_text = %Q[La transaction a échoué, Veuillez réessayer
