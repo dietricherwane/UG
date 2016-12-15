@@ -1298,7 +1298,7 @@ Saisissez le nombre de fois
             @current_ussd_session.update_attributes(session_identifier: @session_identifier, events_trash: @events_trash, spc_event_list_request: @spc_event_list_request, spc_event_list_response: @spc_event_list_response, spc_tournament_label: (@tournament[0] rescue nil), spc_tournament_code: (@tournament[1] rescue nil))
           when '52'
             set_session_identifier_depending_on_spc_event_selected
-            @current_ussd_session.update_attributes(session_identifier: @session_identifier, spc_bet_type_trash: @bet_types, spc_bet_type_request: @spc_bet_type_request, spc_bet_type_response: @spc_bet_type_response, spc_event_description: (@event[0] rescue nil), spc_event_pal_code: (@event[1] rescue nil), spc_event_code: (@event[2] rescue nil))
+            @current_ussd_session.update_attributes(session_identifier: @session_identifier, spc_bet_type_trash: @bet_types_trash, spc_bet_type_request: @spc_bet_type_request, spc_bet_type_response: @spc_bet_type_response, spc_event_description: (@event[0] rescue nil), spc_event_pal_code: (@event[1] rescue nil), spc_event_code: (@event[2] rescue nil))
           when '53'
             set_session_identifier_depending_on_bet_type_selected
             @current_ussd_session.update_attributes(session_identifier: @session_identifier, spc_draw_trash: @draw_trash, spc_draw_request: @spc_draw_request, spc_draw_response: @spc_draw_response, spc_bet_description: (@bet_type[1] rescue nil), spc_bet_code: (@bet_type[0] rescue nil))
