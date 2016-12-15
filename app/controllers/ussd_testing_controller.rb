@@ -1390,7 +1390,7 @@ En continuant le processus, vous certifiez avoir +18
 5- Votre service SMS
 6- Mes OTP
 7- Mes comptes
-8- Déchargement]
+8- Retrait vers Mobile Money]
       @session_identifier = '5'
     end
   end
@@ -1907,7 +1907,7 @@ Montant débité: #{@current_ussd_session.stake.split('-')[1]} FCFA. Confirmez e
 5- Votre service SMS
 6- Mes OTP
 7- Mes comptes
-8- Déchargement]
+8- Retrait vers Mobile Money]
       @session_identifier = '5'
     end
   end
@@ -2119,7 +2119,7 @@ Le solde de jeu est de: #{balance rescue 0} FCFA
 5- Votre service SMS
 6- Mes OTP
 7- Mes comptes
-8- Déchargement]
+8- Retrait vers Mobile Money]
             @session_identifier = '5'
           end
         end
@@ -2232,7 +2232,7 @@ Votre solde de jeu est de: #{balance rescue 0} FCFA
 5- Votre service SMS
 6- Mes OTP
 7- Mes comptes
-8- Déchargement]
+8- Retrait vers Mobile Money]
               @session_identifier = '5'
             end
           end
@@ -4690,7 +4690,7 @@ www.parionsdirect.ci/windows-phone]
 5- Votre service SMS
 6- Mes OTP
 7- Mes comptes
-8- Déchargement]
+8- Retrait vers Mobile Money]
     @session_identifier = '5'
   end
 
@@ -4760,15 +4760,15 @@ Saisissez le montant du rechargement.
   end
 
   def enter_mtn_unload_amount
-    @rendered_text = %Q[Saisissez le montant du déchargement
+    @rendered_text = %Q[Saisissez le montant du Retrait vers Mobile Money
 0- Retour]
     @session_identifier = '10--'
   end
 
   def get_unload_amount
     if not_a_number?(@ussd_string)
-      @rendered_text = %Q[Le montant du déchargement n'est pas valide
-Saisissez le montant du déchargement
+      @rendered_text = %Q[Le montant du Retrait vers Mobile Money n'est pas valide
+Saisissez le montant du Retrait vers Mobile Money
 0- Retour]
       @session_identifier = '10--'
     else
@@ -4779,8 +4779,8 @@ Saisissez le montant du déchargement
 
   def proceed_unloading
     if not_a_number?(@ussd_string)
-      @rendered_text = %Q[Le montant du déchargement n'est pas valide
-Saisissez le montant du déchargement
+      @rendered_text = %Q[Le montant du Retrait vers Mobile Money n'est pas valide
+Saisissez le montant du Retrait vers Mobile Money
 0- Retour]
       @session_identifier = '10--'
     else
@@ -4793,7 +4793,7 @@ Saisissez le montant du déchargement
         @session_identifier = '11--'
       else
         @rendered_text = %Q[La transaction a échoué, Veuillez réessayer
-Saisissez le montant du déchargement
+Saisissez le montant du Retrait vers Mobile Money
 0- Retour]
         @session_identifier = '10--'
       end
