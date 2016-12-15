@@ -830,13 +830,13 @@ Saisissez le nombre de fois
             # solde du compte de jeu
             get_paymoney_sold
             unless ['0', '00'].include?(@ussd_string)
-              @current_ussd_session.update_attributes(session_identifier: @session_identifier, de jeu_sold_url: @get_paymoney_sold_url, de jeu_sold_response: (@get_paymoney_sold_response.body rescue nil))
+              @current_ussd_session.update_attributes(session_identifier: @session_identifier, paymoney_sold_url: @get_paymoney_sold_url, paymoney_sold_response: (@get_paymoney_sold_response.body rescue nil))
             end
           when '9'
             # affichage de la liste des otp
             get_paymoney_otp
             unless ['0', '00'].include?(@ussd_string)
-              @current_ussd_session.update_attributes(session_identifier: @session_identifier, de jeu_otp_url: @get_paymoney_otp_url, de jeu_otp_response: (@get_paymoney_otp_response.body rescue nil))
+              @current_ussd_session.update_attributes(session_identifier: @session_identifier, paymoney_otp_url: @get_paymoney_otp_url, paymoney_otp_response: (@get_paymoney_otp_response.body rescue nil))
             end
           when '10'
             # retour au menu principal ou affichage des otp d'un autre compte
@@ -889,7 +889,7 @@ Saisissez le nombre de fois
           when '40'
             get_paymoney_other_account_password
             unless ['0', '00'].include?(@ussd_string)
-              @current_ussd_session.update_attributes(session_identifier: @session_identifier, other_paymoney_account_password: @ussd_string, de jeu_sold_url: @get_paymoney_sold_url, de jeu_sold_response: (@get_paymoney_sold_response.body rescue nil))
+              @current_ussd_session.update_attributes(session_identifier: @session_identifier, other_paymoney_account_password: @ussd_string, paymoney_sold_url: @get_paymoney_sold_url, paymoney_sold_response: (@get_paymoney_sold_response.body rescue nil))
             end
           when '41'
             get_paymoney_other_otp_account_number
@@ -2304,7 +2304,7 @@ Veuillez entrer votre mot de passe parionsdirect.
         @pw_account_number = @ussd_string
         @pw_account_token = @check_pw_account_response.body
         # On associe le compte de jeu du client à son numéro
-        AccountProfile.find_by_msisdn(@msisdn[-8,8]).update_attributes(paymoney_account_number: @pw_account_number) rescue AccountProfile.create(msisdn: @msisdn[-8,8], de jeu_account_number: @pw_account_number) rescue nil
+        AccountProfile.find_by_msisdn(@msisdn[-8,8]).update_attributes(paymoney_account_number: @pw_account_number) rescue AccountProfile.create(msisdn: @msisdn[-8,8], paymoney_account_number: @pw_account_number) rescue nil
         @rendered_text = %Q[BIENVENUE DANS LE MENU LONACI:
 1- Recharger compte de jeux
 2- Jouer
@@ -2382,7 +2382,7 @@ Veuillez confirmer le code secret précédemment entré.]
         # Création du compte de jeu du client
         @creation_pw_request = Parameter.first.paymoney_url + "/PAYMONEY_WALLET/rest/ussd_create_compte/#{@msisdn[-8,8]}"
         @creation_pw_response = Typhoeus.get(@creation_pw_request, connecttimeout: 30)
-        de jeu_account = JSON.parse(@creation_pw_response.body) rescue nil
+        paymoney_account = JSON.parse(@creation_pw_response.body) rescue nil
         # Le compte de jeu a été créé
         if (paymoney_account["errors"] rescue nil).blank?
           @pw_account_created = true
