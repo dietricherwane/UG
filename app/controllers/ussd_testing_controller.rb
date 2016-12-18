@@ -4761,7 +4761,7 @@ Gain probable: #{@current_ussd_session.spc_stake.to_f * @current_ussd_session.sp
                   "bets": [
                     {
                       "pal_code":"#{@current_ussd_session.spc_event_pal_code}",
-                      "event_code":"#{@current_ussd_session.spc_event_code}}",
+                      "event_code":"#{@current_ussd_session.spc_event_code}",
                       "bet_code":"#{@current_ussd_session.spc_bet_code}",
                       "draw_code":"#{@current_ussd_session.spc_draw_description}",
                       "odd":"#{@current_ussd_session.spc_odd.to_f * 100}",
