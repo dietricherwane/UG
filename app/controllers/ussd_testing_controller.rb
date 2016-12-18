@@ -4662,7 +4662,7 @@ Faites vos pronostics. Choisissez votre cote:
 #{draw_string}
 0- Retour
 00- Accueil]
-          @session_identifier = '53'
+          @session_identifier = '54'
         end
       end
   end
