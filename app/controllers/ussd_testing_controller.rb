@@ -722,9 +722,9 @@ Faites vos pronostics. Choisissez votre pari :
 
     UssdReceptionLog.create(received_parameters: @raw_body, rev_id: @rev_id, rev_password: @rev_password, sp_id: @sp_id, service_id: @service_id, timestamp: @timestamp, trace_unique_id: @unique_id, msg_type: @msg_type, sender_cb: @sender_cb, receiver_cb: @receive_cb, ussd_of_type: @ussd_op_type, msisdn: @msisdn, service_code: @service_code, code_scheme: @code_scheme, ussd_string: @ussd_string, error_code: @error_code, error_message: @error_message, remote_ip: remote_ip_address)
 
-    #render :xml => @result
+    render :xml => @result
 
-    #Thread.new do
+    Thread.new do
       if @error_code == '0'
         # Récupération d'une session existante
         @current_ussd_session = UssdSession.find_by_sender_cb(@sender_cb)
@@ -1322,7 +1322,7 @@ Faites vos pronostics. Choisissez votre pari :
             @current_ussd_session.update_attributes(session_identifier: @session_identifier, events_trash: @events_trash, spc_event_list_request: @spc_event_list_request, spc_event_list_response: @spc_event_list_response, spc_tournament_label: (@tournament[0] rescue nil), spc_tournament_code: (@tournament[1] rescue nil))
           when '52'
             set_session_identifier_depending_on_spc_event_selected
-            @current_ussd_session.update_attributes(session_identifier: @session_identifier, spc_bet_type_trash: @bet_types_trash, spc_bet_type_request: @spc_bet_type_request, spc_bet_type_response: @spc_bet_type_response, spc_event_description: (@event[0] rescue nil), spc_event_pal_code: (@event[1] rescue nil), spc_event_code: (@event[2] rescue nil))
+            @current_ussd_session.update_attributes(session_identifier: @session_identifier, spc_bet_type_trash: @bet_types_trash, spc_bet_type_request: @spc_bet_type_request, spc_bet_type_response: @spc_bet_type_response, spc_event_description: (@event[0] rescue nil), spc_event_pal_code: (@event[1] rescue nil), spc_event_code: (@event[2] rescue nil), spc_event_date: (@event[3] rescue nil), spc_event_time: (@event[4] rescue nil))
           when '53'
             set_session_identifier_depending_on_bet_type_selected
             @current_ussd_session.update_attributes(session_identifier: @session_identifier, spc_draw_trash: @draw_trash, spc_draw_request: @spc_draw_request, spc_draw_response: @spc_draw_response, spc_bet_description: (@bet_type[1] rescue nil), spc_bet_code: (@bet_type[0] rescue nil))
@@ -1339,11 +1339,11 @@ Faites vos pronostics. Choisissez votre pari :
           end
         end
 
-        #send_ussd(@operation_type, @msisdn, @sender_cb, @linkid, @rendered_text)
+        send_ussd(@operation_type, @msisdn, @sender_cb, @linkid, @rendered_text)
       end
-    #end
+    end
 
-    render text: @rendered_text
+    #render text: @rendered_text
   end
 
   def display_mtn_welcome_menu
@@ -4765,7 +4765,7 @@ Gain probable: #{@current_ussd_session.spc_stake.to_f * @current_ussd_session.sp
                       "bet_code":"#{@current_ussd_session.spc_bet_code}",
                       "draw_code":"#{@current_ussd_session.spc_draw_description}",
                       "odd":"#{@current_ussd_session.spc_odd.to_f * 100}",
-                      "begin_date":"#{@event[3].gsub('-', '')} #{@event[4].gsub('-', '')}",
+                      "begin_date":"#{@current_ussd_session.spc_event_date.gsub('-', '')} #{@current_ussd_session.spc_event_time}",
                       "teams":"#{@current_ussd_session.spc_event_description}",
                       "sport":"#{@current_ussd_session.spc_sport_label}"
                     }
