@@ -4764,7 +4764,7 @@ Gain probable: #{@current_ussd_session.spc_stake.to_f * @current_ussd_session.sp
                       "event_code":"#{@current_ussd_session.spc_event_code}",
                       "bet_code":"#{@current_ussd_session.spc_bet_code}",
                       "draw_code":"#{@current_ussd_session.spc_draw_description}",
-                      "odd":"#{@current_ussd_session.spc_odd.to_f * 100}",
+                      "odd":"#{(@current_ussd_session.spc_odd.to_f * 100).to_i}",
                       "begin_date":"#{@current_ussd_session.spc_event_date.gsub('-', '') rescue nil} #{@current_ussd_session.spc_event_time}",
                       "teams":"#{@current_ussd_session.spc_event_description}",
                       "sport":"#{@current_ussd_session.spc_sport_label}"
