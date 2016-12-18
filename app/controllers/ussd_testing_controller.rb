@@ -722,9 +722,9 @@ Faites vos pronostics. Choisissez votre pari :
 
     UssdReceptionLog.create(received_parameters: @raw_body, rev_id: @rev_id, rev_password: @rev_password, sp_id: @sp_id, service_id: @service_id, timestamp: @timestamp, trace_unique_id: @unique_id, msg_type: @msg_type, sender_cb: @sender_cb, receiver_cb: @receive_cb, ussd_of_type: @ussd_op_type, msisdn: @msisdn, service_code: @service_code, code_scheme: @code_scheme, ussd_string: @ussd_string, error_code: @error_code, error_message: @error_message, remote_ip: remote_ip_address)
 
-    #render :xml => @result
+    render :xml => @result
 
-    #Thread.new do
+    Thread.new do
       if @error_code == '0'
         # Récupération d'une session existante
         @current_ussd_session = UssdSession.find_by_sender_cb(@sender_cb)
@@ -1339,11 +1339,11 @@ Faites vos pronostics. Choisissez votre pari :
           end
         end
 
-        #send_ussd(@operation_type, @msisdn, @sender_cb, @linkid, @rendered_text)
+        send_ussd(@operation_type, @msisdn, @sender_cb, @linkid, @rendered_text)
       end
-    #end
+    end
 
-    render text: @rendered_text
+    #render text: @rendered_text
   end
 
   def display_mtn_welcome_menu
@@ -4796,8 +4796,7 @@ Gain probable: #{@current_ussd_session.spc_stake.to_f * @current_ussd_session.sp
         @session_identifier = '56'
       else
         if json_object["error"].blank?
-          @rendered_text = %Q[FELICITATIONS, votre pari a bien été  enregistré. N° ticket : #{json_object["bet"]["TicketSogei"]} / Gain probable: #{json_object["bet"]["AmountWin"]}
-@rendered_text = %Q[SPORTCASH
+          @rendered_text = %Q|FELICITATIONS, votre pari a bien été  enregistré. N° ticket : #{json_object["bet"]["TicketSogei"]} / Gain probable: #{json_object["bet"]["AmountWin"]}
 1- Sport
 2- Top matchs
 3- Dernière minute
@@ -4806,8 +4805,8 @@ Gain probable: #{@current_ussd_session.spc_stake.to_f * @current_ussd_session.sp
 6- Calendrier
 7- Jouer
 0- Retour
-00- Accueil]
-          @session_identifier = '49']
+00- Accueil|
+          @session_identifier = '49'
         else
           @rendered_text = %Q[Votre pari n'a pas pu etre placé.
 Veuillez entrer votre code secret de compte de jeu pour prendre le pari.
