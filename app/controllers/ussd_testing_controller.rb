@@ -1334,7 +1334,7 @@ Faites vos pronostics. Choisissez votre pari :
             @current_ussd_session.update_attributes(session_identifier: @session_identifier, spc_stake: @spc_stake)
           when '56'
             spc_place_bet
-            @current_ussd_session.update_attributes(session_identifier: @session_identifier, spc_stake: @spc_stake)
+            @current_ussd_session.update_attributes(session_identifier: @session_identifier, spc_place_bet_request: @spc_place_bet_url + @request_body, spc_place_bet_response: @spc_place_bet_response)
           end
         end
 
