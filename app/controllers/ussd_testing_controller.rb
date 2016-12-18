@@ -647,6 +647,30 @@ Saisissez le nombre de fois
     @current_ussd_session.update_attributes(session_identifier: @session_identifier)
   end
 
+  def back_to_list_spc_bet_types
+    @spc_bet_type_request = Parameter.first.parionsdirect_url + "/ussd_spc/get_event_markets/#{@current_ussd_session.spc_event_code}"
+    @spc_bet_type_response = RestClient.get(@spc_bet_type_request) rescue ''
+    bet_types_string = ""
+    counter = 0
+
+    bet_types = JSON.parse('{"bet_types":' + @spc_bet_type_response + '}') rescue nil
+    bet_types = bet_types["bet_types"] rescue nil
+    unless bet_types.blank?
+      bet_types.each do |bet_type|
+        counter += 1
+        bet_types_string << counter.to_s + '- ' + %Q[#{bet_type["Bet_description"]}
+]
+      end
+    end
+    @rendered_text = %Q[#{@event[0] rescue ''}
+Faites vos pronostics. Choisissez votre pari :
+#{bet_types_string}
+0- Retour
+00- Accueil]
+    @session_identifier = '53'
+    @current_ussd_session.update_attributes(session_identifier: @session_identifier)
+  end
+
   def back_to_get_paymoney_other_account_number
     @rendered_text = %Q[Veuillez entrer le numéro de compte de jeu dont vous voulez consulter le solde.
 0- Retour
@@ -1303,8 +1327,11 @@ Saisissez le nombre de fois
             set_session_identifier_depending_on_bet_type_selected
             @current_ussd_session.update_attributes(session_identifier: @session_identifier, spc_draw_trash: @draw_trash, spc_draw_request: @spc_draw_request, spc_draw_response: @spc_draw_response, spc_bet_description: (@bet_type[1] rescue nil), spc_bet_code: (@bet_type[0] rescue nil))
           when '54'
-            set_session_identifier_depending_on_event_selected
-            @current_ussd_session.update_attributes(session_identifier: @session_identifier, spc_draw_trash: @draw_trash, spc_draw_request: @spc_draw_request, spc_draw_response: @spc_draw_response, spc_bet_description: (@bet_type[1] rescue nil), spc_bet_code: (@bet_type[0] rescue nil))
+            set_session_identifier_depending_on_spc_draw_selected
+            @current_ussd_session.update_attributes(session_identifier: @session_identifier, spc_draw_description: @spc_draw_description, spc_odd: @spc_odd)
+          when '55'
+            spc_validate_stake
+            @current_ussd_session.update_attributes(session_identifier: @session_identifier, spc_stake: @spc_stake)
           end
         end
 
@@ -4653,9 +4680,9 @@ Faites vos pronostics. Choisissez votre pari :
           unless draws.blank?
             draws.each do |draw|
               counter += 1
-              draw_string << counter.to_s + '- ' + %Q[#{draw["Bet_description"]}:#{draw["Odd"]}
+              draw_string << counter.to_s + '- ' + %Q[#{draw["Bet_description"]}:#{(draw["Odd"]).to_f/100}
 ]
-              @draw_trash << %Q["#{counter.to_s}":"#{draw["Bet_description"]}|#{draw["Odd"]}",]
+              @draw_trash << %Q["#{counter.to_s}":"#{draw["Bet_description"]}|#{(draw["Odd"]).to_f/100}",]
             end
           end
           @draw_trash = @draw_trash.chop + "}"
@@ -4668,6 +4695,42 @@ Faites vos pronostics. Choisissez votre cote:
           @session_identifier = '54'
         end
       end
+  end
+
+  def set_session_identifier_depending_on_spc_draw_selected
+    @draw = JSON.parse(@current_ussd_session.spc_draw_trash).assoc(@ussd_string)[1].split('|') rescue nil
+    case @ussd_string
+      when '0'
+        back_to_list_spc_bet_types
+      when '00'
+        back_list_main_menu
+      else
+        @spc_draw_description = @draw[0]
+        @spc_odd = @draw[1]
+        @rendered_text = %Q[Misez gros pour gagner GROS ! Entrez le montant de votre mise
+0- Retour
+00- Accueil]
+        @session_identifier = '55'
+      end
+  end
+
+  def spc_validate_stake
+    if not_a_number?(@ussd_string)
+      @rendered_text = %Q[Misez gros pour gagner GROS ! Entrez le montant de votre mise
+0- Retour
+00- Accueil]
+      @session_identifier = '55'
+    else
+      @spc_stake = @ussd_string
+      @rendered_text = %Q[VOTRE COUPON:
+Equipes: #{@current_ussd_session.spc_event_description}
+#{@current_ussd_session.spc_bet_description}
+Mise: #{@ussd_string}
+Gain probable: #{@ussd_string.to_f * @current_ussd_session.spc_odd.to_f}
+0- Retour
+00- Accueil]
+      @session_identifier = '55'
+    end
   end
 
   def display_parions_direct_web_link

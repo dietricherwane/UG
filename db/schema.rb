@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161212173644) do
+ActiveRecord::Schema.define(version: 20161218093904) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -253,6 +253,9 @@ ActiveRecord::Schema.define(version: 20161212173644) do
     t.string   "unload_amount"
     t.text     "unload_request"
     t.text     "unload_response"
+    t.string   "spc_draw_description"
+    t.string   "spc_odd"
+    t.string   "spc_stake"
   end
 
 end
