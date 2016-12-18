@@ -1332,6 +1332,9 @@ Faites vos pronostics. Choisissez votre pari :
           when '55'
             spc_validate_stake
             @current_ussd_session.update_attributes(session_identifier: @session_identifier, spc_stake: @spc_stake)
+          when '56'
+            spc_place_bet
+            @current_ussd_session.update_attributes(session_identifier: @session_identifier, spc_stake: @spc_stake)
           end
         end
 
@@ -4570,7 +4573,7 @@ Veuillez entrer votre code secret de jeu pour valider le pari.
               counter += 1
               events_string << counter.to_s + '- ' + %Q[#{event["Description_match"]} (#{event["Palcode"]}-#{event["Codevts"]})
 ]
-              @events_trash << %Q["#{counter.to_s}":"#{event["Description_match"]}|#{event["Palcode"]}|#{event["Codevts"]}",]
+              @events_trash << %Q["#{counter.to_s}":"#{event["Description_match"]}|#{event["Palcode"]}|#{event["Codevts"]}|#{event["Date_match"]}|#{event["Hour_match"]}",]
             end
           end
           @events_trash = @events_trash.chop + "}"
@@ -4715,7 +4718,7 @@ Faites vos pronostics. Choisissez votre cote:
   end
 
   def spc_validate_stake
-    if not_a_number?(@ussd_string)
+    if not_a_number?(@ussd_string) || @ussd_string.to_i <= 0
       @rendered_text = %Q[Misez gros pour gagner GROS ! Entrez le montant de votre mise
 0- Retour
 00- Accueil]
@@ -4723,13 +4726,100 @@ Faites vos pronostics. Choisissez votre cote:
     else
       @spc_stake = @ussd_string
       @rendered_text = %Q[VOTRE COUPON:
+Veuillez entrer votre code secret de compte de jeu pour prendre le pari.
 Equipes: #{@current_ussd_session.spc_event_description}
 #{@current_ussd_session.spc_bet_description}
+Côte: #{@current_ussd_session.spc_odd.to_f}
 Mise: #{@ussd_string}
 Gain probable: #{@ussd_string.to_f * @current_ussd_session.spc_odd.to_f}
 0- Retour
 00- Accueil]
-      @session_identifier = '55'
+      @session_identifier = '56'
+    end
+  end
+
+  def spc_place_bet
+    @get_gamer_id_request = Parameter.first.gateway_url + "/8ba869a7a9c59f3a0/api/users/gamer_id/#{@account_profile.msisdn}"
+    @get_gamer_id_response = Typhoeus.get(@get_gamer_id_request, connecttimeout: 30)
+    if @get_gamer_id_response.body.blank?
+      @rendered_text = %Q[VOTRE COUPON:
+Veuillez entrer votre code secret de compte de jeu pour prendre le pari.
+Equipes: #{@current_ussd_session.spc_event_description}
+#{@current_ussd_session.spc_bet_description}
+Côte: #{@current_ussd_session.spc_odd.to_f}
+Mise: #{@current_ussd_session.spc_stake.to_f}
+Gain probable: #{@current_ussd_session.spc_stake.to_f * @current_ussd_session.spc_odd.to_f}
+0- Retour
+00- Accueil]
+      @session_identifier = '56'
+    else
+      @event = JSON.parse(@current_ussd_session.events_trash).assoc(@ussd_string)[1].split('|') rescue nil
+      @spc_place_bet_url = Parameter.first.gateway_url + "/spc/api/6d3782c78d/m_coupon/sell/#{@get_gamer_id_response.body}/#{@account_profile.paymoney_account_number}/#{@ussd_string}"
+      @request_body = %Q|
+                {
+                  "bets": [
+                    {
+                      "pal_code":"#{@current_ussd_session.spc_event_pal_code}",
+                      "event_code":"#{@current_ussd_session.spc_event_code}}",
+                      "bet_code":"#{@current_ussd_session.spc_bet_code}",
+                      "draw_code":"#{@current_ussd_session.spc_draw_description}",
+                      "odd":"#{@current_ussd_session.spc_odd.to_f * 100}",
+                      "begin_date":"#{@event[3].gsub('-', '')} #{@event[4].gsub('-', '')}",
+                      "teams":"#{@current_ussd_session.spc_event_description}",
+                      "sport":"#{@current_ussd_session.spc_sport_label}"
+                    }
+                  ],
+                  "amount":"#{@current_ussd_session.spc_stake}",
+                  "formula":"SIMPLE"
+                }
+              |
+      request = Typhoeus::Request.new(
+      @spc_place_bet_url,
+      method: :post,
+      body: @request_body
+      )
+      request.run
+      @spc_place_bet_response = request.response
+
+      json_object = JSON.parse(@spc_place_bet_response.body) rescue nil
+      if json_object.blank?
+        @rendered_text = %Q[Votre pari n'a pas pu etre placé.
+Veuillez entrer votre code secret de compte de jeu pour prendre le pari.
+Equipes: #{@current_ussd_session.spc_event_description}
+#{@current_ussd_session.spc_bet_description}
+Côte: #{@current_ussd_session.spc_odd.to_f}
+Mise: #{@current_ussd_session.spc_stake.to_f}
+Gain probable: #{@current_ussd_session.spc_stake.to_f * @current_ussd_session.spc_odd.to_f}
+0- Retour
+00- Accueil]
+        @session_identifier = '56'
+      else
+        if json_object["error"].blank?
+          @rendered_text = %Q[FELICITATIONS, votre pari a bien été  enregistré. N° ticket : #{json_object["bet"]["TicketSogei"]} / Gain probable: #{json_object["bet"]["AmountWin"]}
+@rendered_text = %Q[SPORTCASH
+1- Sport
+2- Top matchs
+3- Dernière minute
+4- Opportunités
+5- Lives
+6- Calendrier
+7- Jouer
+0- Retour
+00- Accueil]
+          @session_identifier = '49']
+        else
+          @rendered_text = %Q[Votre pari n'a pas pu etre placé.
+Veuillez entrer votre code secret de compte de jeu pour prendre le pari.
+Equipes: #{@current_ussd_session.spc_event_description}
+#{@current_ussd_session.spc_bet_description}
+Côte: #{@current_ussd_session.spc_odd.to_f}
+Mise: #{@current_ussd_session.spc_stake.to_f}
+Gain probable: #{@current_ussd_session.spc_stake.to_f * @current_ussd_session.spc_odd.to_f}
+0- Retour
+00- Accueil]
+        @session_identifier = '56'
+        end
+      end
     end
   end
 
