@@ -1310,6 +1310,17 @@ Faites vos pronostics. Choisissez votre pari :
                 when '1'
                   list_sportcash_sports
                 when '2'
+                  spc_top_match
+                  @current_ussd_session.update_attributes(session_identifier: @session_identifier, tournaments_trash: @tournaments_trash, spc_tournament_list_request: @spc_tournament_list_request, spc_tournament_list_response: @spc_tournament_list_response, spc_sport_label: (@sport_name[0] rescue nil), spc_sport_code: (@sport_name[1] rescue nil)
+                when '3'
+
+                when '4'
+
+                when '5'
+
+                when '6'
+
+                when '7'
 
               end
             end
@@ -4501,7 +4512,7 @@ Veuillez entrer votre code secret de jeu pour valider le pari.
             sports.each do |sport|
               counter += 1
               sports_string << counter.to_s + '- ' + %Q[#{sport["Description"]}
-    ]
+]
             end
           end
           @rendered_text = %Q[SPORTCASH - Liste des sports
@@ -4716,6 +4727,46 @@ Faites vos pronostics. Choisissez votre cote:
 00- Accueil]
         @session_identifier = '55'
       end
+  end
+
+  def spc_top_match
+    @spc_tournament_list_request = Parameter.first.parionsdirect_url + "/ussd_spc/get_topmatch_list"
+    @spc_tournament_list_response = RestClient.get(@spc_tournament_list_request) rescue ''
+    if (JSON.parse(@spc_tournament_list_response)["Status"] rescue nil) == "ERROR"
+      @rendered_text = %Q[Aucun match n'a été trouvé
+SPORTCASH
+1- Sport
+2- Top matchs
+3- Dernière minute
+4- Opportunités
+5- Lives
+6- Calendrier
+7- Jouer
+0- Retour
+00- Accueil]
+      @session_identifier = '49'
+    else
+      tournaments_string = ""
+      @tournaments_trash = "{"
+      counter = 0
+
+      tournaments = JSON.parse('{"tournaments":' + @spc_tournament_list_response + '}') rescue nil
+      tournaments = tournaments["tournaments"] rescue nil
+      unless tournaments.blank?
+        tournaments.each do |tournament|
+          counter += 1
+          tournaments_string << counter.to_s + '- ' + %Q[#{tournament["Descrition_Tourn"]}
+]
+          @tournaments_trash << %Q["#{counter.to_s}":"#{tournament["Descrition_Tourn"]}|#{tournament["Code_Tournois"]}",]
+        end
+      end
+      @tournaments_trash = @tournaments_trash.chop + "}"
+      @rendered_text = %Q[SPORTCASH
+#{tournaments_string}
+0- Retour
+00- Accueil]
+      @session_identifier = '51'
+    end
   end
 
   def spc_validate_stake
