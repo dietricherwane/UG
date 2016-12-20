@@ -756,9 +756,9 @@ Faites vos pronostics. Choisissez votre pari :
 
     #@account_profile = AccountProfile.find_by_msisdn(@msisdn[-8,8])
 
-    #render :xml => @result
+    render :xml => @result
 
-    #Thread.new do
+    Thread.new do
       if @error_code == '0'
 #puts "Error code3 - #{@account_profile.inspect}"
         # Récupération d'une session existante
@@ -1392,12 +1392,12 @@ Faites vos pronostics. Choisissez votre pari :
           end
         end
         unless @exit == true
-          #send_ussd(@operation_type, @msisdn, @sender_cb, @linkid, @rendered_text)
+          send_ussd(@operation_type, @msisdn, @sender_cb, @linkid, @rendered_text)
         end
       end
-    #end
+    end
 
-    render text: @rendered_text
+    #render text: @rendered_text
   end
 
   def display_mtn_welcome_menu
@@ -2341,6 +2341,7 @@ Votre solde de jeu est de: #{balance rescue 0} FCFA
 
     if password.blank?
       # Le client n'a pas de compte parionsdirect et doit en créer un
+=begin
       if @current_ussd_session.session_identifier != '-10'
         @rendered_text = %Q[BIENVENUE DANS LE MENU LONACI:
 En continuant le processus, vous certifiez avoir +18
@@ -2349,9 +2350,10 @@ En continuant le processus, vous certifiez avoir +18
 3- Quitter]
         @session_identifier = '-10'
       else
+=end
         @rendered_text = %Q[Pour accéder à ce service, créez votre compte de jeu en entrant un code secret de 4 caractères.]
         @session_identifier = '1'
-      end
+      #end
     else
       # Le client a un compte parionsdirect et doit s'authentifier
       @rendered_text = %Q[Veuillez entrer votre mot de passe parionsdirect.]
