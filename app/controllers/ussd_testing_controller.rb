@@ -130,6 +130,7 @@ class UssdTestingController < ApplicationController
     sp_password = Digest::MD5.hexdigest(sp_id + password + timestamp)
     service_code = '218'
     code_scheme = '15'
+    @exit = true
 
     request_body = %Q[
       <?xml version = "1.0" encoding = "utf-8" ?>
@@ -154,7 +155,7 @@ class UssdTestingController < ApplicationController
             <loc:msIsdn>#{@msisdn}</loc:msIsdn>
             <loc:serviceCode>#{service_code}</loc:serviceCode>
             <loc:codeScheme>#{code_scheme}</loc:codeScheme>
-            <loc:ussdString></loc:ussdString>
+            <loc:ussdString>Merci d'avoir utilsé ce service</loc:ussdString>
           </loc:sendUssd>
         </soapenv:Body>
       </soapenv:Envelope>
@@ -1390,8 +1391,9 @@ puts "Error code3 - #{@msisdn}"
             @current_ussd_session.update_attributes(session_identifier: @session_identifier, spc_place_bet_request: @spc_place_bet_url + @request_body, spc_place_bet_response: @spc_place_bet_response.body)
           end
         end
-
-        send_ussd(@operation_type, @msisdn, @sender_cb, @linkid, @rendered_text)
+        unless @exit == true
+          send_ussd(@operation_type, @msisdn, @sender_cb, @linkid, @rendered_text)
+        end
       end
     end
 
