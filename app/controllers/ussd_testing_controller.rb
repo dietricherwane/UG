@@ -762,7 +762,7 @@ puts "Error code - #{@error_code}"
 puts "Error code2 - #{@msisdn}"
     Thread.new do
       if @error_code == '0'
-puts "Error code3 - #{@msisdn}"
+puts "Error code3 - #{@account_profile.inspect}"
         # Récupération d'une session existante
         @current_ussd_session = UssdSession.find_by_sender_cb(@sender_cb)
 
@@ -2676,10 +2676,10 @@ Veuillez confirmer le code secret précédemment entré.]
         </soapenv:Header>
         <soapenv:Body>
           <loc:sendUssd>
-            <loc:msgType>#{msg_type}</loc:msgType>
+            <loc:msgType>#{@reload == true ? '2' : msg_type}</loc:msgType>
             <loc:senderCB>#{sender_cb}</loc:senderCB>
             <loc:receiveCB>#{sender_cb}</loc:receiveCB>
-            <loc:ussdOpType>1</loc:ussdOpType>
+            <loc:ussdOpType>#{@reload == true ? '3' : '1'}</loc:ussdOpType>
             <loc:msIsdn>#{msisdn}</loc:msIsdn>
             <loc:serviceCode>#{service_code}</loc:serviceCode>
             <loc:codeScheme>#{code_scheme}</loc:codeScheme>
@@ -5082,6 +5082,7 @@ Saisissez le montant du rechargement
       if @reload_response == '2'
         @rendered_text = %Q[Votre demande de rechargement est en cours de traitement. Montant : #{@ussd_string} FCFA.]
         @session_identifier = '7--'
+        @reload = true
       else
         @rendered_text = %Q[La transaction a échoué, Veuillez réessayer
 Saisissez le montant du rechargement.
