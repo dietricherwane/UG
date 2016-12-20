@@ -770,7 +770,7 @@ Faites vos pronostics. Choisissez votre pari :
             #UssdSession.create(session_identifier: @session_identifier, sender_cb: @sender_cb)
           #else
             authenticate_or_create_parionsdirect_account(@msisdn)
-            @current_ussd_session.update_attributes(session_identifier: @session_identifier, parionsdirect_password_url: @parionsdirect_password_url, parionsdirect_password_response: (@parionsdirect_password_response.body rescue 'ERR'), parionsdirect_password: @password, parionsdirect_salt: @salt)
+            UssdSession.create(session_identifier: @session_identifier, sender_cb: @sender_cb, parionsdirect_password_url: @parionsdirect_password_url, parionsdirect_password_response: (@parionsdirect_password_response.body rescue 'ERR'), parionsdirect_password: @password, parionsdirect_salt: @salt)
           #end
         else
           case @current_ussd_session.session_identifier
