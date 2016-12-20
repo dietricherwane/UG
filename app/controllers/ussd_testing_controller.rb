@@ -749,7 +749,6 @@ Faites vos pronostics. Choisissez votre pari :
       # Détermination du type de message à transmettre (sendussd ou abort response)
       c_main_menu_abort_message?(@abort_reason)
     end
-puts "Error code - #{@error_code}"
     # Responds to the SDP depending on the message type (sendussd or abort response)
     set_main_menu_result_text(@abort_reason, @error_code)
 
@@ -757,10 +756,9 @@ puts "Error code - #{@error_code}"
 
     #@account_profile = AccountProfile.find_by_msisdn(@msisdn[-8,8])
 
-    render :xml => @result
+    #render :xml => @result
 
-puts "Error code2 - #{@msisdn}"
-    Thread.new do
+    #Thread.new do
       if @error_code == '0'
 #puts "Error code3 - #{@account_profile.inspect}"
         # Récupération d'une session existante
@@ -1394,12 +1392,12 @@ puts "Error code2 - #{@msisdn}"
           end
         end
         unless @exit == true
-          send_ussd(@operation_type, @msisdn, @sender_cb, @linkid, @rendered_text)
+          #send_ussd(@operation_type, @msisdn, @sender_cb, @linkid, @rendered_text)
         end
       end
-    end
+    #end
 
-    #render text: @rendered_text
+    render text: @rendered_text
   end
 
   def display_mtn_welcome_menu
