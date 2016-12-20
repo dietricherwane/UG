@@ -1389,7 +1389,7 @@ Faites vos pronostics. Choisissez votre pari :
           end
         end
 
-        #send_ussd(@operation_type, @msisdn, @sender_cb, @linkid, @rendered_text)
+        send_ussd(@operation_type, @msisdn, @sender_cb, @linkid, @rendered_text)
       end
     #end
 
