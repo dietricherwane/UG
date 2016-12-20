@@ -155,7 +155,7 @@ class UssdTestingController < ApplicationController
             <loc:msIsdn>#{@msisdn}</loc:msIsdn>
             <loc:serviceCode>#{service_code}</loc:serviceCode>
             <loc:codeScheme>#{code_scheme}</loc:codeScheme>
-            <loc:ussdString>Merci d'avoir utilsé ce service</loc:ussdString>
+            <loc:ussdString>Merci d'avoir utilisé ce service</loc:ussdString>
           </loc:sendUssd>
         </soapenv:Body>
       </soapenv:Envelope>
