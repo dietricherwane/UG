@@ -756,8 +756,10 @@ puts "Error code - #{@error_code}"
 
     render :xml => @result
 
+puts "Error code2 - #{@msisdn}"
     Thread.new do
       if @error_code == '0'
+puts "Error code3 - #{@msisdn}"
         # Récupération d'une session existante
         @current_ussd_session = UssdSession.find_by_sender_cb(@sender_cb)
 
