@@ -757,7 +757,7 @@ Faites vos pronostics. Choisissez votre pari :
     render :xml => @result
 
     Thread.new do
-      if @error_code == '0'
+      if true#@error_code == '0'
         # Récupération d'une session existante
         @current_ussd_session = UssdSession.find_by_sender_cb(@sender_cb)
 
