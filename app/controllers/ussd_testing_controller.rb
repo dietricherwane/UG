@@ -764,13 +764,13 @@ puts "Error code3 - #{@msisdn}"
         @current_ussd_session = UssdSession.find_by_sender_cb(@sender_cb)
 
         if @current_ussd_session.blank?
-          if AccountProfile.find_by_msisdn(@msisdn[-8,8]).blank?
+          #if AccountProfile.find_by_msisdn(@msisdn[-8,8]).blank?
             display_mtn_welcome_menu
             UssdSession.create(session_identifier: @session_identifier, sender_cb: @sender_cb)
-          else
-            authenticate_or_create_parionsdirect_account(@msisdn)
-            @current_ussd_session.update_attributes(session_identifier: @session_identifier, parionsdirect_password_url: @parionsdirect_password_url, parionsdirect_password_response: (@parionsdirect_password_response.body rescue 'ERR'), parionsdirect_password: @password, parionsdirect_salt: @salt)
-          end
+          #else
+            #authenticate_or_create_parionsdirect_account(@msisdn)
+            #@current_ussd_session.update_attributes(session_identifier: @session_identifier, parionsdirect_password_url: @parionsdirect_password_url, parionsdirect_password_response: (@parionsdirect_password_response.body rescue 'ERR'), parionsdirect_password: @password, parionsdirect_salt: @salt)
+          #end
         else
           case @current_ussd_session.session_identifier
           when '-10'
