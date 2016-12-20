@@ -2343,8 +2343,12 @@ Votre solde de jeu est de: #{balance rescue 0} FCFA
 
     if password.blank?
       # Le client n'a pas de compte parionsdirect et doit en créer un
-      @rendered_text = %Q[Pour accéder à ce service, créez votre compte de jeu en entrant un code secret de 4 caractères.]
-      @session_identifier = '1'
+      if @current_ussd_session != '-10'
+        display_mtn_welcome_menu
+      else
+        @rendered_text = %Q[Pour accéder à ce service, créez votre compte de jeu en entrant un code secret de 4 caractères.]
+        @session_identifier = '1'
+      end
     else
       # Le client a un compte parionsdirect et doit s'authentifier
       @rendered_text = %Q[Veuillez entrer votre mot de passe parionsdirect.]
