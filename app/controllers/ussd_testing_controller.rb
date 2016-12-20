@@ -128,7 +128,39 @@ class UssdTestingController < ApplicationController
     password = 'bmeB500'
     timestamp = DateTime.now.strftime('%Y%m%d%H%M%S')
     sp_password = Digest::MD5.hexdigest(sp_id + password + timestamp)
+    service_code = '218'
+    code_scheme = '15'
 
+    request_body = %Q[
+      <?xml version = "1.0" encoding = "utf-8" ?>
+      <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:loc="http://www.csapi.org/schema/parlayx/ussd/send/v1_0/local">
+        <soapenv:Header>
+          <tns:RequestSOAPHeader xmlns:tns="http://www.huawei.com.cn/schema/common/v2_1">
+            <tns:spId>#{sp_id}</tns:spId>
+            <tns:spPassword>#{sp_password}</tns:spPassword>
+            <tns:serviceId>#{service_id}</tns:serviceId>
+            <tns:timeStamp>#{timestamp}</tns:timeStamp>
+            <tns:OA>#{@msisdn}</tns:OA>
+            <tns:FA>#{@msisdn}</tns:FA>
+            <tns:linkid>#{@linkid}</tns:linkid>
+          </tns:RequestSOAPHeader>
+        </soapenv:Header>
+        <soapenv:Body>
+          <loc:sendUssd>
+            <loc:msgType>2</loc:msgType>
+            <loc:senderCB>#{sender_cb}</loc:senderCB>
+            <loc:receiveCB>#{sender_cb}</loc:receiveCB>
+            <loc:ussdOpType>3</loc:ussdOpType>
+            <loc:msIsdn>#{@msisdn}</loc:msIsdn>
+            <loc:serviceCode>#{service_code}</loc:serviceCode>
+            <loc:codeScheme>#{code_scheme}</loc:codeScheme>
+            <loc:ussdString></loc:ussdString>
+          </loc:sendUssd>
+        </soapenv:Body>
+      </soapenv:Envelope>
+    ]
+
+=begin
     request_body = %Q[
       <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:loc="http://www.csapi.org/schema/osg/ussd/notification_manager/v1_0/local">
         <soapenv:Header>
@@ -150,7 +182,7 @@ class UssdTestingController < ApplicationController
         </soapenv:Body>
       </soapenv:Envelope>
     ]
-
+=end
     exit_session_response = Typhoeus.post(url, body: request_body, connecttimeout: 30)
 
     nokogiri_response = (Nokogiri.XML(exit_session_response.body) rescue nil)
