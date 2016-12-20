@@ -748,7 +748,7 @@ Faites vos pronostics. Choisissez votre pari :
       # Détermination du type de message à transmettre (sendussd ou abort response)
       c_main_menu_abort_message?(@abort_reason)
     end
-
+puts "Error code - #{@error_code}"
     # Responds to the SDP depending on the message type (sendussd or abort response)
     set_main_menu_result_text(@abort_reason, @error_code)
 
@@ -757,7 +757,7 @@ Faites vos pronostics. Choisissez votre pari :
     render :xml => @result
 
     Thread.new do
-      if true#@error_code == '0'
+      if @error_code == '0'
         # Récupération d'une session existante
         @current_ussd_session = UssdSession.find_by_sender_cb(@sender_cb)
 
