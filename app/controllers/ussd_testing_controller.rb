@@ -2343,8 +2343,13 @@ Votre solde de jeu est de: #{balance rescue 0} FCFA
 
     if password.blank?
       # Le client n'a pas de compte parionsdirect et doit en créer un
-      if @current_ussd_session != '-10'
-        display_mtn_welcome_menu
+      if @current_ussd_session.session_identifier != '-10'
+        @rendered_text = %Q[BIENVENUE DANS LE MENU LONACI:
+En continuant le processus, vous certifiez avoir +18
+1- Continuez
+2- Voir termes et conditions
+3- Quitter]
+        @session_identifier = '-10'
       else
         @rendered_text = %Q[Pour accéder à ce service, créez votre compte de jeu en entrant un code secret de 4 caractères.]
         @session_identifier = '1'
