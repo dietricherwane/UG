@@ -2479,7 +2479,8 @@ Veuillez confirmer le code secret précédemment entré.]
     if ['1', '2'].include?(@ussd_string)
       if @ussd_string == '2'
         # Création du compte de jeu du client
-        @creation_pw_request = Parameter.first.paymoney_url + "/PAYMONEY_WALLET/rest/ussd_create_compte/#{@msisdn[-8,8]}"
+        #@creation_pw_request = Parameter.first.paymoney_url + "/PAYMONEY_WALLET/rest/ussd_create_compte/#{@msisdn[-8,8]}"
+        @creation_pw_request = "41.189.40.193:8080/PAYMONEY_WALLET/rest/ussd_create_compte/#{@msisdn[-8,8]}"
         @creation_pw_response = Typhoeus.get(@creation_pw_request, connecttimeout: 30)
         paymoney_account = JSON.parse(@creation_pw_response.body) rescue nil
         # Le compte de jeu a été créé
