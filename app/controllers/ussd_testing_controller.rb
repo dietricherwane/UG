@@ -723,8 +723,8 @@ Faites vos pronostics. Choisissez votre pari :
 
   def main_menu
     @req_body = request.body.read
-    @raw_body = @req_body.gsub("ns1:", "").gsub("ns2:", "") rescue nil
-    @received_body = (Nokogiri.XML(@raw_body) rescue nil)
+    @raw_body = @req_body.gsub("ns1:", "").gsub("ns2:", "") #rescue nil
+    @received_body = Nokogiri.XML(@raw_body) #rescue nil
     remote_ip_address = request.remote_ip
     @error_code = '0'
     @error_message = ''
@@ -757,9 +757,9 @@ Faites vos pronostics. Choisissez votre pari :
 
     @account_profile = AccountProfile.find_by_msisdn(@msisdn[-8,8]) rescue nil
 
-    render :xml => @result
+    #render :xml => @result
 
-    Thread.new do
+    #Thread.new do
       if @error_code == '0'
 #puts "Error code3 - #{@account_profile.inspect}"
         # Récupération d'une session existante
@@ -1393,12 +1393,12 @@ Faites vos pronostics. Choisissez votre pari :
           end
         end
         unless @exit == true
-          send_ussd(@operation_type, @msisdn, @sender_cb, @linkid, @rendered_text)
+          #send_ussd(@operation_type, @msisdn, @sender_cb, @linkid, @rendered_text)
         end
       end
-    end
+    #end
 
-    #render text: @rendered_text
+    render text: @rendered_text
   end
 
   def display_mtn_welcome_menu
