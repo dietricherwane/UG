@@ -755,11 +755,11 @@ Faites vos pronostics. Choisissez votre pari :
 
     UssdReceptionLog.create(received_parameters: @req_body, rev_id: @rev_id, rev_password: @rev_password, sp_id: @sp_id, service_id: @service_id, timestamp: @timestamp, trace_unique_id: @unique_id, msg_type: @msg_type, sender_cb: @sender_cb, receiver_cb: @receive_cb, ussd_of_type: @ussd_op_type, msisdn: @msisdn, service_code: @service_code, code_scheme: @code_scheme, ussd_string: @ussd_string, error_code: @error_code, error_message: @error_message, remote_ip: remote_ip_address)
 
-    @account_profile = AccountProfile.find_by_msisdn(@msisdn[-8,8]) rescue nil
+    #@account_profile = AccountProfile.find_by_msisdn(@msisdn[-8,8]) rescue nil
 
-    #render :xml => @result
+    render :xml => @result
 
-    #Thread.new do
+    Thread.new do
       if @error_code == '0'
 #puts "Error code3 - #{@account_profile.inspect}"
         # Récupération d'une session existante
@@ -1393,12 +1393,12 @@ Faites vos pronostics. Choisissez votre pari :
           end
         end
         unless @exit == true
-          #send_ussd(@operation_type, @msisdn, @sender_cb, @linkid, @rendered_text)
+          send_ussd(@operation_type, @msisdn, @sender_cb, @linkid, @rendered_text)
         end
       end
-    #end
+    end
 
-    render text: @rendered_text
+    #render text: @rendered_text
   end
 
   def display_mtn_welcome_menu
