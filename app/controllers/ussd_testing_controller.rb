@@ -5105,7 +5105,7 @@ Saisissez le montant du rechargement
         @reload = true
       else
         if @reload_response == '-1'
-          @rendered_text = %Q[Votre solde est insuffisant. Veuillez vérifier le solde de votre compte MTN Mobile Money
+          @rendered_text = %Q[Fond insuffisant. Veuillez vérifier puis réessayer
 0- Retour]
           @session_identifier = '9--'
         else
@@ -5152,7 +5152,7 @@ Saisissez le montant du Retrait vers MTN MOBILE MONEY
         @session_identifier = '11--'
       else
         if @unload_response == '-1'
-          @rendered_text = %Q[Votre solde est insuffisant. Veuillez vérifier le solde de votre compte MTN Mobile Money
+          @rendered_text = %Q[Fond insuffisant. Veuillez vérifier puis réessayer
 0- Retour]
           @session_identifier = '10--'
         else
