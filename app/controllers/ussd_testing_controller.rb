@@ -2355,7 +2355,7 @@ En continuant le processus, vous certifiez avoir +18
         @session_identifier = '-10'
       else
 =end
-        @rendered_text = %Q[Pour accéder à ce service, créez votre compte de jeu en entrant un code secret de 4 caractères.]
+        @rendered_text = %Q[Pour accéder à ce service, créez votre compte de jeu en entrant un mot de passe de 4 caractères.]
         @session_identifier = '1'
       #end
     else
@@ -2426,12 +2426,12 @@ Veuillez saisir votre numéro de compte de jeu.]
     # L'utilisateur n'a pas saisi de code secret, on le ramène au menu précédent
     if @ussd_string.blank? || @ussd_string.length != 4
       # Le client n'a pas de compte parionsdirect et entrer un code secret pour en créer un
-      @rendered_text = %Q[Pour accéder à ce service, créez votre compte de jeu en entrant un code secret de 4 caractères.]
+      @rendered_text = %Q[Pour accéder à ce service, créez votre compte de jeu en entrant un mot de passe de 4 caractères.]
       @session_identifier = '1'
     else
       @creation_pd_password = @ussd_string
       # Le client n'a pas de compte parionsdirect et confirmer le code secret pour en créer un
-      @rendered_text = %Q[Veuillez confirmer le code secret précédemment entré.]
+      @rendered_text = %Q[Veuillez confirmer le mot de passe précédemment entré.]
       @session_identifier = '3'
     end
   end
@@ -2441,14 +2441,14 @@ Veuillez saisir votre numéro de compte de jeu.]
     # L'utilisateur n'a pas saisi de confirmation de code secret, on le ramène au menu précédent
     if @ussd_string.blank? || @ussd_string.length != 4
       # Le client n'a pas de compte parionsdirect et confirmer le code secret pour en créer un
-      @rendered_text = %Q[Veuillez confirmer le code secret précédemment entré.]
+      @rendered_text = %Q[Veuillez confirmer le mot de passe précédemment entré.]
       @session_identifier = '3'
     else
       @creation_pd_password_confirmation = @ussd_string
       # Les mots de passe saisis ne sont pas identiques
       if @current_ussd_session.creation_pd_password != @creation_pd_password_confirmation
         # Le client n'a pas de compte parionsdirect et confirmer le code secret pour en créer un
-        @rendered_text = %Q[Veuillez confirmer le code secret précédemment entré.]
+        @rendered_text = %Q[Veuillez confirmer le mot de passe précédemment entré.]
         @session_identifier = '3'
       else
         @pseudo = "#{Digest::SHA1.hexdigest([DateTime.now.iso8601(6), rand].join).hex.to_s[0..8]}"
@@ -2466,7 +2466,7 @@ Veuillez saisir votre numéro de compte de jeu.]
           @pd_account_created = false
           @rendered_text = %Q[
 Une erreur s'est produite lors de la création du compte PARIONSDIRECT
-Veuillez confirmer le code secret précédemment entré.]
+Veuillez confirmer le mot de passe précédemment entré.]
           @session_identifier = '3'
         else
           @pd_account_created = true
