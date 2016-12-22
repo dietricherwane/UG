@@ -2387,7 +2387,7 @@ En continuant le processus, vous certifiez avoir +18
         end
       else
         @rendered_text = %Q[Le code secret saisi n'est pas valide.
-Veuillez entrer votre code secret parionsdirect.
+Veuillez entrer votre mot de passe parionsdirect.
           ]
         @session_identifier = '2'
       end
