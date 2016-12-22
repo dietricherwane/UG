@@ -121,7 +121,7 @@ class UssdTestingController < ApplicationController
     render text: stop_session_response.body
   end
 
-  def exit_menu(sender_cb)
+  def exit_menu(sender_cb, msg)
     url = '196.201.33.108:8310/SendUssdService/services/SendUssd'
     sp_id = '2250110000460'
     service_id = '225012000003070'
@@ -155,7 +155,7 @@ class UssdTestingController < ApplicationController
             <loc:msIsdn>#{@msisdn}</loc:msIsdn>
             <loc:serviceCode>#{service_code}</loc:serviceCode>
             <loc:codeScheme>#{code_scheme}</loc:codeScheme>
-            <loc:ussdString>Merci d'utiliser MTN Mobile Money</loc:ussdString>
+            <loc:ussdString>#{msg}</loc:ussdString>
           </loc:sendUssd>
         </soapenv:Body>
       </soapenv:Envelope>
@@ -786,7 +786,7 @@ Faites vos pronostics. Choisissez votre pari :
                   display_mtn_terms_and_conditions
                   @current_ussd_session.update_attributes(session_identifier: @session_identifier)
                 when '3'
-                  exit_menu(@sender_cb)
+                  exit_menu(@sender_cb, "Merci d'utiliser MTN Mobile Money")
               end
             end
           when '-9'
@@ -797,7 +797,7 @@ Faites vos pronostics. Choisissez votre pari :
                   display_mtn_welcome_menu
                   @current_ussd_session.update_attributes(session_identifier: @session_identifier)
                 when '00'
-                  exit_menu(@sender_cb)
+                  exit_menu(@sender_cb, "Merci d'utiliser MTN Mobile Money")
                 else
                   display_mtn_terms_and_conditions
                   @current_ussd_session.update_attributes(session_identifier: @session_identifier)
@@ -815,7 +815,7 @@ Faites vos pronostics. Choisissez votre pari :
                   @session_identifier = '5--'
                   @current_ussd_session.update_attributes(session_identifier: @session_identifier)
                 when '00'
-                  exit_menu(@sender_cb)
+                  exit_menu(@sender_cb, "Merci d'utiliser MTN Mobile Money")
                 else
                   display_mtn_home_menu_terms_and_conditions
                   @current_ussd_session.update_attributes(session_identifier: @session_identifier)
@@ -842,6 +842,7 @@ Faites vos pronostics. Choisissez votre pari :
           when '4-'
             create_paymoney_account
             @current_ussd_session.update_attributes(session_identifier: @session_identifier, creation_pw_request: @creation_pw_request, creation_pw_response: (@creation_pw_response.body rescue 'ERR'), pw_account_created: @pw_account_created)
+            exit_menu(@sender_cb, "Vous allez recevoir un SMS avec les détails de votre portemonnaie de jeu.")
           when '5--'
             select_action_depending_on_mtn_main_menu_selection
             if @status
@@ -2373,11 +2374,17 @@ En continuant le processus, vous certifiez avoir +18
     else
       password = Digest::SHA2.hexdigest(@current_ussd_session.parionsdirect_salt + @ussd_string)
       if password == @current_ussd_session.parionsdirect_password
-        existing_paymoney_account = AccountProfile.find_by_msisdn(@msisdn[-8,8])
+        existing_paymoney_account = AccountProfile.find_by_msisdn(@msisdn[-8,8]).paymoney_account_number rescue nil
         # On vérifie que le client n'a pas déjà de compte de jeu associé à son numéro
         if existing_paymoney_account.blank?
+          @rendered_text = %Q[Avez vous un compte de jeu?
+1- Oui
+2- Non]
+          @session_identifier = '4-'
+=begin
           @rendered_text = %Q[Veuillez saisir votre numéro de compte de jeu.]
           @session_identifier = '4'
+=end
         else
           @rendered_text = %Q[BIENVENUE DANS LE MENU LONACI:
 1- Recharger compte de jeu
@@ -2490,7 +2497,7 @@ Veuillez confirmer le mot de passe précédemment entré.]
         # Le compte de jeu a été créé
         if (paymoney_account["errors"] rescue nil).blank?
           @pw_account_created = true
-          @rendered_text = %Q[Vous allez recevoir un SMS avec  les détails de votre portemonnaie de jeux de jeu.]
+          @rendered_text = %Q[Vous allez recevoir un SMS avec les détails de votre porte monnaie de jeu.]
           @session_identifier = '4'
         else
           @pw_account_created = false
