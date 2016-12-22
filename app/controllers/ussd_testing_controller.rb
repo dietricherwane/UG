@@ -1406,7 +1406,7 @@ Faites vos pronostics. Choisissez votre pari :
 
   def display_mtn_welcome_menu
     @rendered_text = %Q[BIENVENUE DANS LE MENU LONACI:
-En continuant le processus, vous certifiez avoir +18
+En continuant le processus, vous certifiez avoir +18 ans
 1- Continuez
 2- Voir termes et conditions
 3- Quitter]
@@ -1419,7 +1419,7 @@ En continuant le processus, vous certifiez avoir +18
       @status = true
     else
       @rendered_text = %Q[BIENVENUE DANS LE MENU LONACI:
-En continuant le processus, vous certifiez avoir +18
+En continuant le processus, vous certifiez avoir +18 ans
 1- Continuez
 2- Voir termes et conditions
 3- Quitter]
@@ -2360,7 +2360,7 @@ En continuant le processus, vous certifiez avoir +18
       #end
     else
       # Le client a un compte parionsdirect et doit s'authentifier
-      @rendered_text = %Q[Veuillez entrer votre mot de passe parionsdirect.]
+      @rendered_text = %Q[Veuillez entrer votre code secret parionsdirect.]
       @session_identifier = '2'
     end
   end
@@ -2368,7 +2368,7 @@ En continuant le processus, vous certifiez avoir +18
   def check_parionsdirect_password
     if @ussd_string.blank?
       # Le client n'a pas de compte parionsdirect et entrer un code secret pour en créer un
-      @rendered_text = %Q[Veuillez entrer votre mot de passe parionsdirect.]
+      @rendered_text = %Q[Veuillez entrer votre code secret parionsdirect.]
       @session_identifier = '2'
     else
       password = Digest::SHA2.hexdigest(@current_ussd_session.parionsdirect_salt + @ussd_string)
@@ -2387,7 +2387,7 @@ En continuant le processus, vous certifiez avoir +18
         end
       else
         @rendered_text = %Q[Le code secret saisi n'est pas valide.
-Veuillez entrer votre mot de passe parionsdirect.
+Veuillez entrer votre code secret parionsdirect.
           ]
         @session_identifier = '2'
       end
@@ -2495,7 +2495,7 @@ Veuillez confirmer le code secret précédemment entré.]
         else
           @pw_account_created = false
           @rendered_text = %Q[Une erreur s'est produite lors de la création du compte de jeu
-Veuillez confirmer le code secret précédemment entré.]
+Veuillez confirmer le mot de passe précédemment entré.]
           @session_identifier = '3'
         end
       else
