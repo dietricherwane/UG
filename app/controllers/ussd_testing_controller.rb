@@ -5151,10 +5151,16 @@ Saisissez le montant du Retrait vers MTN MOBILE MONEY
         @rendered_text = %Q[Votre transaction a été effectuée avec succès. Montant : #{@current_ussd_session.unload_amount} FCFA.]
         @session_identifier = '11--'
       else
-        @rendered_text = %Q[La transaction a échoué, Veuillez réessayer
+        if @reload_response == '-1'
+          @rendered_text = %Q[Votre solde est insuffisant. Veuillez vérifier le solde de votre compte MTN Mobile Money
+0- Retour]
+          @session_identifier = '10--'
+        else
+          @rendered_text = %Q[La transaction a échoué, Veuillez réessayer
 Saisissez le montant du Retrait vers MTN MOBILE MONEY
 0- Retour]
-        @session_identifier = '10--'
+          @session_identifier = '10--'
+        end
       end
     end
   end
