@@ -2360,7 +2360,7 @@ En continuant le processus, vous certifiez avoir +18
       #end
     else
       # Le client a un compte parionsdirect et doit s'authentifier
-      @rendered_text = %Q[Veuillez entrer votre code secret parionsdirect.]
+      @rendered_text = %Q[Veuillez entrer votre mot de passe parionsdirect.]
       @session_identifier = '2'
     end
   end
@@ -2368,7 +2368,7 @@ En continuant le processus, vous certifiez avoir +18
   def check_parionsdirect_password
     if @ussd_string.blank?
       # Le client n'a pas de compte parionsdirect et entrer un code secret pour en créer un
-      @rendered_text = %Q[Veuillez entrer votre code secret parionsdirect.]
+      @rendered_text = %Q[Veuillez entrer votre mot de passe parionsdirect.]
       @session_identifier = '2'
     else
       password = Digest::SHA2.hexdigest(@current_ussd_session.parionsdirect_salt + @ussd_string)
