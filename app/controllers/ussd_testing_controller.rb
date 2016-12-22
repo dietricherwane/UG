@@ -5104,10 +5104,16 @@ Saisissez le montant du rechargement
         @session_identifier = '7--'
         @reload = true
       else
-        @rendered_text = %Q[La transaction a échoué, Veuillez réessayer
+        if @reload_response == '-1'
+          @rendered_text = %Q[Votre solde est insuffisant.
+0- Retour]
+          @session_identifier = '9--'
+        else
+          @rendered_text = %Q[La transaction a échoué, Veuillez réessayer
 Saisissez le montant du rechargement.
 0- Retour]
-        @session_identifier = '9--'
+          @session_identifier = '9--'
+        end
       end
     end
   end
