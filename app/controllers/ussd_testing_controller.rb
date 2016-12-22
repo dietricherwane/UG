@@ -755,7 +755,7 @@ Faites vos pronostics. Choisissez votre pari :
 
     UssdReceptionLog.create(received_parameters: @req_body, rev_id: @rev_id, rev_password: @rev_password, sp_id: @sp_id, service_id: @service_id, timestamp: @timestamp, trace_unique_id: @unique_id, msg_type: @msg_type, sender_cb: @sender_cb, receiver_cb: @receive_cb, ussd_of_type: @ussd_op_type, msisdn: @msisdn, service_code: @service_code, code_scheme: @code_scheme, ussd_string: @ussd_string, error_code: @error_code, error_message: @error_message, remote_ip: remote_ip_address)
 
-    #@account_profile = AccountProfile.find_by_msisdn(@msisdn[-8,8]) rescue nil
+    @account_profile = AccountProfile.find_by_msisdn(@msisdn[-8,8]) rescue nil
 
     render :xml => @result
 
@@ -766,13 +766,13 @@ Faites vos pronostics. Choisissez votre pari :
         @current_ussd_session = UssdSession.find_by_sender_cb(@sender_cb)
 
         if @current_ussd_session.blank?
-          #if @account_profile.blank?
-            #display_mtn_welcome_menu
-            #UssdSession.create(session_identifier: @session_identifier, sender_cb: @sender_cb)
-          #else
+          if @account_profile.blank?
+            display_mtn_welcome_menu
+            UssdSession.create(session_identifier: @session_identifier, sender_cb: @sender_cb)
+          else
             authenticate_or_create_parionsdirect_account(@msisdn)
             UssdSession.create(session_identifier: @session_identifier, sender_cb: @sender_cb, parionsdirect_password_url: @parionsdirect_password_url, parionsdirect_password_response: (@parionsdirect_password_response.body rescue 'ERR'), parionsdirect_password: @password, parionsdirect_salt: @salt)
-          #end
+          end
         else
           case @current_ussd_session.session_identifier
           when '-10'
