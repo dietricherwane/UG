@@ -155,7 +155,7 @@ class UssdTestingController < ApplicationController
             <loc:msIsdn>#{@msisdn}</loc:msIsdn>
             <loc:serviceCode>#{service_code}</loc:serviceCode>
             <loc:codeScheme>#{code_scheme}</loc:codeScheme>
-            <loc:ussdString>Merci d'avoir utilisé ce service</loc:ussdString>
+            <loc:ussdString>Merci d'utiliser MTN Mobile Money</loc:ussdString>
           </loc:sendUssd>
         </soapenv:Body>
       </soapenv:Envelope>
@@ -198,7 +198,7 @@ class UssdTestingController < ApplicationController
 
   def back_to_home
     @rendered_text = %Q[BIENVENUE DANS LE MENU LONACI:
-1- Recharger compte de jeux
+1- Recharger compte de jeu
 2- Jouer
 3- Termes et conditions]
     @session_identifier = '5--'
@@ -207,7 +207,7 @@ class UssdTestingController < ApplicationController
 
   def back_list_main_menu
     @rendered_text = %Q[BIENVENUE DANS LE MENU LONACI:
-1- Recharger compte de jeux
+1- Recharger compte de jeu
 2- Jouer
 3- Termes et conditions]
     @session_identifier = '5--'
@@ -809,7 +809,7 @@ Faites vos pronostics. Choisissez votre pari :
               case @ussd_string
                 when '0'
                   @rendered_text = %Q[BIENVENUE DANS LE MENU LONACI:
-1- Recharger compte de jeux
+1- Recharger compte de jeu
 2- Jouer
 3- Termes et conditions]
                   @session_identifier = '5--'
@@ -866,10 +866,13 @@ Faites vos pronostics. Choisissez votre pari :
                   @current_ussd_session.update_attributes(session_identifier: @session_identifier)
                 when '2'
                   display_parions_direct_web_link
+                  @current_ussd_session.update_attributes(session_identifier: @session_identifier)
                 when '3'
                   display_parions_direct_apk_link
+                  @current_ussd_session.update_attributes(session_identifier: @session_identifier)
                 when '4'
                   display_parions_direct_windows_phone_link
+                  @current_ussd_session.update_attributes(session_identifier: @session_identifier)
               end
             end
           when '7--'
@@ -1490,7 +1493,7 @@ En continuant le processus, vous certifiez avoir +18
       @status = true
     else
       @rendered_text = %Q[BIENVENUE DANS LE MENU LONACI:
-1- Recharger compte de jeux
+1- Recharger compte de jeu
 2- Jouer
 3- Termes et conditions]
       @session_identifier = '5--'
@@ -2377,7 +2380,7 @@ En continuant le processus, vous certifiez avoir +18
           @session_identifier = '4'
         else
           @rendered_text = %Q[BIENVENUE DANS LE MENU LONACI:
-1- Recharger compte de jeux
+1- Recharger compte de jeu
 2- Jouer
 3- Termes et conditions]
           @session_identifier = '5--'
@@ -2406,7 +2409,7 @@ Veuillez entrer votre mot de passe parionsdirect.
         # On associe le compte de jeu du client à son numéro
         AccountProfile.find_by_msisdn(@msisdn[-8,8]).update_attributes(paymoney_account_number: @pw_account_number) rescue AccountProfile.create(msisdn: @msisdn[-8,8], paymoney_account_number: @pw_account_number) rescue nil
         @rendered_text = %Q[BIENVENUE DANS LE MENU LONACI:
-1- Recharger compte de jeux
+1- Recharger compte de jeu
 2- Jouer
 3- Termes et conditions]
         @session_identifier = '5--'
@@ -5011,18 +5014,24 @@ Gain probable: #{@current_ussd_session.spc_stake.to_f * @current_ussd_session.sp
   end
 
   def display_parions_direct_web_link
-    @rendered_text = %Q[Cliquez pour télécharger
-www.parionsdirect.ci]
+    @rendered_text = %Q[Aller sur le lien pour télécharger
+www.parionsdirect.ci
+0- Retour]
+    @session_identifier = '6--'
   end
 
   def display_parions_direct_apk_link
-    @rendered_text = %Q[Cliquez pour télécharger
-www.parionsdirect.ci/apk]
+    @rendered_text = %Q[Aller sur le lien pour télécharger
+www.parionsdirect.ci/apk
+0- Retour]
+    @session_identifier = '6--'
   end
 
   def display_parions_direct_windows_phone_link
-    @rendered_text  = %Q[Cliquez pour télécharger
-www.parionsdirect.ci/windows-phone]
+    @rendered_text  = %Q[Aller sur le lien pour télécharger
+www.parionsdirect.ci/windows-phone
+0- Retour]
+    @session_identifier = '6--'
   end
 
   def display_parions_direct_main_ussd_menu
