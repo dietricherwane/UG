@@ -842,7 +842,7 @@ Faites vos pronostics. Choisissez votre pari :
           when '4-'
             create_paymoney_account
             @current_ussd_session.update_attributes(session_identifier: @session_identifier, creation_pw_request: @creation_pw_request, creation_pw_response: (@creation_pw_response.body rescue 'ERR'), pw_account_created: @pw_account_created)
-            exit_menu(@sender_cb, "Vous allez recevoir un SMS avec les détails de votre portemonnaie de jeu.")
+            #exit_menu(@sender_cb, "Vous allez recevoir un SMS avec les détails de votre portemonnaie de jeu.")
           when '5--'
             select_action_depending_on_mtn_main_menu_selection
             if @status
@@ -2369,7 +2369,7 @@ En continuant le processus, vous certifiez avoir +18
   def check_parionsdirect_password
     if @ussd_string.blank?
       # Le client n'a pas de compte parionsdirect et entrer un code secret pour en créer un
-      @rendered_text = %Q[Veuillez entrer votre mot de passe parionsdirect.]
+      @rendered_text = %Q[Veuillez entrer votre mot de passe de compte de jeu.]
       @session_identifier = '2'
     else
       password = Digest::SHA2.hexdigest(@current_ussd_session.parionsdirect_salt + @ussd_string)
