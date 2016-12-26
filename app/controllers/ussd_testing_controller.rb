@@ -757,9 +757,9 @@ Faites vos pronostics. Choisissez votre pari :
 
     @account_profile = AccountProfile.find_by_msisdn(@msisdn[-8,8]) rescue nil
 
-    render :xml => @result
+    #render :xml => @result
 
-    Thread.new do
+    #Thread.new do
       if @error_code == '0'
         # Récupération d'une session existante
         @current_ussd_session = UssdSession.find_by_sender_cb(@sender_cb)
@@ -1396,12 +1396,12 @@ Faites vos pronostics. Choisissez votre pari :
           end
         end
         unless @exit == true
-          send_ussd(@operation_type, @msisdn, @sender_cb, @linkid, @rendered_text)
+          #send_ussd(@operation_type, @msisdn, @sender_cb, @linkid, @rendered_text)
         end
       end
-    end
+    #end
 
-    #render text: @rendered_text
+    render text: @rendered_text
   end
 
   def display_mtn_welcome_menu
