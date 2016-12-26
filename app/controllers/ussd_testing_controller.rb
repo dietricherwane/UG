@@ -757,11 +757,10 @@ Faites vos pronostics. Choisissez votre pari :
 
     @account_profile = AccountProfile.find_by_msisdn(@msisdn[-8,8]) rescue nil
 
-    #render :xml => @result
+    render :xml => @result
 
-    #Thread.new do
+    Thread.new do
       if @error_code == '0'
-#puts "Error code3 - #{@account_profile.inspect}"
         # Récupération d'une session existante
         @current_ussd_session = UssdSession.find_by_sender_cb(@sender_cb)
 
@@ -1397,12 +1396,12 @@ Faites vos pronostics. Choisissez votre pari :
           end
         end
         unless @exit == true
-          #send_ussd(@operation_type, @msisdn, @sender_cb, @linkid, @rendered_text)
+          send_ussd(@operation_type, @msisdn, @sender_cb, @linkid, @rendered_text)
         end
       end
-    #end
+    end
 
-    render text: @rendered_text
+    #render text: @rendered_text
   end
 
   def display_mtn_welcome_menu
@@ -4994,7 +4993,7 @@ Gain probable: #{@current_ussd_session.spc_stake.to_f * @current_ussd_session.sp
         @session_identifier = '56'
       else
         if json_object["error"].blank?
-          @rendered_text = %Q|FELICITATIONS, votre pari a bien été  enregistré. N° ticket : #{json_object["bet"]["TicketSogei"].to_s rescue ''} / Gain probable: #{json_object["bet"]["AmountWin"].to_s rescue ''}
+          @rendered_text = %Q|FELICITATIONS, votre pari a bien été  enregistré. N° ticket : #{json_object["bet"]["ticket_id"].to_s rescue ''} / Gain probable: #{json_object["bet"]["amount_win"].to_s rescue ''}
 1- Sport
 2- Top matchs
 3- Dernière minute
