@@ -4763,7 +4763,7 @@ Faites vos pronostics. Choisissez votre pari :
               counter += 1
               draw_string << counter.to_s + '- ' + %Q[#{draw["Bet_description"]}:#{(draw["Odd"]).to_f/100}
 ]
-              @draw_trash << %Q["#{counter.to_s}":"#{draw["Bet_description"]}|#{(draw["Odd"]).to_f/100}",]
+              @draw_trash << %Q["#{counter.to_s}":"#{draw["Draw code"]}|#{(draw["Odd"]).to_f/100}",]
             end
           end
           @draw_trash = @draw_trash.chop + "}"
