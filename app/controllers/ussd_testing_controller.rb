@@ -4796,9 +4796,9 @@ Faites vos pronostics. Choisissez votre cote:
   end
 
   def spc_top_match
-    @spc_tournament_list_request = Parameter.first.parionsdirect_url + "/ussd_spc/get_topmatch_list"
-    @spc_tournament_list_response = RestClient.get(@spc_tournament_list_request) rescue ''
-    if (JSON.parse(@spc_tournament_list_response)["Status"] rescue nil) == "ERROR"
+    @spc_event_list_request = Parameter.first.parionsdirect_url + "/ussd_spc/get_topmatch_list"
+    @spc_event_list_response = RestClient.get(@spc_event_list_request) rescue ''
+    if (JSON.parse(@spc_event_list_response)["Status"] rescue nil) == "ERROR"
       @rendered_text = %Q[Aucun match n'a été trouvé
 SPORTCASH
 1- Sport
@@ -4812,26 +4812,27 @@ SPORTCASH
 00- Accueil]
       @session_identifier = '49'
     else
-      tournaments_string = ""
-      @tournaments_trash = "{"
+      @spc_event_list_response = RestClient.get(@spc_event_list_request) rescue ''
+      events_string = ""
+      @events_trash = "{"
       counter = 0
 
-      tournaments = JSON.parse('{"tournaments":' + @spc_tournament_list_response + '}') rescue nil
-      tournaments = tournaments["tournaments"] rescue nil
-      unless tournaments.blank?
-        tournaments.each do |tournament|
+      events = JSON.parse('{"events":' + @spc_event_list_response + '}') rescue nil
+      events = events["events"] rescue nil
+      unless events.blank?
+        events.each do |event|
           counter += 1
-          tournaments_string << counter.to_s + '- ' + %Q[#{tournament["Descrition_Tourn"]}
+          events_string << counter.to_s + '- ' + %Q[#{event["Description_match"]} (#{event["Palcode"]}-#{event["Codevts"]})
 ]
-          @tournaments_trash << %Q["#{counter.to_s}":"#{tournament["Descrition_Tourn"]}|#{tournament["Code_Tournois"]}",]
+          @events_trash << %Q["#{counter.to_s}":"#{event["Description_match"]}|#{event["Palcode"]}|#{event["Codevts"]}|#{event["Date_match"]}|#{event["Hour_match"]}",]
         end
+        @events_trash = @events_trash.chop + "}"
       end
-      @tournaments_trash = @tournaments_trash.chop + "}"
       @rendered_text = %Q[SPORTCASH
-#{tournaments_string}
+#{events_string}
 0- Retour
 00- Accueil]
-      @session_identifier = '51'
+      @session_identifier = '52'
     end
   end
 
