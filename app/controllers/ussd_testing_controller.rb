@@ -4994,7 +4994,7 @@ Gain probable: #{@current_ussd_session.spc_stake.to_f * @current_ussd_session.sp
         @session_identifier = '56'
       else
         if json_object["error"].blank?
-          @rendered_text = %Q|FELICITATIONS, votre pari a bien été  enregistré. N° ticket : #{json_object["bet"]["TicketSogei"]} / Gain probable: #{json_object["bet"]["AmountWin"]}
+          @rendered_text = %Q|FELICITATIONS, votre pari a bien été  enregistré. N° ticket : #{json_object["bet"]["TicketSogei"].to_s rescue ''} / Gain probable: #{json_object["bet"]["AmountWin"].to_s rescue ''}
 1- Sport
 2- Top matchs
 3- Dernière minute
