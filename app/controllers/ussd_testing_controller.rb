@@ -1356,7 +1356,7 @@ Faites vos pronostics. Choisissez votre pari :
                   list_sportcash_sports
                 when '2'
                   spc_top_match
-                  @current_ussd_session.update_attributes(session_identifier: @session_identifier, tournaments_trash: @tournaments_trash, spc_tournament_list_request: @spc_tournament_list_request, spc_tournament_list_response: @spc_tournament_list_response, spc_sport_label: (@sport_name[0] rescue nil), spc_sport_code: (@sport_name[1] rescue nil))
+                  @current_ussd_session.update_attributes(session_identifier: @session_identifier, events_trash: @events_trash, spc_event_list_request: @spc_event_list_request, spc_event_list_response: @spc_event_list_response)
                 when '3'
                   spc_last_minute_match
                   @current_ussd_session.update_attributes(session_identifier: @session_identifier, tournaments_trash: @tournaments_trash, spc_tournament_list_request: @spc_tournament_list_request, spc_tournament_list_response: @spc_tournament_list_response, spc_sport_label: (@sport_name[0] rescue nil), spc_sport_code: (@sport_name[1] rescue nil))
