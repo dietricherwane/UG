@@ -2305,7 +2305,7 @@ Veuillez entrer le numéro de compte de jeu dont vous souhaitez consulter les OT
           else
             account_profile = AccountProfile.find_by_msisdn(@msisdn[-8,8])
             #@get_paymoney_sold_url = Parameter.first.paymoney_url + "/PAYMONEY_WALLET/rest/solte_compte/#{account_profile.paymoney_account_number}/#{@ussd_string}"
-            @get_paymoney_sold_url = "41.189.40.193:8080/PAYMONEY_WALLET/rest/solte_compte/#{@current_ussd_session.other_paymoney_account_number}/#{@ussd_string}"
+            @get_paymoney_sold_url = "41.189.40.193:8080/PAYMONEY_WALLET/rest/solte_compte/#{account_profile.paymoney_account_number}/#{@ussd_string}"
             @get_paymoney_sold_response = Typhoeus.get(@get_paymoney_sold_url, connecttimeout: 30)
 
             balance = JSON.parse(@get_paymoney_sold_response.body)["solde"] rescue nil
