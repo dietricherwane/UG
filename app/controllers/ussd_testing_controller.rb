@@ -1358,12 +1358,12 @@ Faites vos pronostics. Choisissez votre pari :
                   @current_ussd_session.update_attributes(session_identifier: @session_identifier, events_trash: @events_trash, spc_event_list_request: @spc_event_list_request, spc_event_list_response: @spc_event_list_response)
                 when '3'
                   spc_last_minute_match
-                  @current_ussd_session.update_attributes(session_identifier: @session_identifier, tournaments_trash: @tournaments_trash, spc_tournament_list_request: @spc_tournament_list_request, spc_tournament_list_response: @spc_tournament_list_response, spc_sport_label: (@sport_name[0] rescue nil), spc_sport_code: (@sport_name[1] rescue nil))
+                  @current_ussd_session.update_attributes(session_identifier: @session_identifier, events_trash: @events_trash, spc_event_list_request: @spc_event_list_request, spc_event_list_response: @spc_event_list_response)
                 when '4'
 
                 when '5'
                   spc_live_match
-                  @current_ussd_session.update_attributes(session_identifier: @session_identifier, tournaments_trash: @tournaments_trash, spc_tournament_list_request: @spc_tournament_list_request, spc_tournament_list_response: @spc_tournament_list_response, spc_sport_label: (@sport_name[0] rescue nil), spc_sport_code: (@sport_name[1] rescue nil))
+                  @current_ussd_session.update_attributes(session_identifier: @session_identifier, events_trash: @events_trash, spc_event_list_request: @spc_event_list_request, spc_event_list_response: @spc_event_list_response)
                 when '6'
 
                 when '7'
@@ -4838,9 +4838,9 @@ SPORTCASH
   end
 
   def spc_last_minute_match
-    @spc_tournament_list_request = Parameter.first.parionsdirect_url + "/ussd_spc/get_last_min_match"
-    @spc_tournament_list_response = RestClient.get(@spc_tournament_list_request) rescue ''
-    if (JSON.parse(@spc_tournament_list_response)["Status"] rescue nil) == "ERROR"
+    @spc_event_list_request = Parameter.first.parionsdirect_url + "/ussd_spc/get_last_min_match"
+    @spc_event_list_response = RestClient.get(@spc_event_list_request) rescue ''
+    if (JSON.parse(@spc_event_list_response)["Status"] rescue nil) == "ERROR"
       @rendered_text = %Q[Aucun match n'a été trouvé
 SPORTCASH
 1- Sport
@@ -4854,33 +4854,34 @@ SPORTCASH
 00- Accueil]
       @session_identifier = '49'
     else
-      tournaments_string = ""
-      @tournaments_trash = "{"
+      @spc_event_list_response = RestClient.get(@spc_event_list_request) rescue ''
+      events_string = ""
+      @events_trash = "{"
       counter = 0
 
-      tournaments = JSON.parse('{"tournaments":' + @spc_tournament_list_response + '}') rescue nil
-      tournaments = tournaments["tournaments"] rescue nil
-      unless tournaments.blank?
-        tournaments.each do |tournament|
+      events = JSON.parse('{"events":' + @spc_event_list_response + '}') rescue nil
+      events = events["events"] rescue nil
+      unless events.blank?
+        events.each do |event|
           counter += 1
-          tournaments_string << counter.to_s + '- ' + %Q[#{tournament["Descrition_Tourn"]}
+          events_string << counter.to_s + '- ' + %Q[#{event["description_match"]} (#{event["Palcode"]}-#{event["Codevts"]})
 ]
-          @tournaments_trash << %Q["#{counter.to_s}":"#{tournament["Descrition_Tourn"]}|#{tournament["Code_Tournois"]}",]
+          @events_trash << %Q["#{counter.to_s}":"#{event["description_match"]}|#{event["Palcode"]}|#{event["Codevts"]}|#{event["Date_match"]}|#{event["Hour_match"]}",]
         end
+        @events_trash = @events_trash.chop + "}"
       end
-      @tournaments_trash = @tournaments_trash.chop + "}"
       @rendered_text = %Q[SPORTCASH
-#{tournaments_string}
+#{events_string}
 0- Retour
 00- Accueil]
-      @session_identifier = '51'
+      @session_identifier = '52'
     end
   end
 
   def spc_live_match
-    @spc_tournament_list_request = Parameter.first.parionsdirect_url + "/ussd_spc/get_live_match_list"
-    @spc_tournament_list_response = RestClient.get(@spc_tournament_list_request) rescue ''
-    if (JSON.parse(@spc_tournament_list_response)["Status"] rescue nil) == "ERROR"
+    @spc_event_list_request = Parameter.first.parionsdirect_url + "/ussd_spc/get_live_match_list"
+    @spc_event_list_response = RestClient.get(@spc_event_list_request) rescue ''
+    if (JSON.parse(@spc_event_list_response)["Status"] rescue nil) == "ERROR"
       @rendered_text = %Q[Aucun match n'a été trouvé
 SPORTCASH
 1- Sport
@@ -4894,26 +4895,27 @@ SPORTCASH
 00- Accueil]
       @session_identifier = '49'
     else
-      tournaments_string = ""
-      @tournaments_trash = "{"
+      @spc_event_list_response = RestClient.get(@spc_event_list_request) rescue ''
+      events_string = ""
+      @events_trash = "{"
       counter = 0
 
-      tournaments = JSON.parse('{"tournaments":' + @spc_tournament_list_response + '}') rescue nil
-      tournaments = tournaments["tournaments"] rescue nil
-      unless tournaments.blank?
-        tournaments.each do |tournament|
+      events = JSON.parse('{"events":' + @spc_event_list_response + '}') rescue nil
+      events = events["events"] rescue nil
+      unless events.blank?
+        events.each do |event|
           counter += 1
-          tournaments_string << counter.to_s + '- ' + %Q[#{tournament["Descrition_Tourn"]}
+          events_string << counter.to_s + '- ' + %Q[#{event["description_match"]} (#{event["Palcode"]}-#{event["Codevts"]})
 ]
-          @tournaments_trash << %Q["#{counter.to_s}":"#{tournament["Descrition_Tourn"]}|#{tournament["Code_Tournois"]}",]
+          @events_trash << %Q["#{counter.to_s}":"#{event["description_match"]}|#{event["Palcode"]}|#{event["Codevts"]}|#{event["Date_match"]}|#{event["Hour_match"]}",]
         end
+        @events_trash = @events_trash.chop + "}"
       end
-      @tournaments_trash = @tournaments_trash.chop + "}"
       @rendered_text = %Q[SPORTCASH
-#{tournaments_string}
+#{events_string}
 0- Retour
 00- Accueil]
-      @session_identifier = '51'
+      @session_identifier = '52'
     end
   end
 
