@@ -601,8 +601,7 @@ Saisissez le nombre de fois
 3- Dernière minute
 4- Opportunités
 5- Lives
-6- Calendrier
-7- Jouer
+6- Jouer
 0- Retour
 00- Accueil]
     @session_identifier = '49'
@@ -1365,12 +1364,14 @@ Faites vos pronostics. Choisissez votre pari :
                   spc_live_match
                   @current_ussd_session.update_attributes(session_identifier: @session_identifier, events_trash: @events_trash, spc_event_list_request: @spc_event_list_request, spc_event_list_response: @spc_event_list_response)
                 when '6'
-
-                when '7'
-
+                  spc_get_event_code
+                  @current_ussd_session.update_attributes(session_identifier: @session_identifier)
               end
             end
             @current_ussd_session.update_attributes(session_identifier: @session_identifier, list_sportcash_sports_request: @list_sportcash_sports_request, list_sportcash_sports_response: @list_sportcash_sports_response, list_spc_sport: @sports_trash)
+          when '49-'
+            spc_play
+            @current_ussd_session.update_attributes(session_identifier: @session_identifier, spc_bet_type_trash: @bet_types_trash, spc_bet_type_request: @spc_bet_type_request, spc_bet_type_response: @spc_bet_type_response, spc_event_code: @ussd_string)
           when '50'
             set_session_identifier_depending_on_spc_sports_list_selected
             @current_ussd_session.update_attributes(session_identifier: @session_identifier, tournaments_trash: @tournaments_trash, spc_tournament_list_request: @spc_tournament_list_request, spc_tournament_list_response: @spc_tournament_list_response, spc_sport_label: (@sport_name[0] rescue nil), spc_sport_code: (@sport_name[1] rescue nil))
@@ -4505,9 +4506,7 @@ Veuillez entrer votre code secret de jeu pour valider le pari.
 3- Dernière minute
 4- Opportunités
 5- Lives
-6- Calendrier
-7- Jouer
-
+6- Jouer
 0- Retour
 00- Accueil]
     @session_identifier = '49'
@@ -4524,8 +4523,7 @@ Veuillez entrer votre code secret de jeu pour valider le pari.
 3- Dernière minute
 4- Opportunités
 5- Lives
-6- Calendrier
-7- Jouer
+6- Jouer
 0- Retour
 00- Accueil]
       @session_identifier = '49'
@@ -4807,8 +4805,7 @@ SPORTCASH
 3- Dernière minute
 4- Opportunités
 5- Lives
-6- Calendrier
-7- Jouer
+6- Jouer
 0- Retour
 00- Accueil]
       @session_identifier = '49'
@@ -4848,8 +4845,7 @@ SPORTCASH
 3- Dernière minute
 4- Opportunités
 5- Lives
-6- Calendrier
-7- Jouer
+6- Jouer
 0- Retour
 00- Accueil]
       @session_identifier = '49'
@@ -4889,8 +4885,7 @@ SPORTCASH
 3- Dernière minute
 4- Opportunités
 5- Lives
-6- Calendrier
-7- Jouer
+6- Jouer
 0- Retour
 00- Accueil]
       @session_identifier = '49'
@@ -4917,6 +4912,61 @@ SPORTCASH
 00- Accueil]
       @session_identifier = '52'
     end
+  end
+
+  def spc_get_event_code
+    @rendered_text = %Q[SPORTCASH
+Veuillez entrer le code évènement
+0- Retour
+00- Accueil]
+      @session_identifier = '49-'
+  end
+
+  def spc_play
+    case @ussd_string
+      when '0'
+        back_to_list_spc_main_menu
+      when '00'
+        back_list_main_menu
+      else
+        @spc_bet_type_request = Parameter.first.parionsdirect_url + "/ussd_spc/get_event_markets/#{@ussd_string rescue 0}"
+        @spc_bet_type_response = RestClient.get(@spc_bet_type_request) rescue ''
+        if (JSON.parse(@spc_bet_type_response)["Status"] rescue nil) == "ERROR"
+          @rendered_text = %Q[Aucun match n'a été trouvé
+SPORTCASH
+1- Sport
+2- Top matchs
+3- Dernière minute
+4- Opportunités
+5- Lives
+6- Jouer
+0- Retour
+00- Accueil]
+          @session_identifier = '49'
+        else
+          bet_types_string = ""
+          @bet_types_trash = "{"
+          counter = 0
+
+          bet_types = JSON.parse('{"bet_types":' + @spc_bet_type_response + '}') rescue nil
+          bet_types = bet_types["bet_types"] rescue nil
+          unless bet_types.blank?
+            bet_types.each do |bet_type|
+              counter += 1
+              bet_types_string << counter.to_s + '- ' + %Q[#{bet_type["Bet_description"]}
+    ]
+              @bet_types_trash << %Q["#{counter.to_s}":"#{bet_type["Bet_code"]}|#{bet_type["Bet_description"]}|#{bet_type["Statut"]}",]
+            end
+          end
+          @bet_types_trash = @bet_types_trash.chop + "}"
+          @rendered_text = %Q[#{@event[0] rescue ''}
+Faites vos pronostics. Choisissez votre pari :
+#{bet_types_string}
+0- Retour
+00- Accueil]
+          @session_identifier = '53'
+        end
+      end
   end
 
   def spc_validate_stake
