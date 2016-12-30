@@ -1371,7 +1371,7 @@ Faites vos pronostics. Choisissez votre pari :
             @current_ussd_session.update_attributes(session_identifier: @session_identifier, list_sportcash_sports_request: @list_sportcash_sports_request, list_sportcash_sports_response: @list_sportcash_sports_response, list_spc_sport: @sports_trash)
           when '49-'
             spc_play
-            @current_ussd_session.update_attributes(session_identifier: @session_identifier, spc_bet_type_trash: @bet_types_trash, spc_bet_type_request: @spc_bet_type_request, spc_bet_type_response: @spc_bet_type_response, spc_event_code: @ussd_string)
+            @current_ussd_session.update_attributes(session_identifier: @session_identifier, spc_bet_type_trash: @bet_types_trash, spc_bet_type_request: @spc_bet_type_request, spc_bet_type_response: @spc_bet_type_response, spc_event_description: @spc_event_description, spc_event_pal_code: @spc_event_pal_code, spc_event_code: @spc_event_code, spc_event_date: @spc_event_date, spc_event_time: @spc_event_time)
           when '50'
             set_session_identifier_depending_on_spc_sports_list_selected
             @current_ussd_session.update_attributes(session_identifier: @session_identifier, tournaments_trash: @tournaments_trash, spc_tournament_list_request: @spc_tournament_list_request, spc_tournament_list_response: @spc_tournament_list_response, spc_sport_label: (@sport_name[0] rescue nil), spc_sport_code: (@sport_name[1] rescue nil))
@@ -4931,7 +4931,10 @@ Veuillez entrer le code évènement
       else
         @spc_bet_type_request = Parameter.first.parionsdirect_url + "/ussd_spc/get_event_markets/#{@ussd_string rescue 0}"
         @spc_bet_type_response = RestClient.get(@spc_bet_type_request) rescue ''
-        if (JSON.parse(@spc_bet_type_response)["Status"] rescue nil) == "ERROR"
+        @spc_event_info_request = Parameter.first.parionsdirect_url + "/ussd_spc/get_event_info/#{@ussd_string rescue 0}"
+        @spc_event_info_response = RestClient.get(@spc_event_info_request) rescue ''
+
+        if (JSON.parse(@spc_bet_type_response)["Status"] rescue nil) == "ERROR" || (JSON.parse(@spc_event_info_response)["Status"] rescue nil) == "ERROR"
           @rendered_text = %Q[Aucun match n'a été trouvé
 SPORTCASH
 1- Sport
@@ -4950,13 +4953,19 @@ SPORTCASH
 
           bet_types = JSON.parse('{"bet_types":' + @spc_bet_type_response + '}') rescue nil
           bet_types = bet_types["bet_types"] rescue nil
-          unless bet_types.blank?
+          event_info = JSON.parse('{"event":' + @spc_event_info_response + '}')["event"].first rescue nil
+          unless bet_types.blank? && event_info.blank?
             bet_types.each do |bet_type|
               counter += 1
               bet_types_string << counter.to_s + '- ' + %Q[#{bet_type["Bet_description"]}
-    ]
+]
               @bet_types_trash << %Q["#{counter.to_s}":"#{bet_type["Bet_code"]}|#{bet_type["Bet_description"]}|#{bet_type["Statut"]}",]
             end
+            @spc_event_description = event_info["Description_match"]
+            @spc_event_pal_code = event_info["Palcode"]
+            @spc_event_code = event_info["Codevts"]
+            @spc_event_date = event_info["Date_match"]
+            @spc_event_time = event_info["Hour_match"]
           end
           @bet_types_trash = @bet_types_trash.chop + "}"
           @rendered_text = %Q[#{@event[0] rescue ''}
