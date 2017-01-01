@@ -54240,3 +54240,20 @@ Migrating to AddSpcEventDateAndSpcEventTimeToUssdSessions (20161218165917)
   [1m[36mSQL (0.9ms)[0m  [1mINSERT INTO "schema_migrations" ("version") VALUES ($1)[0m  [["version", "20161218165917"]]
   [1m[35m (42.4ms)[0m  COMMIT
   [1m[36mActiveRecord::SchemaMigration Load (0.9ms)[0m  [1mSELECT "schema_migrations".* FROM "schema_migrations"[0m
+  [1m[36mActiveRecord::SchemaMigration Load (30.4ms)[0m  [1mSELECT "schema_migrations".* FROM "schema_migrations"[0m
+Migrating to AddOpportunitiesFieldsToUssdSessions (20170101205916)
+  [1m[35m (0.5ms)[0m  BEGIN
+  [1m[36m (137.5ms)[0m  [1mALTER TABLE "ussd_sessions" ADD COLUMN "opportunities_trash" text[0m
+  [1m[35m (2.4ms)[0m  ALTER TABLE "ussd_sessions" ADD COLUMN "spc_opportunities_list_request" text
+  [1m[36m (0.5ms)[0m  [1mALTER TABLE "ussd_sessions" ADD COLUMN "spc_opportunities_list_response" text[0m
+  [1m[35mSQL (0.8ms)[0m  INSERT INTO "schema_migrations" ("version") VALUES ($1)  [["version", "20170101205916"]]
+  [1m[36m (20.2ms)[0m  [1mCOMMIT[0m
+  [1m[35mActiveRecord::SchemaMigration Load (0.7ms)[0m  SELECT "schema_migrations".* FROM "schema_migrations"
+  [1m[36mActiveRecord::SchemaMigration Load (1.2ms)[0m  [1mSELECT "schema_migrations".* FROM "schema_migrations"[0m
+Migrating to AddCombinedFieldsToUssdSessions (20170101212145)
+  [1m[35m (0.6ms)[0m  BEGIN
+  [1m[36m (1.7ms)[0m  [1mALTER TABLE "ussd_sessions" ADD COLUMN "spc_combined" boolean[0m
+  [1m[35m (0.9ms)[0m  ALTER TABLE "ussd_sessions" ADD COLUMN "spc_combined_string" text
+  [1m[36mSQL (0.8ms)[0m  [1mINSERT INTO "schema_migrations" ("version") VALUES ($1)[0m  [["version", "20170101212145"]]
+  [1m[35m (10.8ms)[0m  COMMIT
+  [1m[36mActiveRecord::SchemaMigration Load (0.9ms)[0m  [1mSELECT "schema_migrations".* FROM "schema_migrations"[0m

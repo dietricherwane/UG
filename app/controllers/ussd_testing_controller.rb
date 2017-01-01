@@ -1359,7 +1359,8 @@ Faites vos pronostics. Choisissez votre pari :
                   spc_last_minute_match
                   @current_ussd_session.update_attributes(session_identifier: @session_identifier, events_trash: @events_trash, spc_event_list_request: @spc_event_list_request, spc_event_list_response: @spc_event_list_response)
                 when '4'
-
+                  spc_list_opportunities
+                  @current_ussd_session.update_attributes(session_identifier: @session_identifier, opportunities_trash: @opportunities_trash, spc_opportunities_list_request: @spc_opportunities_list_request, spc_opportunities_list_response: @spc_opportunities_list_response)
                 when '5'
                   spc_live_match
                   @current_ussd_session.update_attributes(session_identifier: @session_identifier, events_trash: @events_trash, spc_event_list_request: @spc_event_list_request, spc_event_list_response: @spc_event_list_response)
@@ -1369,6 +1370,9 @@ Faites vos pronostics. Choisissez votre pari :
               end
             end
             @current_ussd_session.update_attributes(session_identifier: @session_identifier, list_sportcash_sports_request: @list_sportcash_sports_request, list_sportcash_sports_response: @list_sportcash_sports_response, list_spc_sport: @sports_trash)
+          when '52-'
+            spc_list_opportunities_details
+            @current_ussd_session.update_attributes(session_identifier: @session_identifier, spc_combined: @spc_combined, spc_combined_string: @spc_combined_string)
           when '49-'
             spc_play
             @current_ussd_session.update_attributes(session_identifier: @session_identifier, spc_bet_type_trash: @bet_types_trash, spc_bet_type_request: @spc_bet_type_request, spc_bet_type_response: @spc_bet_type_response, spc_event_description: @spc_event_description, spc_event_pal_code: @spc_event_pal_code, spc_event_code: @spc_event_code, spc_event_date: @spc_event_date, spc_event_time: @spc_event_time)
@@ -4810,7 +4814,6 @@ SPORTCASH
 00- Accueil]
       @session_identifier = '49'
     else
-      @spc_event_list_response = RestClient.get(@spc_event_list_request) rescue ''
       events_string = ""
       @events_trash = "{"
       counter = 0
@@ -4831,6 +4834,131 @@ SPORTCASH
 0- Retour
 00- Accueil]
       @session_identifier = '52'
+    end
+  end
+
+  def spc_list_opportunities
+    @spc_opportunities_list_request = Parameter.first.parionsdirect_url + "/ussd_spc/get_opportunity_list"
+    @spc_opportunities_list_response = RestClient.get(@spc_opportunities_list_request) rescue ''
+    if (JSON.parse(@spc_opportunities_list_response)["Status"] rescue nil) == "ERROR"
+      @rendered_text = %Q[Aucune opportunité n'a été trouvée
+SPORTCASH
+1- Sport
+2- Top matchs
+3- Dernière minute
+4- Opportunités
+5- Lives
+6- Jouer
+0- Retour
+00- Accueil]
+      @session_identifier = '49'
+    else
+      opportunities_string = ""
+      @opportunities_trash = "{"
+      counter = 0
+
+      opportunities = JSON.parse('{"opportunities":' + @spc_opportunities_list_response + '}') rescue nil
+      opportunities = opportunities["opportunities"] rescue nil
+      unless opportunities.blank?
+        opportunities.each do |opportunity|
+          counter += 1
+          opportunities_string << counter.to_s + '- ' + %Q[#{opportunity["Championat"]} Mise: #{opportunity["Mise_opp"].to_s} Gain potentiel: #{opportunity["Gain_potentiel"].to_s})
+]
+          @opportunities_trash << %Q["#{counter.to_s}":"#{opportunity["Championat"]}|#{opportunity["Mise_opp"].to_s}|#{opportunity["Gain_potentiel"].to_s}|#{opportunity["List_Event"].join('|')}",]
+        end
+        @opportunities_trash = @opportunities_trash.chop + "}"
+      end
+      @rendered_text = %Q[SPORTCASH
+#{opportunities_string}
+0- Retour
+00- Accueil]
+      @session_identifier = '52-'
+    end
+  end
+
+  def spc_list_opportunities_details
+    @opportunity = JSON.parse(@current_ussd_session.opportunities_trash).assoc(@ussd_string)[1].split('|') rescue nil
+    @spc_combined = false
+    @spc_combined_string = ""
+    if @opportunity.blank?
+      @spc_opportunities_list_request = Parameter.first.parionsdirect_url + "/ussd_spc/get_opportunity_list"
+      @spc_opportunities_list_response = RestClient.get(@spc_opportunities_list_request) rescue ''
+      opportunities_string = ""
+      counter = 0
+
+      opportunities = JSON.parse('{"opportunities":' + @spc_opportunities_list_response + '}') rescue nil
+      opportunities = opportunities["opportunities"] rescue nil
+      unless opportunities.blank?
+        opportunities.each do |opportunity|
+          counter += 1
+          opportunities_string << counter.to_s + '- ' + %Q[#{opportunity["Championat"]} Mise: #{opportunity["Mise_opp"].to_s} Gain potentiel: #{opportunity["Gain_potentiel"].to_s})
+]
+        end
+      end
+      @rendered_text = %Q[SPORTCASH
+#{opportunities_string}]
+      @session_identifier = '52-'
+    else
+      opp1 = @opportunity[3].split(',')
+      opp2 = @opportunity[4].split(',')
+      opp3 = @opportunity[5].split(',')
+      opp4 = @opportunity[6].split(',')
+      @spc_combined_string = %Q|
+                {
+                  "bets": [
+                    {
+                      "pal_code":"#{opp1[1]}",
+                      "event_code":"#{opp1[2]}",
+                      "bet_code":"#{opp1[3]}",
+                      "draw_code":"#{opp1[4]}",
+                      "odd":"#{(opp1[5].to_f * 100).to_i}",
+                      "begin_date":"#{opp1[6].gsub('-', '') rescue nil} #{opp1[7]}",
+                      "teams":"#{opp1[0]}",
+                      "sport":""
+                    },
+                    {
+                      "pal_code":"#{opp2[1]}",
+                      "event_code":"#{opp2[2]}",
+                      "bet_code":"#{opp2[3]}",
+                      "draw_code":"#{opp2[4]}",
+                      "odd":"#{(opp2[5].to_f * 100).to_i}",
+                      "begin_date":"#{opp2[6].gsub('-', '') rescue nil} #{opp2[7]}",
+                      "teams":"#{opp2[0]}",
+                      "sport":""
+                    },
+                    {
+                      "pal_code":"#{opp3[1]}",
+                      "event_code":"#{opp3[2]}",
+                      "bet_code":"#{opp3[3]}",
+                      "draw_code":"#{opp3[4]}",
+                      "odd":"#{(opp3[5].to_f * 100).to_i}",
+                      "begin_date":"#{opp3[6].gsub('-', '') rescue nil} #{opp3[7]}",
+                      "teams":"#{opp3[0]}",
+                      "sport":""
+                    },
+                    {
+                      "pal_code":"#{opp4[1]}",
+                      "event_code":"#{opp4[2]}",
+                      "bet_code":"#{opp4[3]}",
+                      "draw_code":"#{opp4[4]}",
+                      "odd":"#{(opp4[5].to_f * 100).to_i}",
+                      "begin_date":"#{opp4[6].gsub('-', '') rescue nil} #{opp4[7]}",
+                      "teams":"#{opp4[0]}",
+                      "sport":""
+                    }
+                  ],
+                  "amount":"400",
+                  "formula":"COMBINE"
+                }
+              |
+      @rendered_text = %Q[SPORTCASH - Veuillez entrer votre mot de passe de compte de jeu pour valider
+#{@opportunity[0]}
+#{opp1[0] (#{opp1[1] - #{opp1[2])}
+#{opp2[0] (#{opp2[1] - #{opp2[2])}
+#{opp3[0] (#{opp3[1] - #{opp3[2])}
+#{opp4[0] (#{opp4[1] - #{opp4[2])}]
+      @session_identifier = '56'
+      @spc_combined = true
     end
   end
 
@@ -5016,24 +5144,28 @@ Gain probable: #{@current_ussd_session.spc_stake.to_f * @current_ussd_session.sp
     else
       @event = JSON.parse(@current_ussd_session.events_trash).assoc(@ussd_string)[1].split('|') rescue nil
       @spc_place_bet_url = Parameter.first.gateway_url + "/spc/api/6d3782c78d/m_coupon/sell/#{@get_gamer_id_response.body}/#{@account_profile.paymoney_account_number}/#{@ussd_string}"
-      @request_body = %Q|
-                {
-                  "bets": [
-                    {
-                      "pal_code":"#{@current_ussd_session.spc_event_pal_code}",
-                      "event_code":"#{@current_ussd_session.spc_event_code}",
-                      "bet_code":"#{@current_ussd_session.spc_bet_code}",
-                      "draw_code":"#{@current_ussd_session.spc_draw_description}",
-                      "odd":"#{(@current_ussd_session.spc_odd.to_f * 100).to_i}",
-                      "begin_date":"#{@current_ussd_session.spc_event_date.gsub('-', '') rescue nil} #{@current_ussd_session.spc_event_time}",
-                      "teams":"#{@current_ussd_session.spc_event_description}",
-                      "sport":"#{@current_ussd_session.spc_sport_label}"
-                    }
-                  ],
-                  "amount":"#{@current_ussd_session.spc_stake}",
-                  "formula":"SIMPLE"
-                }
-              |
+      if @spc_combined == true
+        @request_body = @spc_combined_string
+      else
+        @request_body = %Q|
+                  {
+                    "bets": [
+                      {
+                        "pal_code":"#{@current_ussd_session.spc_event_pal_code}",
+                        "event_code":"#{@current_ussd_session.spc_event_code}",
+                        "bet_code":"#{@current_ussd_session.spc_bet_code}",
+                        "draw_code":"#{@current_ussd_session.spc_draw_description}",
+                        "odd":"#{(@current_ussd_session.spc_odd.to_f * 100).to_i}",
+                        "begin_date":"#{@current_ussd_session.spc_event_date.gsub('-', '') rescue nil} #{@current_ussd_session.spc_event_time}",
+                        "teams":"#{@current_ussd_session.spc_event_description}",
+                        "sport":"#{@current_ussd_session.spc_sport_label}"
+                      }
+                    ],
+                    "amount":"#{@current_ussd_session.spc_stake}",
+                    "formula":"SIMPLE"
+                  }
+                |
+      end
       request = Typhoeus::Request.new(
       @spc_place_bet_url,
       method: :post,

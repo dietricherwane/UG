@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161218165917) do
+ActiveRecord::Schema.define(version: 20170101212145) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -260,6 +260,11 @@ ActiveRecord::Schema.define(version: 20161218165917) do
     t.text     "spc_place_bet_response"
     t.string   "spc_event_date"
     t.string   "spc_event_time"
+    t.text     "opportunities_trash"
+    t.text     "spc_opportunities_list_request"
+    t.text     "spc_opportunities_list_response"
+    t.boolean  "spc_combined"
+    t.text     "spc_combined_string"
   end
 
 end
