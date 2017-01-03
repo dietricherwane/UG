@@ -5096,7 +5096,7 @@ SPORTCASH
             @spc_event_time = event_info["Hour_match"]
           end
           @bet_types_trash = @bet_types_trash.chop + "}"
-          @rendered_text = %Q[#{@event[0] rescue ''}
+          @rendered_text = %Q[#{@spc_event_description}
 Faites vos pronostics. Choisissez votre pari :
 #{bet_types_string}
 0- Retour
@@ -5144,8 +5144,8 @@ Gain probable: #{@current_ussd_session.spc_stake.to_f * @current_ussd_session.sp
     else
       @event = JSON.parse(@current_ussd_session.events_trash).assoc(@ussd_string)[1].split('|') rescue nil
       @spc_place_bet_url = Parameter.first.gateway_url + "/spc/api/6d3782c78d/m_coupon/sell/#{@get_gamer_id_response.body}/#{@account_profile.paymoney_account_number}/#{@ussd_string}"
-      if @spc_combined == true
-        @request_body = @spc_combined_string
+      if @current_ussd_session.spc_combined == true
+        @request_body = @current_ussd_session.spc_combined_string
       else
         @request_body = %Q|
                   {
