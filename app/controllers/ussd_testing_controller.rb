@@ -4951,7 +4951,7 @@ SPORTCASH
                   "formula":"COMBINE"
                 }
               |
-      @rendered_text = %Q[SPORTCASH - Veuillez entrer votre mot de passe de compte de jeu pour valider
+      @rendered_text = %Q[SPORTCASH - Veuillez entrer votre code secret de compte de jeu pour valider
 #{@opportunity[0]}
 #{opp1[0]} (#{opp1[1]} - #{opp1[2]})
 #{opp2[0]} (#{opp2[1]} - #{opp2[2]})
@@ -4988,9 +4988,9 @@ SPORTCASH
       unless events.blank?
         events.each do |event|
           counter += 1
-          events_string << counter.to_s + '- ' + %Q[#{event["description_match"]} (#{event["Palcode"]}-#{event["Codevts"]})
+          events_string << counter.to_s + '- ' + %Q[#{event["Description_match"]} (#{event["Palcode"]}-#{event["Codevts"]})
 ]
-          @events_trash << %Q["#{counter.to_s}":"#{event["description_match"]}|#{event["Palcode"]}|#{event["Codevts"]}|#{event["Date_match"]}|#{event["Hour_match"]}",]
+          @events_trash << %Q["#{counter.to_s}":"#{event["Description_match"]}|#{event["Palcode"]}|#{event["Codevts"]}|#{event["Date_match"]}|#{event["Hour_match"]}",]
         end
         @events_trash = @events_trash.chop + "}"
       end
