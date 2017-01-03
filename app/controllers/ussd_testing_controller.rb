@@ -4953,10 +4953,10 @@ SPORTCASH
               |
       @rendered_text = %Q[SPORTCASH - Veuillez entrer votre mot de passe de compte de jeu pour valider
 #{@opportunity[0]}
-#{opp1[0]} (#{opp1[1] - #{opp1[2])}
-#{opp2[0]} (#{opp2[1] - #{opp2[2])}
-#{opp3[0]} (#{opp3[1] - #{opp3[2])}
-#{opp4[0]} (#{opp4[1] - #{opp4[2])}]
+#{opp1[0]} (#{opp1[1]} - #{opp1[2]})
+#{opp2[0]} (#{opp2[1]} - #{opp2[2]})
+#{opp3[0]} (#{opp3[1]} - #{opp3[2]})
+#{opp4[0]} (#{opp4[1]} - #{opp4[2]})]
       @session_identifier = '56'
       @spc_combined = true
     end
