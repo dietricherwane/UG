@@ -5114,8 +5114,8 @@ Faites vos pronostics. Choisissez votre pari :
       @session_identifier = '55'
     else
       @spc_stake = @ussd_string
-      @rendered_text = %Q[VOTRE COUPON:
-Veuillez entrer votre code secret de compte de jeu pour prendre le pari.
+      @rendered_text = %Q[Veuillez entrer votre code secret de compte de jeu pour prendre le pari.
+VOTRE COUPON:
 Equipes: #{@current_ussd_session.spc_event_description}
 #{@current_ussd_session.spc_bet_description}
 Côte: #{@current_ussd_session.spc_odd.to_f}
@@ -5174,7 +5174,7 @@ Gain probable: #{@current_ussd_session.spc_stake.to_f * @current_ussd_session.sp
       request.run
       @spc_place_bet_response = request.response
 
-      json_object = JSON.parse(@spc_place_bet_response.body) rescue nil
+      json_object = JSON.parse(@spc_place_bet_response.body)["bet"].first rescue nil
       if json_object.blank?
         @rendered_text = %Q[Votre pari n'a pas pu etre placé.
 Veuillez entrer votre code secret de compte de jeu pour prendre le pari.
@@ -5188,7 +5188,7 @@ Gain probable: #{@current_ussd_session.spc_stake.to_f * @current_ussd_session.sp
         @session_identifier = '56'
       else
         if json_object["error"].blank?
-          @rendered_text = %Q|FELICITATIONS, votre pari a bien été  enregistré. N° ticket : #{json_object["bet"]["ticket_id"].to_s rescue ''} / Gain probable: #{json_object["bet"]["amount_win"].to_s rescue ''}
+          @rendered_text = %Q|FELICITATIONS, votre pari a bien été  enregistré. N° ticket : #{json_object["ticket_id"] rescue ''} / Gain probable: #{json_object["amount_win"] rescue ''}
 1- Sport
 2- Top matchs
 3- Dernière minute
