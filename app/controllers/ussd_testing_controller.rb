@@ -1363,7 +1363,7 @@ Faites vos pronostics. Choisissez votre pari :
                   @current_ussd_session.update_attributes(session_identifier: @session_identifier, opportunities_trash: @opportunities_trash, spc_opportunities_list_request: @spc_opportunities_list_request, spc_opportunities_list_response: @spc_opportunities_list_response)
                 when '5'
                   spc_live_match
-                  @current_ussd_session.update_attributes(session_identifier: @session_identifier, events_trash: @events_trash, spc_event_list_request: @spc_event_list_request, spc_event_list_response: @spc_event_list_response, spc_live: true)
+                  @current_ussd_session.update_attributes(session_identifier: @session_identifier, events_trash: @events_trash, spc_event_list_request: @spc_event_list_request, spc_event_list_response: @spc_event_list_response, spc_live: @spc_live)
                 when '6'
                   spc_get_event_code
                   @current_ussd_session.update_attributes(session_identifier: @session_identifier)
@@ -5018,6 +5018,7 @@ SPORTCASH
 00- Accueil]
       @session_identifier = '49'
     else
+      @spc_live = true
       @spc_event_list_response = RestClient.get(@spc_event_list_request) rescue ''
       events_string = ""
       @events_trash = "{"
