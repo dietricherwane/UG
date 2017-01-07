@@ -655,7 +655,7 @@ Saisissez le nombre de fois
   end
 
   def back_to_list_spc_events
-    @spc_bet_type_request = Parameter.first.parionsdirect_url + "/ussd_spc/get_event_markets/#{@current_ussd_session.spc_event_code}"
+    @spc_bet_type_request = Parameter.first.parionsdirect_url + "#{@current_ussd_session.spc_live == true ? '/ussd_spc/get_event_markets_live/' : '/ussd_spc/get_event_markets/'}#{@current_ussd_session.spc_event_code}"
     @spc_bet_type_response = RestClient.get(@spc_bet_type_request) rescue ''
     @spc_event_list_request = Parameter.first.parionsdirect_url + "/ussd_spc/get_event_by_tourn_sport/#{@current_ussd_session.spc_sport_label}/#{@current_ussd_session.spc_tournament_code}"
     @spc_event_list_response = RestClient.get(@spc_event_list_request) rescue ''
@@ -680,7 +680,7 @@ Saisissez le nombre de fois
   end
 
   def back_to_list_spc_bet_types
-    @spc_bet_type_request = Parameter.first.parionsdirect_url + "/ussd_spc/get_event_markets/#{@current_ussd_session.spc_event_code}"
+    @spc_bet_type_request = Parameter.first.parionsdirect_url + "#{@current_ussd_session.spc_live == true ? '/ussd_spc/get_event_markets_live/' : '/ussd_spc/get_event_markets/'}#{@current_ussd_session.spc_event_code}"
     @spc_bet_type_response = RestClient.get(@spc_bet_type_request) rescue ''
     bet_types_string = ""
     counter = 0
@@ -1363,7 +1363,7 @@ Faites vos pronostics. Choisissez votre pari :
                   @current_ussd_session.update_attributes(session_identifier: @session_identifier, opportunities_trash: @opportunities_trash, spc_opportunities_list_request: @spc_opportunities_list_request, spc_opportunities_list_response: @spc_opportunities_list_response)
                 when '5'
                   spc_live_match
-                  @current_ussd_session.update_attributes(session_identifier: @session_identifier, events_trash: @events_trash, spc_event_list_request: @spc_event_list_request, spc_event_list_response: @spc_event_list_response)
+                  @current_ussd_session.update_attributes(session_identifier: @session_identifier, events_trash: @events_trash, spc_event_list_request: @spc_event_list_request, spc_event_list_response: @spc_event_list_response, spc_live: true)
                 when '6'
                   spc_get_event_code
                   @current_ussd_session.update_attributes(session_identifier: @session_identifier)
@@ -4675,7 +4675,7 @@ Veuillez entrer votre code secret de jeu pour valider le pari.
       when '00'
         back_list_main_menu
       else
-        @spc_bet_type_request = Parameter.first.parionsdirect_url + "/ussd_spc/get_event_markets/#{@event[2] rescue 0}"
+        @spc_bet_type_request = Parameter.first.parionsdirect_url + "#{@current_ussd_session.spc_live == true ? '/ussd_spc/get_event_markets_live/' : '/ussd_spc/get_event_markets/'}#{@event[2] rescue 0}"
         @spc_bet_type_response = RestClient.get(@spc_bet_type_request) rescue ''
         if (JSON.parse(@spc_bet_type_response)["Status"] rescue nil) == "ERROR"
           @spc_event_list_request = Parameter.first.parionsdirect_url + "/ussd_spc/get_event_by_tourn_sport/#{@current_ussd_session.spc_sport_label}/#{@current_ussd_session.spc_tournament_code}"
@@ -4731,10 +4731,10 @@ Faites vos pronostics. Choisissez votre pari :
       when '00'
         back_list_main_menu
       else
-        @spc_draw_request = Parameter.first.parionsdirect_url + "/ussd_spc/get_event_markets_draws/#{@current_ussd_session.spc_event_code}/#{@bet_type[0]}"
+        @spc_draw_request = Parameter.first.parionsdirect_url + "#{@current_ussd_session.spc_live == true ? '/ussd_spc/get_event_markets_draws_live/' : '/get_event_markets_draws/'}#{@current_ussd_session.spc_event_code}/#{@bet_type[0]}"
         @spc_draw_response = RestClient.get(@spc_draw_request) rescue ''
         if (JSON.parse(@spc_draw_response)["Status"] rescue nil) == "ERROR"
-          @spc_bet_type_request = Parameter.first.parionsdirect_url + "/ussd_spc/get_event_markets/#{@current_ussd_session.spc_event_code}"
+          @spc_bet_type_request = Parameter.first.parionsdirect_url + "#{@current_ussd_session.spc_live == true ? '/ussd_spc/get_event_markets_live/' : '/ussd_spc/get_event_markets/'}#{@current_ussd_session.spc_event_code}"
           @spc_bet_type_response = RestClient.get(@spc_bet_type_request) rescue ''
           bet_types_string = ""
           counter = 0
@@ -5057,7 +5057,7 @@ Veuillez entrer le code évènement
       when '00'
         back_list_main_menu
       else
-        @spc_bet_type_request = Parameter.first.parionsdirect_url + "/ussd_spc/get_event_markets/#{@ussd_string rescue 0}"
+        @spc_bet_type_request = Parameter.first.parionsdirect_url + "#{@current_ussd_session.spc_live == true ? '/ussd_spc/get_event_markets_live/' : '/ussd_spc/get_event_markets/'}#{@ussd_string rescue 0}"
         @spc_bet_type_response = RestClient.get(@spc_bet_type_request) rescue ''
         @spc_event_info_request = Parameter.first.parionsdirect_url + "/ussd_spc/get_event_info/#{@ussd_string rescue 0}"
         @spc_event_info_response = RestClient.get(@spc_event_info_request) rescue ''
