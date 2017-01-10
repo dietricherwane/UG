@@ -4731,7 +4731,7 @@ Faites vos pronostics. Choisissez votre pari :
       when '00'
         back_list_main_menu
       else
-        @spc_draw_request = Parameter.first.parionsdirect_url + "#{@current_ussd_session.spc_live == true ? '/ussd_spc/get_event_markets_draws_live/' : '/get_event_markets_draws/'}#{@current_ussd_session.spc_event_code}/#{@bet_type[0]}"
+        @spc_draw_request = Parameter.first.parionsdirect_url + "#{@current_ussd_session.spc_live == true ? '/ussd_spc/get_event_markets_draws_live/' : '/ussd_spc/get_event_markets_draws/'}#{@current_ussd_session.spc_event_code}/#{@bet_type[0]}"
         @spc_draw_response = RestClient.get(@spc_draw_request) rescue ''
         if (JSON.parse(@spc_draw_response)["Status"] rescue nil) == "ERROR"
           @spc_bet_type_request = Parameter.first.parionsdirect_url + "#{@current_ussd_session.spc_live == true ? '/ussd_spc/get_event_markets_live/' : '/ussd_spc/get_event_markets/'}#{@current_ussd_session.spc_event_code}"
