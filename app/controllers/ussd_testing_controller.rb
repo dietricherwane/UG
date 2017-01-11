@@ -5292,7 +5292,7 @@ Saisissez le montant du rechargement
 0- Retour]
       @session_identifier = '9--'
     else
-      @rendered_text = %Q[Vous allez recharger votre compte de: #{@ussd_string} FCFA et serez débité de #{(@ussd_string.to_f * 0.02.ceil)} FCFA
+      @rendered_text = %Q[Vous allez recharger votre compte de: #{@ussd_string} FCFA et serez débité de #{(@ussd_string.to_f * 0.02 + @ussd_string.to_f).ceil} FCFA
 0- Retour]
       @session_identifier = '9---'
     end
@@ -5325,7 +5325,7 @@ Saisissez le montant du rechargement
       @reload_response = RestClient.get(@reload_request) rescue ''
 
       if @reload_response == '2'
-        @rendered_text = %Q[Votre demande de rechargement est en cours de traitement. Montant : #{@ussd_string} FCFA.]
+        @rendered_text = %Q[Votre demande de rechargement est en cours de traitement. Montant : #{@current_ussd_session.reload_amount} FCFA.]
         @session_identifier = '7--'
         @reload = true
       else
