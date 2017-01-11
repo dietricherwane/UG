@@ -890,6 +890,9 @@ Faites vos pronostics. Choisissez votre pari :
             get_reload_account
             @current_ussd_session.update_attributes(session_identifier: @session_identifier, reload_account: @ussd_string)
           when '9--'
+            display_mtn_reload_amount_with_fee
+            @current_ussd_session.update_attributes(session_identifier: @session_identifier, reload_amount: @ussd_string, reload_request: @reload_request, reload_response: @reload_response)
+          when '9---'
             proceed_reloading
             @current_ussd_session.update_attributes(session_identifier: @session_identifier, reload_amount: @ussd_string, reload_request: @reload_request, reload_response: @reload_response)
           # Sélection d'un élément du menu
@@ -5280,6 +5283,19 @@ www.parionsdirect.ci/windows-phone
     @rendered_text = %Q[Saisissez le montant du rechargement
 0- Retour]
     @session_identifier = '9--'
+  end
+
+  def display_mtn_reload_amount_with_fee
+    if not_a_number?(@ussd_string)
+      @rendered_text = %Q[Le montant du rechargement n'est pas valide
+Saisissez le montant du rechargement
+0- Retour]
+      @session_identifier = '9--'
+    else
+      @rendered_text = %Q[Vous allez recharger votre compte de: #{@ussd_string} FCFA et serez débité de #{(@ussd_string.to_f * 0.02.ceil)} FCFA
+0- Retour]
+      @session_identifier = '9---'
+    end
   end
 
   def get_reload_account
