@@ -4588,6 +4588,7 @@ Veuillez entrer votre code secret de jeu pour valider le pari.
             end
           end
           @rendered_text = %Q[SPORTCASH - Liste des sports
+Aucune donnée disponible
 #{sports_string}
 0- Retour
 00- Accueil]
@@ -4641,6 +4642,7 @@ Veuillez entrer votre code secret de jeu pour valider le pari.
             end
           end
           @rendered_text = %Q[SPORTCASH
+Aucune donnée disponible
 #{tournaments_string}
 0- Retour
 00- Accueil]
@@ -4696,6 +4698,7 @@ Veuillez entrer votre code secret de jeu pour valider le pari.
             end
           end
           @rendered_text = %Q[SPORTCASH
+Aucune donnée disponible
 #{events_string}
 0- Retour
 00- Accueil]
@@ -4752,6 +4755,7 @@ Faites vos pronostics. Choisissez votre pari :
             end
           end
           @rendered_text = %Q[#{@event[0] rescue ''}
+Aucune donnée disponible
 Faites vos pronostics. Choisissez votre pari :
 #{bet_types_string}
 0- Retour
