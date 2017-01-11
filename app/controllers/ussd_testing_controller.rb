@@ -891,7 +891,7 @@ Faites vos pronostics. Choisissez votre pari :
             @current_ussd_session.update_attributes(session_identifier: @session_identifier, reload_account: @ussd_string)
           when '9--'
             display_mtn_reload_amount_with_fee
-            @current_ussd_session.update_attributes(session_identifier: @session_identifier, reload_amount: @ussd_string, reload_request: @reload_request, reload_response: @reload_response)
+            @current_ussd_session.update_attributes(session_identifier: @session_identifier, reload_amount: @ussd_string)
           when '9---'
             proceed_reloading
             @current_ussd_session.update_attributes(session_identifier: @session_identifier, reload_amount: @ussd_string, reload_request: @reload_request, reload_response: @reload_response)
