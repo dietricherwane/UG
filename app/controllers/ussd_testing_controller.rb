@@ -5298,6 +5298,7 @@ Saisissez le montant du rechargement
     else
       @rendered_text = %Q[Vous allez recharger votre compte de jeu de: #{@ussd_string} FCFA
 Montant des frais: #{(@ussd_string.to_f * 0.02).ceil} FCFA
+1- Valider
 0- Retour]
       @session_identifier = '9---'
     end
