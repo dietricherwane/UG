@@ -5296,9 +5296,9 @@ Saisissez le montant du rechargement
 0- Retour]
       @session_identifier = '9--'
     else
-      @rendered_text = %Q[Vous allez recharger votre compte de jeu de: #{@ussd_string} FCFA
-Montant des frais: #{(@ussd_string.to_f * 0.02)} FCFA
-1- Valider
+      @rendered_text = %Q[Montant recharge: #{@ussd_string} F
+Frais: #{(@ussd_string.to_f * 0.02).ceil} F
+1- Confirmer
 0- Retour]
       @session_identifier = '9---'
     end
