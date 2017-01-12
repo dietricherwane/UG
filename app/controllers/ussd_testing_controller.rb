@@ -5297,7 +5297,7 @@ Saisissez le montant du rechargement
       @session_identifier = '9--'
     else
       @rendered_text = %Q[Montant recharge: #{@ussd_string} F
-Frais: #{(@ussd_string.to_f * 0.02).ceil} F
+Frais: #{(@ussd_string.to_f * 0.02).floor} F
 1- Confirmer
 0- Retour]
       @session_identifier = '9---'
