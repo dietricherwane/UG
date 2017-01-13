@@ -2294,7 +2294,15 @@ Veuillez entrer le numéro de compte de jeu dont vous souhaitez consulter les OT
   def get_paymoney_sold
     case @ussd_string
       when '0'
-        back_to_home
+        @rendered_text = %Q[1- Jeux
+2- Mes paris
+3- Mon solde
+4- Rechargement
+5- Votre service SMS
+6- Mes OTP
+7- Mes comptes
+8- Retrait vers MTN MOBILE MONEY]
+        @session_identifier = '5'
       when '00'
         back_to_home
       else
@@ -5368,8 +5376,20 @@ Saisissez le montant du Retrait vers MTN MOBILE MONEY
 0- Retour]
       @session_identifier = '10--'
     else
-      @rendered_text = %Q[Veuillez saisir le code secret de votre compte de jeu]
-      @session_identifier = '11--'
+      if @ussd_string == '0'
+        @rendered_text = %Q[1- Jeux
+2- Mes paris
+3- Mon solde
+4- Rechargement
+5- Votre service SMS
+6- Mes OTP
+7- Mes comptes
+8- Retrait vers MTN MOBILE MONEY]
+      @session_identifier = '5'
+      else
+        @rendered_text = %Q[Veuillez saisir le code secret de votre compte de jeu]
+        @session_identifier = '11--'
+      end
     end
   end
 
