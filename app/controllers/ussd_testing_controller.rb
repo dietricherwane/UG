@@ -5304,11 +5304,17 @@ Saisissez le montant du rechargement
 0- Retour]
       @session_identifier = '9--'
     else
-      @rendered_text = %Q[Montant recharge: #{@ussd_string} F
+      if @ussd_string == '0'
+        @rendered_text = %Q[Saisissez le numéro de compte de jeu à recharger
+0- Retour]
+        @session_identifier = '8--'
+      else
+        @rendered_text = %Q[Montant recharge: #{@ussd_string} F
 Frais: #{(@ussd_string.to_f * 0.02).floor} F
 1- Confirmer
 0- Retour]
-      @session_identifier = '9---'
+        @session_identifier = '9---'
+      end
     end
   end
 
@@ -5340,7 +5346,7 @@ Saisissez le montant du rechargement
         @session_identifier = '9--'
       else
         #@reload_request = "http://41.189.40.193:6968/MTNCI/ussd/reload/8f90aaece362b6d83b6887cc19067433/75592949-2b13-4175-b811-3caf75687355/#{Digest::SHA1.hexdigest([DateTime.now.iso8601(6), rand].join).hex.to_s[0..8]}/225#{@msisdn[-8,8]}/#{@ussd_string}/XOF/#{@current_ussd_session.reload_account.blank? ? AccountProfile.find_by_msisdn(@msisdn[-8,8]).paymoney_account_number : @current_ussd_session.reload_account}"
-        @reload_request = "http://41.189.40.193:6968/MTNCI/ussd/reload/8f90aaece362b6d83b6887cc19067433/75592949-2b13-4175-b811-3caf75687355/#{Digest::SHA1.hexdigest([DateTime.now.iso8601(6), rand].join).hex.to_s[0..8]}/225#{@msisdn[-8,8]}/#{@ussd_string}/XOF/#{@current_ussd_session.reload_account.blank? ? AccountProfile.find_by_msisdn(@msisdn[-8,8]).paymoney_account_number : @current_ussd_session.reload_account}"
+        @reload_request = "http://41.189.40.193:6968/MTNCI/ussd/reload/8f90aaece362b6d83b6887cc19067433/75592949-2b13-4175-b811-3caf75687355/#{Digest::SHA1.hexdigest([DateTime.now.iso8601(6), rand].join).hex.to_s[0..8]}/225#{@msisdn[-8,8]}/#{@current_ussd_session.reload_amount}/XOF/#{@current_ussd_session.reload_account.blank? ? AccountProfile.find_by_msisdn(@msisdn[-8,8]).paymoney_account_number : @current_ussd_session.reload_account}"
         @reload_response = RestClient.get(@reload_request) rescue ''
 
         if @reload_response == '2'
