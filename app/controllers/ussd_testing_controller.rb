@@ -2851,17 +2851,17 @@ Veuillez confirmer le mot de passe précédemment entré.]
     @selector2 = ''
     case @current_ussd_session.draw_day_shortcut
       when 'etoile'
-        @selector2 = -16 + DateTime.parse("01/01/#{Date.today.year} 19:00:00").upto(DateTime.now).count(&:monday?)
+        @selector2 = 35 + DateTime.parse("01/01/#{Date.today.year} 19:00:00").upto(DateTime.now).count(&:monday?)
       when 'emergence'
-        @selector2 = -16 + DateTime.parse("01/01/#{Date.today.year} 19:00:00").upto(DateTime.now).count(&:tuesday?)
+        @selector2 = 36 + DateTime.parse("01/01/#{Date.today.year} 19:00:00").upto(DateTime.now).count(&:tuesday?)
       when 'fortune'
-        @selector2 = -8 + DateTime.parse("01/01/#{Date.today.year} 19:00:00").upto(DateTime.now).count(&:wednesday?)
+        @selector2 = 44 + DateTime.parse("01/01/#{Date.today.year} 19:00:00").upto(DateTime.now).count(&:wednesday?)
       when 'privilege'
-        @selector2 = -16 + DateTime.parse("01/01/#{Date.today.year} 19:00:00").upto(DateTime.now).count(&:thursday?)
+        @selector2 = 36 + DateTime.parse("01/01/#{Date.today.year} 19:00:00").upto(DateTime.now).count(&:thursday?)
       when 'solution'
-        @selector2 = -17 + DateTime.parse("01/01/#{Date.today.year} 19:00:00").upto(DateTime.now).count(&:friday?)
+        @selector2 = 36 + DateTime.parse("01/01/#{Date.today.year} 19:00:00").upto(DateTime.now).count(&:friday?)
       when 'diamant'
-        @selector2 = -8 + DateTime.parse("01/01/#{Date.today.year} 19:00:00").upto(DateTime.now).count(&:saturday?)
+        @selector2 = 45 + DateTime.parse("01/01/#{Date.today.year} 19:00:00").upto(DateTime.now).count(&:saturday?)
       end
 
     @begin_date = ''
