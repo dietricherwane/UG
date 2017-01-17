@@ -217,12 +217,12 @@ class UssdTestingController < ApplicationController
   def back_display_loto_draw_day
     reference_date = "01/01/#{Date.today.year} 19:00:00"
     @rendered_text = %Q[
-1- Etoile #{(-16 + DateTime.parse(reference_date).upto(DateTime.now).count(&:monday?)).to_s}
-2- Emergence #{(-16 + DateTime.parse(reference_date).upto(DateTime.now).count(&:tuesday?)).to_s}
-3- Fortune #{(-8 + DateTime.parse(reference_date).upto(DateTime.now).count(&:wednesday?)).to_s}
-4- Privilège #{(-16 + DateTime.parse(reference_date).upto(DateTime.now).count(&:thursday?)).to_s}
-5- Solution #{(-17 + DateTime.parse(reference_date).upto(DateTime.now).count(&:friday?)).to_s}
-6- Diamant #{(-8 + DateTime.parse(reference_date).upto(DateTime.now).count(&:saturday?)).to_s}
+1- Etoile #{(35 + DateTime.parse(reference_date).upto(DateTime.now).count(&:monday?)).to_s}
+2- Emergence #{(36 + DateTime.parse(reference_date).upto(DateTime.now).count(&:tuesday?)).to_s}
+3- Fortune #{(44 + DateTime.parse(reference_date).upto(DateTime.now).count(&:wednesday?)).to_s}
+4- Privilège #{(36 + DateTime.parse(reference_date).upto(DateTime.now).count(&:thursday?)).to_s}
+5- Solution #{(36 + DateTime.parse(reference_date).upto(DateTime.now).count(&:friday?)).to_s}
+6- Diamant #{(45 + DateTime.parse(reference_date).upto(DateTime.now).count(&:saturday?)).to_s}
 0- Retour
 00- Accueil]
     @session_identifier = '12'
@@ -1043,22 +1043,22 @@ Faites vos pronostics. Choisissez votre pari :
                 when '00'
                   back_list_main_menu
                 when '1'
-                  @draw_day_label = "Etoile #{(-16 + DateTime.parse(reference_date).upto(DateTime.now).count(&:monday?)).to_s}"
+                  @draw_day_label = "Etoile #{(35 + DateTime.parse(reference_date).upto(DateTime.now).count(&:monday?)).to_s}"
                   @draw_day_shortcut = 'etoile'
                 when '2'
-                  @draw_day_label = "Emergence #{(-16 + DateTime.parse(reference_date).upto(DateTime.now).count(&:tuesday?)).to_s}"
+                  @draw_day_label = "Emergence #{(36 + DateTime.parse(reference_date).upto(DateTime.now).count(&:tuesday?)).to_s}"
                   @draw_day_shortcut = 'emergence'
                 when '3'
-                  @draw_day_label = "Fortune #{(-8 + DateTime.parse(reference_date).upto(DateTime.now).count(&:wednesday?)).to_s}"
+                  @draw_day_label = "Fortune #{(44 + DateTime.parse(reference_date).upto(DateTime.now).count(&:wednesday?)).to_s}"
                   @draw_day_shortcut = 'fortune'
                 when '4'
-                  @draw_day_label = "Privilège #{(-16 + DateTime.parse(reference_date).upto(DateTime.now).count(&:thursday?)).to_s}"
+                  @draw_day_label = "Privilège #{(36 + DateTime.parse(reference_date).upto(DateTime.now).count(&:thursday?)).to_s}"
                   @draw_day_shortcut = 'privilege'
                 when '5'
-                  @draw_day_label = "Solution #{(-17 + DateTime.parse(reference_date).upto(DateTime.now).count(&:friday?)).to_s}"
+                  @draw_day_label = "Solution #{(36 + DateTime.parse(reference_date).upto(DateTime.now).count(&:friday?)).to_s}"
                   @draw_day_shortcut = 'solution'
                 when '6'
-                  @draw_day_label = "Diamant #{(-8 + DateTime.parse(reference_date).upto(DateTime.now).count(&:saturday?)).to_s}"
+                  @draw_day_label = "Diamant #{(45 + DateTime.parse(reference_date).upto(DateTime.now).count(&:saturday?)).to_s}"
                   @draw_day_shortcut = 'diamant'
               end
               unless ['0', '00'].include?(@ussd_string)
@@ -1540,12 +1540,12 @@ En continuant le processus, vous certifiez avoir +18 ans
     else
       reference_date = "01/01/#{Date.today.year} 19:00:00"
       @rendered_text = %Q[
-1- Etoile #{(-16 + DateTime.parse(reference_date).upto(DateTime.now).count(&:monday?)).to_s}
-2- Emergence #{(-16 + DateTime.parse(reference_date).upto(DateTime.now).count(&:tuesday?)).to_s}
-3- Fortune #{(-8 + DateTime.parse(reference_date).upto(DateTime.now).count(&:wednesday?)).to_s}
-4- Privilège #{(-16 + DateTime.parse(reference_date).upto(DateTime.now).count(&:thursday?)).to_s}
-5- Solution #{(-17 + DateTime.parse(reference_date).upto(DateTime.now).count(&:friday?)).to_s}
-6- Diamant #{(-8 + DateTime.parse(reference_date).upto(DateTime.now).count(&:saturday?)).to_s}
+1- Etoile #{(35 + DateTime.parse(reference_date).upto(DateTime.now).count(&:monday?)).to_s}
+2- Emergence #{(36 + DateTime.parse(reference_date).upto(DateTime.now).count(&:tuesday?)).to_s}
+3- Fortune #{(44 + DateTime.parse(reference_date).upto(DateTime.now).count(&:wednesday?)).to_s}
+4- Privilège #{(36 + DateTime.parse(reference_date).upto(DateTime.now).count(&:thursday?)).to_s}
+5- Solution #{(36 + DateTime.parse(reference_date).upto(DateTime.now).count(&:friday?)).to_s}
+6- Diamant #{(45 + DateTime.parse(reference_date).upto(DateTime.now).count(&:saturday?)).to_s}
 0- Retour
 00- Accueil]
       @session_identifier = '12'
@@ -1918,12 +1918,12 @@ Montant débité: #{@current_ussd_session.stake.split('-')[1]} FCFA. Confirmez e
                 reference_date = "01/01/#{Date.today.year} 19:00:00"
                 @rendered_text = %Q[FELICITATIONS, votre pari a bien été  enregistré. N° ticket : #{json_object["bet"]["ticket_number"]} / Réf. : #{json_object["bet"]["ref_number"]}
 Consultez les résultats le #{@end_date}
-1- Etoile #{(-16 + DateTime.parse(reference_date).upto(DateTime.now).count(&:monday?)).to_s}
-2- Emergence #{(-16 + DateTime.parse(reference_date).upto(DateTime.now).count(&:tuesday?)).to_s}
-3- Fortune #{(-8 + DateTime.parse(reference_date).upto(DateTime.now).count(&:wednesday?)).to_s}
-4- Privilège #{(-16 + DateTime.parse(reference_date).upto(DateTime.now).count(&:thursday?)).to_s}
-5- Solution #{(-17 + DateTime.parse(reference_date).upto(DateTime.now).count(&:friday?)).to_s}
-6- Diamant #{(-8 + DateTime.parse(reference_date).upto(DateTime.now).count(&:saturday?)).to_s}
+1- Etoile #{(35 + DateTime.parse(reference_date).upto(DateTime.now).count(&:monday?)).to_s}
+2- Emergence #{(36 + DateTime.parse(reference_date).upto(DateTime.now).count(&:tuesday?)).to_s}
+3- Fortune #{(44 + DateTime.parse(reference_date).upto(DateTime.now).count(&:wednesday?)).to_s}
+4- Privilège #{(36 + DateTime.parse(reference_date).upto(DateTime.now).count(&:thursday?)).to_s}
+5- Solution #{(36 + DateTime.parse(reference_date).upto(DateTime.now).count(&:friday?)).to_s}
+6- Diamant #{(45 + DateTime.parse(reference_date).upto(DateTime.now).count(&:saturday?)).to_s}
 0- Retour
 00- Accueil]
                 @session_identifier = '12'
@@ -2047,12 +2047,12 @@ Montant débité: #{@current_ussd_session.stake.split('-')[1]} FCFA. Confirmez e
   def loto_display_draw_day
     reference_date = "01/01/#{Date.today.year} 19:00:00"
     @rendered_text = %Q[
-1- Etoile #{(-16 + DateTime.parse(reference_date).upto(DateTime.now).count(&:monday?)).to_s}
-2- Emergence #{(-16 + DateTime.parse(reference_date).upto(DateTime.now).count(&:tuesday?)).to_s}
-3- Fortune #{(-8 + DateTime.parse(reference_date).upto(DateTime.now).count(&:wednesday?)).to_s}
-4- Privilège #{(-16 + DateTime.parse(reference_date).upto(DateTime.now).count(&:thursday?)).to_s}
-5- Solution #{(-17 + DateTime.parse(reference_date).upto(DateTime.now).count(&:friday?)).to_s}
-6- Diamant #{(-8 + DateTime.parse(reference_date).upto(DateTime.now).count(&:saturday?)).to_s}
+1- Etoile #{(35 + DateTime.parse(reference_date).upto(DateTime.now).count(&:monday?)).to_s}
+2- Emergence #{(36 + DateTime.parse(reference_date).upto(DateTime.now).count(&:tuesday?)).to_s}
+3- Fortune #{(44 + DateTime.parse(reference_date).upto(DateTime.now).count(&:wednesday?)).to_s}
+4- Privilège #{(36 + DateTime.parse(reference_date).upto(DateTime.now).count(&:thursday?)).to_s}
+5- Solution #{(36 + DateTime.parse(reference_date).upto(DateTime.now).count(&:friday?)).to_s}
+6- Diamant #{(45 + DateTime.parse(reference_date).upto(DateTime.now).count(&:saturday?)).to_s}
 0- Retour
 00- Accueil]
     @session_identifier = '12'
