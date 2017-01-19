@@ -840,7 +840,9 @@ Faites vos pronostics. Choisissez votre pari :
           when '4-'
             create_paymoney_account
             @current_ussd_session.update_attributes(session_identifier: @session_identifier, creation_pw_request: @creation_pw_request, creation_pw_response: (@creation_pw_response.body rescue 'ERR'), pw_account_created: @pw_account_created)
-            #exit_menu(@sender_cb, "Vous allez recevoir un SMS avec les détails de votre portemonnaie de jeu.")
+            if @pw_account_created == true
+              exit_menu(@sender_cb, "Vous allez recevoir un SMS avec les détails de votre portemonnaie de jeu.")
+            end
           when '5--'
             select_action_depending_on_mtn_main_menu_selection
             if @status
@@ -2373,7 +2375,7 @@ En continuant le processus, vous certifiez avoir +18
         @session_identifier = '-10'
       else
 =end
-        @rendered_text = %Q[Pour accéder à ce service, créez votre compte de jeu en entrant un mot de passe de 4 caractères.]
+        @rendered_text = %Q[Pour accéder à ce service, créez votre compte PARIONSDIRECT en entrant un mot de passe de 4 caractères.]
         @session_identifier = '1'
       #end
     else
@@ -2450,7 +2452,7 @@ Veuillez saisir votre numéro de compte de jeu.]
     # L'utilisateur n'a pas saisi de code secret, on le ramène au menu précédent
     if @ussd_string.blank? || @ussd_string.length != 4
       # Le client n'a pas de compte parionsdirect et entrer un code secret pour en créer un
-      @rendered_text = %Q[Pour accéder à ce service, créez votre compte de jeu en entrant un mot de passe de 4 caractères.]
+      @rendered_text = %Q[Pour accéder à ce service, créez votre compte PARIONSDIRECT en entrant un mot de passe de 4 caractères.]
       @session_identifier = '1'
     else
       @creation_pd_password = @ussd_string
@@ -2494,7 +2496,7 @@ Veuillez confirmer le mot de passe précédemment entré.]
           @session_identifier = '3'
         else
           @pd_account_created = true
-          @rendered_text = %Q[Votre compte de jeu PARIONSDIRECT a été créé avec succès. Pour jouer, il vous faut un compte de jeu. Avez vous un compte de jeu?
+          @rendered_text = %Q[Votre compte PARIONSDIRECT a été créé avec succès. Pour jouer, il vous faut un compte de jeu. Avez vous un compte de jeu?
 1- Oui
 2- Non]
           @session_identifier = '4-'
@@ -2513,14 +2515,16 @@ Veuillez confirmer le mot de passe précédemment entré.]
         paymoney_account = JSON.parse(@creation_pw_response.body) rescue nil
         # Le compte de jeu a été créé
         if (paymoney_account["errors"] rescue nil).blank?
+          AccountProfile.create(msisdn: @msisdn[-8,8], paymoney_account_number: paymoney_account["compte"])
           @pw_account_created = true
           @rendered_text = %Q[Vous allez recevoir un SMS avec les détails de votre porte monnaie de jeu.]
           @session_identifier = '4'
         else
           @pw_account_created = false
-          @rendered_text = %Q[Une erreur s'est produite lors de la création du compte de jeu
-Veuillez confirmer le mot de passe précédemment entré.]
-          @session_identifier = '3'
+          @rendered_text = %Q[Veuillez réessayer. Pour jouer, il vous faut un compte de jeu. Avez vous un compte de jeu?
+1- Oui
+2- Non]
+          @session_identifier = '4-'
         end
       else
         # Le client saisit son numéro de compte de jeu pour le faire valider
@@ -2528,7 +2532,7 @@ Veuillez confirmer le mot de passe précédemment entré.]
         @session_identifier = '4'
       end
     else
-      @rendered_text = %Q[Votre compte de jeu PARIONSDIRECT a été créé avec succès. Pour jouer, il vous faut un compte de jeu. Avez vous un compte de jeu?
+      @rendered_text = %Q[Votre compte PARIONSDIRECT a été créé avec succès. Pour jouer, il vous faut un compte de jeu. Avez vous un compte de jeu?
 1- Oui
 2- Non]
       @session_identifier = '4-'
