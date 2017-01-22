@@ -917,7 +917,9 @@ Faites vos pronostics. Choisissez votre pari :
                   @current_ussd_session.update_attributes(session_identifier: @session_identifier)
                 when '4'
                   @rendered_text = %Q[1- Recharger mon compte
-2- Recharger autre compte]
+2- Recharger autre compte
+0- Retour
+00- Accueil]
                   @session_identifier = '7--'
                   @current_ussd_session.update_attributes(session_identifier: @session_identifier)
                 when '5'
@@ -1512,11 +1514,13 @@ En continuant le processus, vous certifiez avoir +18 ans
 
   def display_mtn_reload_instructions_depending_on_reloading_menu_selection
     @status = false
-    if ['1', '2'].include?(@ussd_string)
+    if ['1', '2', '0', '00'].include?(@ussd_string)
       @status = true
     else
       @rendered_text = %Q[1- Recharger mon compte
-2- Recharger autre compte]
+2- Recharger autre compte
+0- Retour
+00- Accueil]
       @session_identifier = '7--'
     end
   end
