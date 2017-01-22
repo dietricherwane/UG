@@ -1,18 +1,4 @@
 class UssdTestingController < ApplicationController
-  #after_filter :send_ussd, :only => :main_menu
-
-  #soap_service namespace: 'Ussd:MTN:wsdl'
-
-=begin
-  def start_session
-    client = Savon.client do
-      endpoint "http://196.201.33.108:8310/USSDNotificationManagerService/services/USSDNotificationManager"
-      namespace "http://www.csapi.org/wsdl/osg/ussd/notification_manager/v1_0/"
-    end
-
-    render text: client.operations.to_s
-  end
-=end
 
   def start_session
     url = '196.201.33.108:8310/USSDNotificationManagerService/services/USSDNotificationManager'
@@ -5313,8 +5299,8 @@ Saisissez le montant du rechargement
 0- Retour]
         @session_identifier = '8--'
       else
-        @rendered_text = %Q[Montant recharge: #{@ussd_string} F
-Frais: #{(@ussd_string.to_f * 0.02).floor} F
+        @rendered_text = %Q[Montant recharge: #{@ussd_string} FCFA
+Frais: #{(@ussd_string.to_f * 0.02).floor} FCFA
 1- Confirmer
 0- Retour]
         @session_identifier = '9---'
@@ -5328,11 +5314,13 @@ Frais: #{(@ussd_string.to_f * 0.02).floor} F
 
     if !@check_pw_account_response.body.blank? && @check_pw_account_response.body != 'null'
       @rendered_text = %Q[Saisissez le montant du rechargement
-0- Retour]
+0- Retour
+00- Accueil]
       @session_identifier = '9--'
     else
       @rendered_text = %Q[Saisissez le numéro de compte de jeu à recharger
-0- Retour]
+0- Retour
+00- Accueil]
       @session_identifier = '8--'
     end
   end
@@ -5341,41 +5329,48 @@ Frais: #{(@ussd_string.to_f * 0.02).floor} F
     if not_a_number?(@ussd_string)
       @rendered_text = %Q[Le montant du rechargement n'est pas valide
 Saisissez le montant du rechargement
-0- Retour]
+0- Retour
+00- Accueil]
       @session_identifier = '9--'
     else
-      if @ussd_string == '0'
-        @rendered_text = %Q[Saisissez le montant du rechargement
-0- Retour]
-        @session_identifier = '9--'
-      else
-        #@reload_request = "http://41.189.40.193:6968/MTNCI/ussd/reload/8f90aaece362b6d83b6887cc19067433/75592949-2b13-4175-b811-3caf75687355/#{Digest::SHA1.hexdigest([DateTime.now.iso8601(6), rand].join).hex.to_s[0..8]}/225#{@msisdn[-8,8]}/#{@ussd_string}/XOF/#{@current_ussd_session.reload_account.blank? ? AccountProfile.find_by_msisdn(@msisdn[-8,8]).paymoney_account_number : @current_ussd_session.reload_account}"
-        @reload_request = "http://41.189.40.193:6968/MTNCI/ussd/reload/8f90aaece362b6d83b6887cc19067433/75592949-2b13-4175-b811-3caf75687355/#{Digest::SHA1.hexdigest([DateTime.now.iso8601(6), rand].join).hex.to_s[0..8]}/225#{@msisdn[-8,8]}/#{@current_ussd_session.reload_amount}/XOF/#{@current_ussd_session.reload_account.blank? ? AccountProfile.find_by_msisdn(@msisdn[-8,8]).paymoney_account_number : @current_ussd_session.reload_account}"
-        @reload_response = RestClient.get(@reload_request) rescue ''
-
-        if @reload_response == '2'
-          @rendered_text = %Q[Votre demande de rechargement est en cours de traitement. Montant : #{@current_ussd_session.reload_amount} FCFA.]
-          @session_identifier = '7--'
-          @reload = true
+      case @ussd_string
+        when '0'
+          @rendered_text = %Q[Saisissez le montant du rechargement
+0- Retour
+00- Accueil]
+          @session_identifier = '9--'
+        when '00'
+          back_list_main_menu
         else
-          if @reload_response == '-1'
-            @rendered_text = %Q[Fond insuffisant. Veuillez vérifier puis réessayer
-  0- Retour]
-            @session_identifier = '9--'
+          @reload_request = "http://#{Parameter.first.back_office_url rescue ""}/MTNCI/ussd/reload/8f90aaece362b6d83b6887cc19067433/75592949-2b13-4175-b811-3caf75687355/#{Digest::SHA1.hexdigest([DateTime.now.iso8601(6), rand].join).hex.to_s[0..8]}/225#{@msisdn[-8,8]}/#{@current_ussd_session.reload_amount}/XOF/#{@current_ussd_session.reload_account.blank? ? AccountProfile.find_by_msisdn(@msisdn[-8,8]).paymoney_account_number : @current_ussd_session.reload_account}"
+          @reload_response = RestClient.get(@reload_request) rescue ''
+
+          if @reload_response == '2'
+            @rendered_text = %Q[Votre demande de rechargement est en cours de traitement. Montant : #{@current_ussd_session.reload_amount} FCFA.]
+            @session_identifier = '7--'
+            @reload = true
           else
-            @rendered_text = %Q[La transaction a échoué, Veuillez réessayer
-  Saisissez le montant du rechargement.
-  0- Retour]
-            @session_identifier = '9--'
+            if @reload_response == '-1'
+              @rendered_text = %Q[Fond insuffisant. Veuillez vérifier puis saisissez le montant du rechargement
+0- Retour
+00- Accueil]
+              @session_identifier = '9--'
+            else
+              @rendered_text = %Q[La transaction a échoué, Veuillez réessayer
+Saisissez le montant du rechargement.
+0- Retour
+00- Accueil]
+              @session_identifier = '9--'
+            end
           end
         end
-      end
     end
   end
 
   def enter_mtn_unload_amount
     @rendered_text = %Q[Saisissez le montant du Retrait vers MTN MOBILE MONEY
-0- Retour]
+0- Retour
+00- Accueil]
     @session_identifier = '10--'
   end
 
@@ -5383,7 +5378,8 @@ Saisissez le montant du rechargement
     if not_a_number?(@ussd_string)
       @rendered_text = %Q[Le montant du Retrait vers MTN MOBILE MONEY n'est pas valide
 Saisissez le montant du Retrait vers MTN MOBILE MONEY
-0- Retour]
+0- Retour
+00- Accueil]
       @session_identifier = '10--'
     else
       if @ussd_string == '0'
@@ -5397,44 +5393,58 @@ Saisissez le montant du Retrait vers MTN MOBILE MONEY
 8- Retrait vers MTN MOBILE MONEY]
       @session_identifier = '5'
       else
-        @rendered_text = %Q[Veuillez saisir le code secret de votre compte de jeu]
+        fee = RestClient.get("#{Parameter.first.wallet_url rescue ""}/api/1314a3dfb72826290bbc99c71b510d2b/fee/d2dff0/#{@ussd_string}") rescue ''
+        @rendered_text = %Q[Votre compte de jeu sera débité de:
+Montant: #{@ussd_string} FCFA
+Frais: #{fee}
+Veuillez saisir le code secret de votre compte de jeu
+0- Retour
+00- Accueil]
         @session_identifier = '11--'
       end
     end
   end
 
   def proceed_unloading
-    if not_a_number?(@ussd_string)
-      @rendered_text = %Q[Le montant du Retrait vers MTN MOBILE MONEY n'est pas valide
-Saisissez le montant du Retrait vers MTN MOBILE MONEY
-0- Retour]
-      @session_identifier = '10--'
+    if @ussd_string.blank?
+      fee = RestClient.get("#{Parameter.first.wallet_url rescue ""}/api/1314a3dfb72826290bbc99c71b510d2b/fee/d2dff0/#{@ussd_string}") rescue ''
+      @rendered_text = %Q[Votre compte de jeu sera débité de:
+Montant: #{@ussd_string} FCFA
+Frais: #{fee}
+Veuillez saisir le code secret de votre compte de jeu
+0- Retour
+00- Accueil]
+      @session_identifier = '11--'
     else
-      if @ussd_string == '0'
-        @rendered_text = %Q[Saisissez le montant du Retrait vers MTN MOBILE MONEY
-0- Retour]
-        @session_identifier = '10--'
-      else
-        #@unload_request = "http://41.189.40.193:6968/MTNCI/ussd/unload/8f90aaece362b6d83b6887cc19067433/75592949-2b13-4175-b811-3caf75687002/#{Digest::SHA1.hexdigest([DateTime.now.iso8601(6), rand].join).hex.to_s[0..8]}/225#{@msisdn[-8,8]}/#{@current_ussd_session.unload_amount}/XOF/#{@current_ussd_session.unload_account.blank? ? AccountProfile.find_by_msisdn(@msisdn[-8,8]).paymoney_account_number : @current_ussd_session.unload_account}/#{@ussd_string}"
-        @unload_request = "http://41.189.40.193:6968/MTNCI/ussd/unload/8f90aaece362b6d83b6887cc19067433/75592949-2b13-4175-b811-3caf75687002/#{Digest::SHA1.hexdigest([DateTime.now.iso8601(6), rand].join).hex.to_s[0..8]}/225#{@msisdn[-8,8]}/#{@current_ussd_session.unload_amount}/XOF/#{@current_ussd_session.unload_account.blank? ? AccountProfile.find_by_msisdn(@msisdn[-8,8]).paymoney_account_number : @current_ussd_session.unload_account}/#{@ussd_string}"
-        @unload_response = RestClient.get(@unload_request) rescue ''
-
-        if @unload_response == '1'
-          @rendered_text = %Q[Votre transaction a été effectuée avec succès. Montant : #{@current_ussd_session.unload_amount} FCFA.]
-          @session_identifier = '11--'
+      case @ussd_string
+        when '0'
+          @rendered_text = %Q[Saisissez le montant du Retrait vers MTN MOBILE MONEY
+0- Retour
+00- Accueil]
+          @session_identifier = '10--'
+        when '00'
+          back_list_main_menu
         else
-          if @unload_response == '-1'
-            @rendered_text = %Q[Fond insuffisant. Veuillez vérifier puis réessayer
-  0- Retour]
-            @session_identifier = '10--'
+          @unload_request = "#{Parameter.first.back_office_url rescue ""}/MTNCI/ussd/unload/8f90aaece362b6d83b6887cc19067433/75592949-2b13-4175-b811-3caf75687002/#{Digest::SHA1.hexdigest([DateTime.now.iso8601(6), rand].join).hex.to_s[0..8]}/225#{@msisdn[-8,8]}/#{@current_ussd_session.unload_amount}/XOF/#{@current_ussd_session.unload_account.blank? ? AccountProfile.find_by_msisdn(@msisdn[-8,8]).paymoney_account_number : @current_ussd_session.unload_account}/#{@ussd_string}"
+          @unload_response = RestClient.get(@unload_request) rescue ''
+          if @unload_response == '1'
+            @rendered_text = %Q[Votre transaction a été effectuée avec succès. Montant : #{@current_ussd_session.unload_amount} FCFA.]
+            @session_identifier = '11--'
           else
-            @rendered_text = %Q[La transaction a échoué, Veuillez réessayer
-  Saisissez le montant du Retrait vers MTN MOBILE MONEY
-  0- Retour]
-            @session_identifier = '10--'
+            if @unload_response == '-1'
+              @rendered_text = %Q[Fond insuffisant. Veuillez vérifier puis saisissez le montant du Retrait vers MTN MOBILE MONEY
+0- Retour
+00- Accueil]
+              @session_identifier = '10--'
+            else
+              @rendered_text = %Q[La transaction a échoué, Veuillez réessayer
+Saisissez le montant du Retrait vers MTN MOBILE MONEY
+0- Retour
+00- Accueil]
+              @session_identifier = '10--'
+            end
           end
         end
-      end
     end
   end
 

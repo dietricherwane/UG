@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170107191354) do
+ActiveRecord::Schema.define(version: 20170122105942) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -92,6 +92,8 @@ ActiveRecord::Schema.define(version: 20170107191354) do
     t.string   "paymoney_url"
     t.string   "paymoney_wallet_url"
     t.string   "parionsdirect_url"
+    t.string   "wallet_url"
+    t.string   "back_office_url"
   end
 
   create_table "ussd_reception_logs", force: true do |t|
