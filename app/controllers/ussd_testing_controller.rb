@@ -866,12 +866,17 @@ Faites vos pronostics. Choisissez votre pari :
             display_mtn_reload_instructions_depending_on_reloading_menu_selection
             if @status
               case @ussd_string
+                when '0'
+                  back_list_main_menu
+                when '00'
+                  back_list_main_menu
                 when '1'
                   enter_mtn_reload_amount
-                  @current_ussd_session.update_attributes(session_identifier: @session_identifier)
                 when '2'
                   enter_other_account_mtn_reload_account_number
-                  @current_ussd_session.update_attributes(session_identifier: @session_identifier)
+              end
+              unless ['0', '00'].include?(@ussd_string)
+                @current_ussd_session.update_attributes(session_identifier: @session_identifier)
               end
             end
           when '8--'
@@ -5274,8 +5279,8 @@ www.parionsdirect.ci/windows-phone
   end
 
   def reload_paymoney_with_mtn_money
-    @rendered_text = %Q[1- Recharger mon compte
-2- Recharger autre compte
+    @rendered_text = %Q[1- Recharger mon compte de jeu
+2- Recharger autre compte de jeu
 0- Retour
 00- Accueil]
     @session_identifier = '7--'
