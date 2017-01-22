@@ -5271,40 +5271,63 @@ www.parionsdirect.ci/windows-phone
 
   def reload_paymoney_with_mtn_money
     @rendered_text = %Q[1- Recharger mon compte
-2- Recharger autre compte]
+2- Recharger autre compte
+0- Retour
+00- Accueil]
     @session_identifier = '7--'
   end
 
   def enter_other_account_mtn_reload_account_number
-    @rendered_text = %Q[Saisissez le numéro de compte de jeu à recharger
-0- Retour]
-    @session_identifier = '8--'
+    case @ussdtring
+      when '0'
+        back_list_main_menu
+      when '00'
+        back_list_main_menu
+      else
+        @rendered_text = %Q[Saisissez le numéro de compte de jeu à recharger
+0- Retour
+00- Accueil]
+        @session_identifier = '8--'
+      end
   end
 
   def enter_mtn_reload_amount
-    @rendered_text = %Q[Saisissez le montant du rechargement
-0- Retour]
-    @session_identifier = '9--'
+    case @ussdtring
+      when '0'
+        back_list_main_menu
+      when '00'
+        back_list_main_menu
+      else
+        @rendered_text = %Q[Saisissez le montant du rechargement
+0- Retour
+00- Accueil]
+        @session_identifier = '9--'
+      end
   end
 
   def display_mtn_reload_amount_with_fee
     if not_a_number?(@ussd_string)
       @rendered_text = %Q[Le montant du rechargement n'est pas valide
 Saisissez le montant du rechargement
-0- Retour]
+0- Retour
+00- Accueil]
       @session_identifier = '9--'
     else
-      if @ussd_string == '0'
-        @rendered_text = %Q[Saisissez le numéro de compte de jeu à recharger
-0- Retour]
-        @session_identifier = '8--'
-      else
-        @rendered_text = %Q[Montant recharge: #{@ussd_string} FCFA
+      case @ussdtring
+        when '0'
+          @rendered_text = %Q[Saisissez le numéro de compte de jeu à recharger
+0- Retour
+00- Accueil]
+          @session_identifier = '8--'
+        when '00'
+          back_list_main_menu
+        else
+          @rendered_text = %Q[Montant recharge: #{@ussd_string} FCFA
 Frais: #{(@ussd_string.to_f * 0.02).floor} FCFA
 1- Confirmer
 0- Retour]
-        @session_identifier = '9---'
-      end
+          @session_identifier = '9---'
+        end
     end
   end
 
