@@ -5374,7 +5374,7 @@ Saisissez le montant du rechargement
         when '00'
           back_list_main_menu
         else
-          @reload_request = "http://#{Parameter.first.back_office_url rescue ""}/MTNCI/ussd/reload/8f90aaece362b6d83b6887cc19067433/75592949-2b13-4175-b811-3caf75687355/#{Digest::SHA1.hexdigest([DateTime.now.iso8601(6), rand].join).hex.to_s[0..8]}/225#{@msisdn[-8,8]}/#{@current_ussd_session.reload_amount}/XOF/#{@current_ussd_session.reload_account.blank? ? AccountProfile.find_by_msisdn(@msisdn[-8,8]).paymoney_account_number : @current_ussd_session.reload_account}"
+          @reload_request = "#{Parameter.first.back_office_url rescue ""}/MTNCI/ussd/reload/8f90aaece362b6d83b6887cc19067433/75592949-2b13-4175-b811-3caf75687355/#{Digest::SHA1.hexdigest([DateTime.now.iso8601(6), rand].join).hex.to_s[0..8]}/225#{@msisdn[-8,8]}/#{@current_ussd_session.reload_amount}/XOF/#{@current_ussd_session.reload_account.blank? ? AccountProfile.find_by_msisdn(@msisdn[-8,8]).paymoney_account_number : @current_ussd_session.reload_account}"
           @reload_response = RestClient.get(@reload_request) rescue ''
 
           if @reload_response == '2'
