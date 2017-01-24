@@ -1879,7 +1879,7 @@ Montant débité: #{@current_ussd_session.stake.split('-')[1]} FCFA. Confirmez e
             @request_body = %Q[
                       {
                         "bet_code":"#{@bet_code}",
-                        "bet_modifier":"0",
+                        "bet_modifier":"#{@bet_modifier}",
                         "selector1":"#{@selector1}",
                         "selector2":"#{@selector2}",
                         "repeats":"#{@current_ussd_session.stake.split('-')[0]}",
@@ -3518,10 +3518,10 @@ Confirmez en saisissant votre code secret
           @bet_modifier = '0'
         when 'champ_reduit'
           @bet_code = '111'
-          @bet_modifier = '0'
+          @bet_modifier = '2'
         when 'champ_total'
           @bet_code = '109'
-          @bet_modifier = '0'
+          @bet_modifier = '1'
         end
     end
     if @current_ussd_session.plr_bet_type_shortcut == 'jumele_place'
@@ -3531,10 +3531,10 @@ Confirmez en saisissant votre code secret
           @bet_modifier = '0'
         when 'champ_reduit'
           @bet_code = '112'
-          @bet_modifier = '0'
+          @bet_modifier = '2'
         when 'champ_total'
           @bet_code = '110'
-          @bet_modifier = '0'
+          @bet_modifier = '1'
         end
     end
     if @current_ussd_session.plr_bet_type_shortcut == 'trio'
@@ -3545,19 +3545,19 @@ Confirmez en saisissant votre code secret
       if @current_ussd_session.plr_formula_shortcut == 'champ_reduit'
         if @current_ussd_session.plr_base.split().length == 1
           @bet_code = '104'
-          @bet_modifier = '0'
+          @bet_modifier = '2'
         else
           @bet_code = '106'
-          @bet_modifier = '0'
+          @bet_modifier = '2'
         end
       end
       if @current_ussd_session.plr_formula_shortcut == 'champ_total'
         if @current_ussd_session.plr_base.split().length == 1
           @bet_code = '103'
-          @bet_modifier = '0'
+          @bet_modifier = '1'
         else
           @bet_code = '105'
-          @bet_modifier = '0'
+          @bet_modifier = '1'
         end
       end
     end
