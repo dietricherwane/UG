@@ -1102,19 +1102,23 @@ Faites vos pronostics. Choisissez votre pari :
                 when '1'
                   @formula_label = "Simple"
                   @formula_shortcut = 'simple'
+                  loto_bet_modifier = '0'
                 when '2'
                   @formula_label = "Perm"
                   @formula_shortcut = 'perm'
+                  loto_bet_modifier = '0'
                 when '3'
                   @formula_label = "Champ réduit"
                   @formula_shortcut = 'champ_reduit'
+                  loto_bet_modifier = '2'
                 when '4'
                   @formula_label = "Champ total"
                   @formula_shortcut = 'champ_total'
+                  loto_bet_modifier = '1'
               end
               unless ['0', '00'].include?(@ussd_string)
                 loto_display_horse_selection_fields
-                @current_ussd_session.update_attributes(session_identifier: @session_identifier, formula_label: @formula_label, formula_shortcut: @formula_shortcut)
+                @current_ussd_session.update_attributes(session_identifier: @session_identifier, formula_label: @formula_label, formula_shortcut: @formula_shortcut, loto_bet_modifier: loto_bet_modifier)
               end
             end
           # Saisie de la base au loto
