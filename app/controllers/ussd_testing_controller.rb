@@ -1883,7 +1883,7 @@ Montant débité: #{@current_ussd_session.stake.split('-')[1]} FCFA. Confirmez e
             @request_body = %Q[
                       {
                         "bet_code":"#{@bet_code}",
-                        "bet_modifier":"#{@bet_modifier}",
+                        "bet_modifier":"#{@current_ussd_session.loto_bet_modifier}",
                         "selector1":"#{@selector1}",
                         "selector2":"#{@selector2}",
                         "repeats":"#{@current_ussd_session.stake.split('-')[0]}",
