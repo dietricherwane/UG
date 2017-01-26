@@ -642,14 +642,14 @@ Saisissez le nombre de fois
 
   def back_to_list_spc_events
     @spc_bet_type_request = Parameter.first.parionsdirect_url + "#{@current_ussd_session.spc_live == true ? '/ussd_spc/get_event_markets_live/' : '/ussd_spc/get_event_markets/'}#{@current_ussd_session.spc_event_code}"
-    @spc_bet_type_response = RestClient.get(@spc_bet_type_request) rescue ''
+    @spc_bet_type_response = RestClient.get(@spc_bet_type_request) #rescue ''
     @spc_event_list_request = Parameter.first.parionsdirect_url + "/ussd_spc/get_event_by_tourn_sport/#{@current_ussd_session.spc_sport_label}/#{@current_ussd_session.spc_tournament_code}"
-    @spc_event_list_response = RestClient.get(@spc_event_list_request) rescue ''
+    @spc_event_list_response = RestClient.get(@spc_event_list_request) #rescue ''
     events_string = ""
     counter = 0
 
-    events = JSON.parse('{"events":' + @spc_event_list_response + '}') rescue nil
-    events = events["events"] rescue nil
+    events = JSON.parse('{"events":' + @spc_event_list_response + '}') #rescue nil
+    events = events["events"] #rescue nil
     unless events.blank?
       events.each do |event|
         counter += 1
