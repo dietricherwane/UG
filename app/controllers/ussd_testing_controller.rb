@@ -4742,6 +4742,7 @@ Faites vos pronostics. Choisissez votre pari :
 
   def set_session_identifier_depending_on_bet_type_selected
     @bet_type = JSON.parse(@current_ussd_session.spc_bet_type_trash).assoc(@ussd_string)[1].split('|') rescue nil
+    @current_ussd_session = @current_ussd_session
     case @ussd_string
       when '0'
         back_to_list_spc_events
