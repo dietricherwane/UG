@@ -745,7 +745,7 @@ Faites vos pronostics. Choisissez votre pari :
     render :xml => @result
 
     Thread.new do
-      #begin
+      ActiveRecord::Base.connection_pool.with_connection do
         if @error_code == '0'
           # Récupération d'une session existante
           @current_ussd_session = UssdSession.find_by_sender_cb(@sender_cb)
@@ -1413,8 +1413,7 @@ Faites vos pronostics. Choisissez votre pari :
         end
       end
     #ensure
-      ActiveRecord::Base.connection_pool.release_connection
-    #end
+    end
 
     #render text: @rendered_text
   end
