@@ -923,13 +923,14 @@ Faites vos pronostics. Choisissez votre pari :
                     @current_ussd_session.update_attributes(session_identifier: @session_identifier)
                   when '4'
                     @rendered_text = %Q[1- Recharger mon compte
-  2- Recharger autre compte
-  0- Retour
-  00- Accueil]
+2- Recharger autre compte
+0- Retour
+00- Accueil]
                     @session_identifier = '7--'
                     @current_ussd_session.update_attributes(session_identifier: @session_identifier)
                   when '5'
-
+                    display_sms_coming_soon
+                    @current_ussd_session.update_attributes(session_identifier: @session_identifier)
                   when '6'
                     get_paymoney_password_to_check_otp
                     @current_ussd_session.update_attributes(session_identifier: @session_identifier)
@@ -941,6 +942,9 @@ Faites vos pronostics. Choisissez votre pari :
                     @current_ussd_session.update_attributes(session_identifier: @session_identifier)
                 end
               end
+            when '5---'
+              return_from_display_sms_coming_soon
+              @current_ussd_session.update_attributes(session_identifier: @session_identifier)
             when '10--'
               get_unload_amount
               @current_ussd_session.update_attributes(session_identifier: @session_identifier, unload_amount: @ussd_string)
@@ -1413,6 +1417,30 @@ Faites vos pronostics. Choisissez votre pari :
     #end
 
     #render text: @rendered_text
+  end
+
+  def display_sms_coming_soon
+    @rendered_text = %Q[Bientôt disponible
+0- Retour
+00- Accueil]
+    @session_identifier = '5---'
+  end
+
+  def return_from_display_sms_coming_soon
+    if @ussd_string == '00'
+      back_list_main_menu
+    else
+      @rendered_text = %Q[
+1- Jeux
+2- Mes paris
+3- Mon solde
+4- Rechargement
+5- Votre service SMS
+6- Mes OTP
+7- Mes comptes
+8- Retrait vers MTN MOBILE MONEY]
+      @session_identifier = '5'
+    end
   end
 
   def display_mtn_welcome_menu
