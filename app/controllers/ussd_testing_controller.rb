@@ -745,667 +745,671 @@ Faites vos pronostics. Choisissez votre pari :
     render :xml => @result
 
     Thread.new do
-      if @error_code == '0'
-        # Récupération d'une session existante
-        @current_ussd_session = UssdSession.find_by_sender_cb(@sender_cb)
+      begin
+        if @error_code == '0'
+          # Récupération d'une session existante
+          @current_ussd_session = UssdSession.find_by_sender_cb(@sender_cb)
 
-        if @current_ussd_session.blank?
-          if @account_profile.blank?
-            display_mtn_welcome_menu
-            UssdSession.create(session_identifier: @session_identifier, sender_cb: @sender_cb)
+          if @current_ussd_session.blank?
+            if @account_profile.blank?
+              display_mtn_welcome_menu
+              UssdSession.create(session_identifier: @session_identifier, sender_cb: @sender_cb)
+            else
+              authenticate_or_create_parionsdirect_account(@msisdn)
+              UssdSession.create(session_identifier: @session_identifier, sender_cb: @sender_cb, parionsdirect_password_url: @parionsdirect_password_url, parionsdirect_password_response: (@parionsdirect_password_response.body rescue 'ERR'), parionsdirect_password: @password, parionsdirect_salt: @salt)
+            end
           else
-            authenticate_or_create_parionsdirect_account(@msisdn)
-            UssdSession.create(session_identifier: @session_identifier, sender_cb: @sender_cb, parionsdirect_password_url: @parionsdirect_password_url, parionsdirect_password_response: (@parionsdirect_password_response.body rescue 'ERR'), parionsdirect_password: @password, parionsdirect_salt: @salt)
-          end
-        else
-          case @current_ussd_session.session_identifier
-          when '-10'
-            select_action_depending_on_mtn_menu_selection
-            if @status
-              case @ussd_string
-                when '1'
-                  authenticate_or_create_parionsdirect_account(@msisdn)
-                  @current_ussd_session.update_attributes(session_identifier: @session_identifier, parionsdirect_password_url: @parionsdirect_password_url, parionsdirect_password_response: (@parionsdirect_password_response.body rescue 'ERR'), parionsdirect_password: @password, parionsdirect_salt: @salt)
-                when '2'
-                  display_mtn_terms_and_conditions
-                  @current_ussd_session.update_attributes(session_identifier: @session_identifier)
-                when '3'
-                  exit_menu(@sender_cb, "Merci d'utiliser MTN Mobile Money")
+            case @current_ussd_session.session_identifier
+            when '-10'
+              select_action_depending_on_mtn_menu_selection
+              if @status
+                case @ussd_string
+                  when '1'
+                    authenticate_or_create_parionsdirect_account(@msisdn)
+                    @current_ussd_session.update_attributes(session_identifier: @session_identifier, parionsdirect_password_url: @parionsdirect_password_url, parionsdirect_password_response: (@parionsdirect_password_response.body rescue 'ERR'), parionsdirect_password: @password, parionsdirect_salt: @salt)
+                  when '2'
+                    display_mtn_terms_and_conditions
+                    @current_ussd_session.update_attributes(session_identifier: @session_identifier)
+                  when '3'
+                    exit_menu(@sender_cb, "Merci d'utiliser MTN Mobile Money")
+                end
               end
-            end
-          when '-9'
-            select_action_depending_on_mtn_terms_and_conditions_selection
-            if @status
-              case @ussd_string
-                when '0'
-                  display_mtn_welcome_menu
-                  @current_ussd_session.update_attributes(session_identifier: @session_identifier)
-                when '00'
-                  exit_menu(@sender_cb, "Merci d'utiliser MTN Mobile Money")
-                else
-                  display_mtn_terms_and_conditions
-                  @current_ussd_session.update_attributes(session_identifier: @session_identifier)
+            when '-9'
+              select_action_depending_on_mtn_terms_and_conditions_selection
+              if @status
+                case @ussd_string
+                  when '0'
+                    display_mtn_welcome_menu
+                    @current_ussd_session.update_attributes(session_identifier: @session_identifier)
+                  when '00'
+                    exit_menu(@sender_cb, "Merci d'utiliser MTN Mobile Money")
+                  else
+                    display_mtn_terms_and_conditions
+                    @current_ussd_session.update_attributes(session_identifier: @session_identifier)
+                end
               end
-            end
-          when '-11'
-            select_action_depending_on_mtn_home_menu_terms_and_conditions_selection
-            if @status
-              case @ussd_string
-                when '0'
-                  @rendered_text = %Q[BIENVENUE DANS LE MENU LONACI:
-1- Recharger compte de jeu
-2- Jouer
-3- Termes et conditions]
-                  @session_identifier = '5--'
-                  @current_ussd_session.update_attributes(session_identifier: @session_identifier)
-                when '00'
-                  exit_menu(@sender_cb, "Merci d'utiliser MTN Mobile Money")
-                else
-                  display_mtn_home_menu_terms_and_conditions
-                  @current_ussd_session.update_attributes(session_identifier: @session_identifier)
+            when '-11'
+              select_action_depending_on_mtn_home_menu_terms_and_conditions_selection
+              if @status
+                case @ussd_string
+                  when '0'
+                    @rendered_text = %Q[BIENVENUE DANS LE MENU LONACI:
+  1- Recharger compte de jeu
+  2- Jouer
+  3- Termes et conditions]
+                    @session_identifier = '5--'
+                    @current_ussd_session.update_attributes(session_identifier: @session_identifier)
+                  when '00'
+                    exit_menu(@sender_cb, "Merci d'utiliser MTN Mobile Money")
+                  else
+                    display_mtn_home_menu_terms_and_conditions
+                    @current_ussd_session.update_attributes(session_identifier: @session_identifier)
+                end
               end
-            end
-          when '0'
-            #authenticate_or_create_parionsdirect_account(@msisdn)
-            #UssdSession.create(session_identifier: @session_identifier, sender_cb: @sender_cb)
-          # Saisie du code secret de création de compte parionsdirect
-          when '1'
-            set_parionsdirect_password
-            @current_ussd_session.update_attributes(session_identifier: @session_identifier, creation_pd_password: @creation_pd_password)
-          # Saisie de la confirmation du code secret de création de compte parionsdirect
-          when '3'
-            create_parionsdirect_account
-            @current_ussd_session.update_attributes(session_identifier: @session_identifier, creation_pd_password_confirmation: @creation_pd_password_confirmation, creation_pd_request: @creation_pd_request, creation_pd_response: (@creation_pd_response.body rescue 'ERR'), pd_account_created: @pd_account_created)
-          when '2'
-            check_parionsdirect_password
-            @current_ussd_session.update_attributes(session_identifier: @session_identifier, connection_pd_pasword: @ussd_string)
-          when '4'
-            check_paymoney_account_number
-            @current_ussd_session.update_attributes(session_identifier: @session_identifier, check_pw_account_url: @check_pw_account_url, check_pw_account_response: (@check_pw_account_response.body rescue 'ERR'), pw_account_number: @pw_account_number, pw_account_token: @pw_account_token)
-          # Saisie du numéro de compte de jeu
-          when '4-'
-            create_paymoney_account
-            @current_ussd_session.update_attributes(session_identifier: @session_identifier, creation_pw_request: @creation_pw_request, creation_pw_response: (@creation_pw_response.body rescue 'ERR'), pw_account_created: @pw_account_created)
-            if @pw_account_created == true
-              exit_menu(@sender_cb, "Vous allez recevoir un SMS avec les détails de votre portemonnaie de jeu.")
-            end
-          when '5--'
-            select_action_depending_on_mtn_main_menu_selection
-            if @status
-              case @ussd_string
-                when '1'
-                  reload_paymoney_with_mtn_money
-                  @current_ussd_session.update_attributes(session_identifier: @session_identifier)
-                when '2'
-                  display_parions_direct_gaming_chanels
-                  @current_ussd_session.update_attributes(session_identifier: @session_identifier)
-                when '3'
-                  display_mtn_home_menu_terms_and_conditions
-                  @current_ussd_session.update_attributes(session_identifier: @session_identifier)
+            when '0'
+              #authenticate_or_create_parionsdirect_account(@msisdn)
+              #UssdSession.create(session_identifier: @session_identifier, sender_cb: @sender_cb)
+            # Saisie du code secret de création de compte parionsdirect
+            when '1'
+              set_parionsdirect_password
+              @current_ussd_session.update_attributes(session_identifier: @session_identifier, creation_pd_password: @creation_pd_password)
+            # Saisie de la confirmation du code secret de création de compte parionsdirect
+            when '3'
+              create_parionsdirect_account
+              @current_ussd_session.update_attributes(session_identifier: @session_identifier, creation_pd_password_confirmation: @creation_pd_password_confirmation, creation_pd_request: @creation_pd_request, creation_pd_response: (@creation_pd_response.body rescue 'ERR'), pd_account_created: @pd_account_created)
+            when '2'
+              check_parionsdirect_password
+              @current_ussd_session.update_attributes(session_identifier: @session_identifier, connection_pd_pasword: @ussd_string)
+            when '4'
+              check_paymoney_account_number
+              @current_ussd_session.update_attributes(session_identifier: @session_identifier, check_pw_account_url: @check_pw_account_url, check_pw_account_response: (@check_pw_account_response.body rescue 'ERR'), pw_account_number: @pw_account_number, pw_account_token: @pw_account_token)
+            # Saisie du numéro de compte de jeu
+            when '4-'
+              create_paymoney_account
+              @current_ussd_session.update_attributes(session_identifier: @session_identifier, creation_pw_request: @creation_pw_request, creation_pw_response: (@creation_pw_response.body rescue 'ERR'), pw_account_created: @pw_account_created)
+              if @pw_account_created == true
+                exit_menu(@sender_cb, "Vous allez recevoir un SMS avec les détails de votre portemonnaie de jeu.")
               end
-            end
-          when '6--'
-            select_action_depending_on_mtn_gaming_channel_menu_selection
-            if @status
-              case @ussd_string
-                when '1'
-                  display_parions_direct_main_ussd_menu
-                  @current_ussd_session.update_attributes(session_identifier: @session_identifier)
-                when '2'
-                  display_parions_direct_web_link
-                  @current_ussd_session.update_attributes(session_identifier: @session_identifier)
-                when '3'
-                  display_parions_direct_apk_link
-                  @current_ussd_session.update_attributes(session_identifier: @session_identifier)
-                when '4'
-                  display_parions_direct_windows_phone_link
-                  @current_ussd_session.update_attributes(session_identifier: @session_identifier)
+            when '5--'
+              select_action_depending_on_mtn_main_menu_selection
+              if @status
+                case @ussd_string
+                  when '1'
+                    reload_paymoney_with_mtn_money
+                    @current_ussd_session.update_attributes(session_identifier: @session_identifier)
+                  when '2'
+                    display_parions_direct_gaming_chanels
+                    @current_ussd_session.update_attributes(session_identifier: @session_identifier)
+                  when '3'
+                    display_mtn_home_menu_terms_and_conditions
+                    @current_ussd_session.update_attributes(session_identifier: @session_identifier)
+                end
               end
-            end
-          when '7--'
-            display_mtn_reload_instructions_depending_on_reloading_menu_selection
-            if @status
-              case @ussd_string
-                when '0'
-                  back_list_main_menu
-                when '00'
-                  back_list_main_menu
-                when '1'
-                  enter_mtn_reload_amount
-                when '2'
-                  enter_other_account_mtn_reload_account_number
+            when '6--'
+              select_action_depending_on_mtn_gaming_channel_menu_selection
+              if @status
+                case @ussd_string
+                  when '1'
+                    display_parions_direct_main_ussd_menu
+                    @current_ussd_session.update_attributes(session_identifier: @session_identifier)
+                  when '2'
+                    display_parions_direct_web_link
+                    @current_ussd_session.update_attributes(session_identifier: @session_identifier)
+                  when '3'
+                    display_parions_direct_apk_link
+                    @current_ussd_session.update_attributes(session_identifier: @session_identifier)
+                  when '4'
+                    display_parions_direct_windows_phone_link
+                    @current_ussd_session.update_attributes(session_identifier: @session_identifier)
+                end
               end
+            when '7--'
+              display_mtn_reload_instructions_depending_on_reloading_menu_selection
+              if @status
+                case @ussd_string
+                  when '0'
+                    back_list_main_menu
+                  when '00'
+                    back_list_main_menu
+                  when '1'
+                    enter_mtn_reload_amount
+                  when '2'
+                    enter_other_account_mtn_reload_account_number
+                end
+                unless ['0', '00'].include?(@ussd_string)
+                  @current_ussd_session.update_attributes(session_identifier: @session_identifier)
+                end
+              end
+            when '8--'
+              get_reload_account
+              @current_ussd_session.update_attributes(session_identifier: @session_identifier, reload_account: @ussd_string)
+            when '9--'
+              display_mtn_reload_amount_with_fee
+              @current_ussd_session.update_attributes(session_identifier: @session_identifier, reload_amount: @ussd_string)
+            when '9---'
+              proceed_reloading
+              @current_ussd_session.update_attributes(session_identifier: @session_identifier, reload_amount: @ussd_string, reload_request: @reload_request, reload_response: @reload_response)
+            # Sélection d'un élément du menu
+            when '8'
+              # solde du compte de jeu
+              get_paymoney_sold
+              unless ['0', '00'].include?(@ussd_string)
+                @current_ussd_session.update_attributes(session_identifier: @session_identifier, paymoney_sold_url: @get_paymoney_sold_url, paymoney_sold_response: (@get_paymoney_sold_response.body rescue nil))
+              end
+            when '9'
+              # affichage de la liste des otp
+              get_paymoney_otp
+              unless ['0', '00'].include?(@ussd_string)
+                @current_ussd_session.update_attributes(session_identifier: @session_identifier, paymoney_otp_url: @get_paymoney_otp_url, paymoney_otp_response: (@get_paymoney_otp_response.body rescue nil))
+              end
+            when '10'
+              # retour au menu principal ou affichage des otp d'un autre compte
+              list_otp_set_session_identifier
               unless ['0', '00'].include?(@ussd_string)
                 @current_ussd_session.update_attributes(session_identifier: @session_identifier)
               end
-            end
-          when '8--'
-            get_reload_account
-            @current_ussd_session.update_attributes(session_identifier: @session_identifier, reload_account: @ussd_string)
-          when '9--'
-            display_mtn_reload_amount_with_fee
-            @current_ussd_session.update_attributes(session_identifier: @session_identifier, reload_amount: @ussd_string)
-          when '9---'
-            proceed_reloading
-            @current_ussd_session.update_attributes(session_identifier: @session_identifier, reload_amount: @ussd_string, reload_request: @reload_request, reload_response: @reload_response)
-          # Sélection d'un élément du menu
-          when '8'
-            # solde du compte de jeu
-            get_paymoney_sold
-            unless ['0', '00'].include?(@ussd_string)
-              @current_ussd_session.update_attributes(session_identifier: @session_identifier, paymoney_sold_url: @get_paymoney_sold_url, paymoney_sold_response: (@get_paymoney_sold_response.body rescue nil))
-            end
-          when '9'
-            # affichage de la liste des otp
-            get_paymoney_otp
-            unless ['0', '00'].include?(@ussd_string)
-              @current_ussd_session.update_attributes(session_identifier: @session_identifier, paymoney_otp_url: @get_paymoney_otp_url, paymoney_otp_response: (@get_paymoney_otp_response.body rescue nil))
-            end
-          when '10'
-            # retour au menu principal ou affichage des otp d'un autre compte
-            list_otp_set_session_identifier
-            unless ['0', '00'].include?(@ussd_string)
-              @current_ussd_session.update_attributes(session_identifier: @session_identifier)
-            end
-          when '5'
-            set_session_identifier_depending_on_menu_selected
-            if @status
-              case @ussd_string
-                when '1'
-                  display_games_menu
-                  @current_ussd_session.update_attributes(session_identifier: @session_identifier)
-                when '2'
-                  display_bet_games_list
-                  @current_ussd_session.update_attributes(session_identifier: @session_identifier)
-                when '3'
-                  get_paymoney_password_to_check_sold
-                  @current_ussd_session.update_attributes(session_identifier: @session_identifier)
-                when '4'
-                  @rendered_text = %Q[1- Recharger mon compte
-2- Recharger autre compte
-0- Retour
-00- Accueil]
-                  @session_identifier = '7--'
-                  @current_ussd_session.update_attributes(session_identifier: @session_identifier)
-                when '5'
+            when '5'
+              set_session_identifier_depending_on_menu_selected
+              if @status
+                case @ussd_string
+                  when '1'
+                    display_games_menu
+                    @current_ussd_session.update_attributes(session_identifier: @session_identifier)
+                  when '2'
+                    display_bet_games_list
+                    @current_ussd_session.update_attributes(session_identifier: @session_identifier)
+                  when '3'
+                    get_paymoney_password_to_check_sold
+                    @current_ussd_session.update_attributes(session_identifier: @session_identifier)
+                  when '4'
+                    @rendered_text = %Q[1- Recharger mon compte
+  2- Recharger autre compte
+  0- Retour
+  00- Accueil]
+                    @session_identifier = '7--'
+                    @current_ussd_session.update_attributes(session_identifier: @session_identifier)
+                  when '5'
 
-                when '6'
-                  get_paymoney_password_to_check_otp
-                  @current_ussd_session.update_attributes(session_identifier: @session_identifier)
-                when '7'
-                  display_default_paymoney_account
-                  @current_ussd_session.update_attributes(session_identifier: @session_identifier)
-                when '8'
-                  enter_mtn_unload_amount
-                  @current_ussd_session.update_attributes(session_identifier: @session_identifier)
+                  when '6'
+                    get_paymoney_password_to_check_otp
+                    @current_ussd_session.update_attributes(session_identifier: @session_identifier)
+                  when '7'
+                    display_default_paymoney_account
+                    @current_ussd_session.update_attributes(session_identifier: @session_identifier)
+                  when '8'
+                    enter_mtn_unload_amount
+                    @current_ussd_session.update_attributes(session_identifier: @session_identifier)
+                end
               end
-            end
-          when '10--'
-            get_unload_amount
-            @current_ussd_session.update_attributes(session_identifier: @session_identifier, unload_amount: @ussd_string)
-          when '11--'
-            proceed_unloading
-            @current_ussd_session.update_attributes(session_identifier: @session_identifier, unload_request: @unload_request, unload_response: @unload_response)
-          when '39'
-            get_paymoney_other_account_number
-            unless ['0', '00'].include?(@ussd_string)
-              @current_ussd_session.update_attributes(session_identifier: @session_identifier, other_paymoney_account_number: @ussd_string)
-            end
-          when '40'
-            get_paymoney_other_account_password
-            unless ['0', '00'].include?(@ussd_string)
-              @current_ussd_session.update_attributes(session_identifier: @session_identifier, other_paymoney_account_password: @ussd_string, paymoney_sold_url: @get_paymoney_sold_url, paymoney_sold_response: (@get_paymoney_sold_response.body rescue nil))
-            end
-          when '41'
-            get_paymoney_other_otp_account_number
-            unless ['0', '00'].include?(@ussd_string)
-              @current_ussd_session.update_attributes(session_identifier: @session_identifier, other_otp_paymoney_account_number: @ussd_string)
-            end
-          when '42'
-            get_paymoney_other_otp_account_password
-            unless ['0', '00'].include?(@ussd_string)
-              @current_ussd_session.update_attributes(session_identifier: @session_identifier, other_otp_paymoney_account_password: @ussd_string)
-            end
-          when '43'
-            set_default_paymoney_account
-            unless ['0', '00'].include?(@ussd_string)
+            when '10--'
+              get_unload_amount
+              @current_ussd_session.update_attributes(session_identifier: @session_identifier, unload_amount: @ussd_string)
+            when '11--'
+              proceed_unloading
+              @current_ussd_session.update_attributes(session_identifier: @session_identifier, unload_request: @unload_request, unload_response: @unload_response)
+            when '39'
+              get_paymoney_other_account_number
+              unless ['0', '00'].include?(@ussd_string)
+                @current_ussd_session.update_attributes(session_identifier: @session_identifier, other_paymoney_account_number: @ussd_string)
+              end
+            when '40'
+              get_paymoney_other_account_password
+              unless ['0', '00'].include?(@ussd_string)
+                @current_ussd_session.update_attributes(session_identifier: @session_identifier, other_paymoney_account_password: @ussd_string, paymoney_sold_url: @get_paymoney_sold_url, paymoney_sold_response: (@get_paymoney_sold_response.body rescue nil))
+              end
+            when '41'
+              get_paymoney_other_otp_account_number
+              unless ['0', '00'].include?(@ussd_string)
+                @current_ussd_session.update_attributes(session_identifier: @session_identifier, other_otp_paymoney_account_number: @ussd_string)
+              end
+            when '42'
+              get_paymoney_other_otp_account_password
+              unless ['0', '00'].include?(@ussd_string)
+                @current_ussd_session.update_attributes(session_identifier: @session_identifier, other_otp_paymoney_account_password: @ussd_string)
+              end
+            when '43'
+              set_default_paymoney_account
+              unless ['0', '00'].include?(@ussd_string)
+                @current_ussd_session.update_attributes(session_identifier: @session_identifier)
+              end
+            when '44'
+              set_session_identifier_depending_game_list_selected
+              if @status
+                case @ussd_string
+                  when '0'
+                    back_list_main_menu
+                  when '00'
+                    back_list_main_menu
+                  when '1'
+                    list_loto_bets
+                  when '2'
+                    list_alr_bets
+                  when '3'
+                    list_plr_bets
+                  when '4'
+                    list_sportcash_bets
+                end
+              end
+              unless ['0', '00'].include?(@ussd_string)
+                @current_ussd_session.update_attributes(session_identifier: @session_identifier, loto_bets_list_request: @loto_bets_list_request, loto_bets_list_request: @loto_bets_list_response, plr_bets_list_request: @plr_bets_list_request, plr_bets_list_request: @plr_bets_list_response, ale_bets_list_request: @alr_bets_list_request, alr_bets_list_request: @alr_bets_list_response, spc_bets_list_request: @spc_bets_list_request, spc_bets_list_request: @spc_bets_list_response)
+              end
+            when '45'
+              return_to_games_bets_list
               @current_ussd_session.update_attributes(session_identifier: @session_identifier)
-            end
-          when '44'
-            set_session_identifier_depending_game_list_selected
-            if @status
-              case @ussd_string
-                when '0'
-                  back_list_main_menu
-                when '00'
-                  back_list_main_menu
-                when '1'
-                  list_loto_bets
-                when '2'
-                  list_alr_bets
-                when '3'
-                  list_plr_bets
-                when '4'
-                  list_sportcash_bets
+            when '46'
+              return_to_games_bets_list
+              @current_ussd_session.update_attributes(session_identifier: @session_identifier)
+            when '47'
+              return_to_games_bets_list
+              @current_ussd_session.update_attributes(session_identifier: @session_identifier)
+            when '48'
+              return_to_games_bets_list
+              @current_ussd_session.update_attributes(session_identifier: @session_identifier)
+            # Affichage du menu listant les jeux
+            when '11'
+              set_session_identifier_depending_on_game_selected
+              if @status
+                case @ussd_string
+                  when '0'
+                    back_list_main_menu
+                  when '00'
+                    back_list_main_menu
+                  when '1'
+                    loto_display_draw_day
+                    @current_ussd_session.update_attributes(session_identifier: @session_identifier)
+                  when '2'
+                    alr_display_races
+                    @current_ussd_session.update_attributes(session_identifier: @session_identifier, alr_get_current_program_request: @alr_get_current_program_request, alr_get_current_program_response: @alr_get_current_program_response.body, alr_program_id: @alr_program_id, alr_program_date: @alr_program_date, alr_program_status: @alr_program_status, alr_race_ids: @alr_race_ids.to_s, alr_race_list_request: @alr_race_list_request, alr_race_list_response: @alr_race_list_response.body, race_data: @race_data.to_s)
+                  when '3'
+                    plr_get_reunion
+                    @current_ussd_session.update_attributes(session_identifier: @session_identifier, get_plr_race_list_request: @get_plr_race_list_request, get_plr_race_list_response: @get_plr_race_list_response)
+                  when '4'
+                    sportcash_main_menu
+                    @current_ussd_session.update_attributes(session_identifier: @session_identifier)
+                end
               end
-            end
-            unless ['0', '00'].include?(@ussd_string)
-              @current_ussd_session.update_attributes(session_identifier: @session_identifier, loto_bets_list_request: @loto_bets_list_request, loto_bets_list_request: @loto_bets_list_response, plr_bets_list_request: @plr_bets_list_request, plr_bets_list_request: @plr_bets_list_response, ale_bets_list_request: @alr_bets_list_request, alr_bets_list_request: @alr_bets_list_response, spc_bets_list_request: @spc_bets_list_request, spc_bets_list_request: @spc_bets_list_response)
-            end
-          when '45'
-            return_to_games_bets_list
-            @current_ussd_session.update_attributes(session_identifier: @session_identifier)
-          when '46'
-            return_to_games_bets_list
-            @current_ussd_session.update_attributes(session_identifier: @session_identifier)
-          when '47'
-            return_to_games_bets_list
-            @current_ussd_session.update_attributes(session_identifier: @session_identifier)
-          when '48'
-            return_to_games_bets_list
-            @current_ussd_session.update_attributes(session_identifier: @session_identifier)
-          # Affichage du menu listant les jeux
-          when '11'
-            set_session_identifier_depending_on_game_selected
-            if @status
-              case @ussd_string
-                when '0'
-                  back_list_main_menu
-                when '00'
-                  back_list_main_menu
-                when '1'
-                  loto_display_draw_day
-                  @current_ussd_session.update_attributes(session_identifier: @session_identifier)
-                when '2'
-                  alr_display_races
-                  @current_ussd_session.update_attributes(session_identifier: @session_identifier, alr_get_current_program_request: @alr_get_current_program_request, alr_get_current_program_response: @alr_get_current_program_response.body, alr_program_id: @alr_program_id, alr_program_date: @alr_program_date, alr_program_status: @alr_program_status, alr_race_ids: @alr_race_ids.to_s, alr_race_list_request: @alr_race_list_request, alr_race_list_response: @alr_race_list_response.body, race_data: @race_data.to_s)
-                when '3'
-                  plr_get_reunion
-                  @current_ussd_session.update_attributes(session_identifier: @session_identifier, get_plr_race_list_request: @get_plr_race_list_request, get_plr_race_list_response: @get_plr_race_list_response)
-                when '4'
-                  sportcash_main_menu
-                  @current_ussd_session.update_attributes(session_identifier: @session_identifier)
+            # Choix du jour de tirage
+            when '12'
+              set_session_identifier_depending_on_draw_day_selected
+              if @status
+                reference_date = "01/01/#{Date.today.year} 19:00:00"
+                case @ussd_string
+                  when '0'
+                    back_list_games_menu
+                  when '00'
+                    back_list_main_menu
+                  when '1'
+                    @draw_day_label = "Etoile #{(35 + DateTime.parse(reference_date).upto(DateTime.now).count(&:monday?)).to_s}"
+                    @draw_day_shortcut = 'etoile'
+                  when '2'
+                    @draw_day_label = "Emergence #{(36 + DateTime.parse(reference_date).upto(DateTime.now).count(&:tuesday?)).to_s}"
+                    @draw_day_shortcut = 'emergence'
+                  when '3'
+                    @draw_day_label = "Fortune #{(44 + DateTime.parse(reference_date).upto(DateTime.now).count(&:wednesday?)).to_s}"
+                    @draw_day_shortcut = 'fortune'
+                  when '4'
+                    @draw_day_label = "Privilège #{(36 + DateTime.parse(reference_date).upto(DateTime.now).count(&:thursday?)).to_s}"
+                    @draw_day_shortcut = 'privilege'
+                  when '5'
+                    @draw_day_label = "Solution #{(36 + DateTime.parse(reference_date).upto(DateTime.now).count(&:friday?)).to_s}"
+                    @draw_day_shortcut = 'solution'
+                  when '6'
+                    @draw_day_label = "Diamant #{(45 + DateTime.parse(reference_date).upto(DateTime.now).count(&:saturday?)).to_s}"
+                    @draw_day_shortcut = 'diamant'
+                end
+                unless ['0', '00'].include?(@ussd_string)
+                  loto_display_bet_selection
+                  @current_ussd_session.update_attributes(session_identifier: @session_identifier, draw_day_label: @draw_day_label, draw_day_shortcut: @draw_day_shortcut)
+                end
               end
-            end
-          # Choix du jour de tirage
-          when '12'
-            set_session_identifier_depending_on_draw_day_selected
-            if @status
-              reference_date = "01/01/#{Date.today.year} 19:00:00"
-              case @ussd_string
-                when '0'
-                  back_list_games_menu
-                when '00'
-                  back_list_main_menu
-                when '1'
-                  @draw_day_label = "Etoile #{(35 + DateTime.parse(reference_date).upto(DateTime.now).count(&:monday?)).to_s}"
-                  @draw_day_shortcut = 'etoile'
-                when '2'
-                  @draw_day_label = "Emergence #{(36 + DateTime.parse(reference_date).upto(DateTime.now).count(&:tuesday?)).to_s}"
-                  @draw_day_shortcut = 'emergence'
-                when '3'
-                  @draw_day_label = "Fortune #{(44 + DateTime.parse(reference_date).upto(DateTime.now).count(&:wednesday?)).to_s}"
-                  @draw_day_shortcut = 'fortune'
-                when '4'
-                  @draw_day_label = "Privilège #{(36 + DateTime.parse(reference_date).upto(DateTime.now).count(&:thursday?)).to_s}"
-                  @draw_day_shortcut = 'privilege'
-                when '5'
-                  @draw_day_label = "Solution #{(36 + DateTime.parse(reference_date).upto(DateTime.now).count(&:friday?)).to_s}"
-                  @draw_day_shortcut = 'solution'
-                when '6'
-                  @draw_day_label = "Diamant #{(45 + DateTime.parse(reference_date).upto(DateTime.now).count(&:saturday?)).to_s}"
-                  @draw_day_shortcut = 'diamant'
+            # Choix de la sélection
+            when '13'
+              set_session_identifier_depending_on_bet_selection_selected
+              if @status
+                case @ussd_string
+                  when '0'
+                    back_display_loto_draw_day
+                  when '00'
+                    back_list_main_menu
+                  when '1'
+                    @bet_selection = "PN"
+                    @bet_selection_shortcut = 'pn'
+                  when '2'
+                    @bet_selection = "2N"
+                    @bet_selection_shortcut = '2n'
+                  when '3'
+                    @bet_selection = "3N"
+                    @bet_selection_shortcut = '3n'
+                  when '4'
+                    @bet_selection = "4N"
+                    @bet_selection_shortcut = '4n'
+                  when '5'
+                    @bet_selection = "5N"
+                    @bet_selection_shortcut = '5n'
+                end
+                unless ['0', '00'].include?(@ussd_string)
+                  loto_display_formula_selection
+                  @current_ussd_session.update_attributes(session_identifier: @session_identifier, bet_selection: @bet_selection, bet_selection_shortcut: @bet_selection_shortcut)
+                end
               end
-              unless ['0', '00'].include?(@ussd_string)
-                loto_display_bet_selection
-                @current_ussd_session.update_attributes(session_identifier: @session_identifier, draw_day_label: @draw_day_label, draw_day_shortcut: @draw_day_shortcut)
+            when '14'
+              set_session_identifier_depending_on_formula_selected
+              if @status
+                case @ussd_string
+                  when '0'
+                    back_display_bet_selection
+                  when '00'
+                    back_list_main_menu
+                  when '1'
+                    @formula_label = "Simple"
+                    @formula_shortcut = 'simple'
+                    loto_bet_modifier = '0'
+                  when '2'
+                    @formula_label = "Perm"
+                    @formula_shortcut = 'perm'
+                    loto_bet_modifier = '0'
+                  when '3'
+                    @formula_label = "Champ réduit"
+                    @formula_shortcut = 'champ_reduit'
+                    loto_bet_modifier = '2'
+                  when '4'
+                    @formula_label = "Champ total"
+                    @formula_shortcut = 'champ_total'
+                    loto_bet_modifier = '1'
+                end
+                unless ['0', '00'].include?(@ussd_string)
+                  loto_display_horse_selection_fields
+                  @current_ussd_session.update_attributes(session_identifier: @session_identifier, formula_label: @formula_label, formula_shortcut: @formula_shortcut, loto_bet_modifier: loto_bet_modifier)
+                end
               end
-            end
-          # Choix de la sélection
-          when '13'
-            set_session_identifier_depending_on_bet_selection_selected
-            if @status
-              case @ussd_string
-                when '0'
-                  back_display_loto_draw_day
-                when '00'
-                  back_list_main_menu
-                when '1'
-                  @bet_selection = "PN"
-                  @bet_selection_shortcut = 'pn'
-                when '2'
-                  @bet_selection = "2N"
-                  @bet_selection_shortcut = '2n'
-                when '3'
-                  @bet_selection = "3N"
-                  @bet_selection_shortcut = '3n'
-                when '4'
-                  @bet_selection = "4N"
-                  @bet_selection_shortcut = '4n'
-                when '5'
-                  @bet_selection = "5N"
-                  @bet_selection_shortcut = '5n'
+            # Saisie de la base au loto
+            when '15'
+              # Vérification des numéros de base saisis et de leur tranche
+              loto_check_base_numbers
+              @current_ussd_session.update_attributes(session_identifier: @session_identifier, base_field: @ussd_string)
+            when '16'
+              # Vérification des numéros de sélection saisis et de leur tranche
+              loto_check_selection_numbers
+              @current_ussd_session.update_attributes(session_identifier: @session_identifier, selection_field: @selection_field)
+            when '17'
+              # Saisie de la mise de base et affichage de l'évaluation du pari
+              loto_evaluate_bet
+              @current_ussd_session.update_attributes(session_identifier: @session_identifier, stake: @ussd_string + '-' + @repeats.to_s)
+            when '18'
+              # Prise du pari à la saisie du code secret de jeu
+              @account_profile = AccountProfile.find_by_msisdn(@msisdn[-8,8])
+              loto_place_bet
+              @current_ussd_session.update_attributes(session_identifier: @session_identifier, loto_bet_paymoney_password: @ussd_string, loto_place_bet_url: @loto_place_bet_url.to_s + @request_body.to_s, loto_place_bet_response: (@loto_place_bet_response.body rescue nil), get_gamer_id_request: @get_gamer_id_request, get_gamer_id_response: (@get_gamer_id_response.body rescue nil))
+            when '20'
+              # Vérification du numéro de réunion entré et sélection de la course
+              plr_get_race
+              @current_ussd_session.update_attributes(session_identifier: @session_identifier, get_plr_race_list_request: @get_plr_race_list_request, get_plr_race_list_response: @get_plr_race_list_response, plr_reunion_number: @ussd_string)
+            when '21'
+              # Vérification du numéro de course entré
+              plr_game_selection
+              @current_ussd_session.update_attributes(session_identifier: @session_identifier, plr_race_number: @ussd_string)
+            when '22'
+              set_session_identifier_depending_on_plr_game_selection
+              if @status
+                case @ussd_string
+                  when '0'
+                    back_to_plr_get_race
+                  when '00'
+                    back_list_main_menu
+                  when '1'
+                    # Affichage des types de paris
+                    display_plr_bet_type
+                    @current_ussd_session.update_attributes(session_identifier: @session_identifier)
+                  when '2'
+                    # Affichage des détails de course
+                    display_plr_race_details
+                    @current_ussd_session.update_attributes(session_identifier: @session_identifier, plr_race_details_request: @plr_race_details_request, plr_race_details_response: @plr_race_details_response)
+                end
               end
-              unless ['0', '00'].include?(@ussd_string)
-                loto_display_formula_selection
-                @current_ussd_session.update_attributes(session_identifier: @session_identifier, bet_selection: @bet_selection, bet_selection_shortcut: @bet_selection_shortcut)
-              end
-            end
-          when '14'
-            set_session_identifier_depending_on_formula_selected
-            if @status
-              case @ussd_string
-                when '0'
-                  back_display_bet_selection
-                when '00'
-                  back_list_main_menu
-                when '1'
-                  @formula_label = "Simple"
-                  @formula_shortcut = 'simple'
-                  loto_bet_modifier = '0'
-                when '2'
-                  @formula_label = "Perm"
-                  @formula_shortcut = 'perm'
-                  loto_bet_modifier = '0'
-                when '3'
-                  @formula_label = "Champ réduit"
-                  @formula_shortcut = 'champ_reduit'
-                  loto_bet_modifier = '2'
-                when '4'
-                  @formula_label = "Champ total"
-                  @formula_shortcut = 'champ_total'
-                  loto_bet_modifier = '1'
-              end
-              unless ['0', '00'].include?(@ussd_string)
-                loto_display_horse_selection_fields
-                @current_ussd_session.update_attributes(session_identifier: @session_identifier, formula_label: @formula_label, formula_shortcut: @formula_shortcut, loto_bet_modifier: loto_bet_modifier)
-              end
-            end
-          # Saisie de la base au loto
-          when '15'
-            # Vérification des numéros de base saisis et de leur tranche
-            loto_check_base_numbers
-            @current_ussd_session.update_attributes(session_identifier: @session_identifier, base_field: @ussd_string)
-          when '16'
-            # Vérification des numéros de sélection saisis et de leur tranche
-            loto_check_selection_numbers
-            @current_ussd_session.update_attributes(session_identifier: @session_identifier, selection_field: @selection_field)
-          when '17'
-            # Saisie de la mise de base et affichage de l'évaluation du pari
-            loto_evaluate_bet
-            @current_ussd_session.update_attributes(session_identifier: @session_identifier, stake: @ussd_string + '-' + @repeats.to_s)
-          when '18'
-            # Prise du pari à la saisie du code secret de jeu
-            @account_profile = AccountProfile.find_by_msisdn(@msisdn[-8,8])
-            loto_place_bet
-            @current_ussd_session.update_attributes(session_identifier: @session_identifier, loto_bet_paymoney_password: @ussd_string, loto_place_bet_url: @loto_place_bet_url.to_s + @request_body.to_s, loto_place_bet_response: (@loto_place_bet_response.body rescue nil), get_gamer_id_request: @get_gamer_id_request, get_gamer_id_response: (@get_gamer_id_response.body rescue nil))
-          when '20'
-            # Vérification du numéro de réunion entré et sélection de la course
-            plr_get_race
-            @current_ussd_session.update_attributes(session_identifier: @session_identifier, get_plr_race_list_request: @get_plr_race_list_request, get_plr_race_list_response: @get_plr_race_list_response, plr_reunion_number: @ussd_string)
-          when '21'
-            # Vérification du numéro de course entré
-            plr_game_selection
-            @current_ussd_session.update_attributes(session_identifier: @session_identifier, plr_race_number: @ussd_string)
-          when '22'
-            set_session_identifier_depending_on_plr_game_selection
-            if @status
+            when '22-'
               case @ussd_string
                 when '0'
                   back_to_plr_get_race
                 when '00'
                   back_list_main_menu
-                when '1'
-                  # Affichage des types de paris
-                  display_plr_bet_type
-                  @current_ussd_session.update_attributes(session_identifier: @session_identifier)
-                when '2'
-                  # Affichage des détails de course
+                else
                   display_plr_race_details
-                  @current_ussd_session.update_attributes(session_identifier: @session_identifier, plr_race_details_request: @plr_race_details_request, plr_race_details_response: @plr_race_details_response)
+                end
+            when '23'
+              set_session_identifier_depending_on_plr_bet_type_selected
+              if @status
+                case @ussd_string
+                  when '0'
+                    back_to_plr_gaming_menu
+                  when '00'
+                    back_list_main_menu
+                  when '1'
+                    @plr_bet_type_label = 'Trio'
+                    @plr_bet_type_shortcut = 'trio'
+                    plr_display_plr_formula
+                  when '2'
+                    @plr_bet_type_label = "Jumelé gagnant"
+                    @plr_bet_type_shortcut = 'jumele_gagnant'
+                    plr_display_plr_formula
+                  when '3'
+                    @plr_bet_type_label = "Jumelé placé"
+                    @plr_bet_type_shortcut = 'jumele_place'
+                    plr_display_plr_formula
+                  when '4'
+                    @plr_bet_type_label = "Simple gagnant"
+                    @plr_bet_type_shortcut = 'simple_gagnant'
+                    plr_display_plr_selection
+                  when '5'
+                    @plr_bet_type_label = "Simple placé"
+                    @plr_bet_type_shortcut = 'simple_place'
+                    plr_display_plr_selection
+                end
+                unless ['0', '00'].include?(@ussd_string)
+                  @current_ussd_session.update_attributes(session_identifier: @session_identifier, plr_bet_type_label: @plr_bet_type_label, plr_bet_type_shortcut: @plr_bet_type_shortcut)
+                end
               end
-            end
-          when '22-'
-            case @ussd_string
-              when '0'
-                back_to_plr_get_race
-              when '00'
-                back_list_main_menu
-              else
-                display_plr_race_details
-              end
-          when '23'
-            set_session_identifier_depending_on_plr_bet_type_selected
-            if @status
-              case @ussd_string
-                when '0'
-                  back_to_plr_gaming_menu
-                when '00'
-                  back_list_main_menu
-                when '1'
-                  @plr_bet_type_label = 'Trio'
-                  @plr_bet_type_shortcut = 'trio'
-                  plr_display_plr_formula
-                when '2'
-                  @plr_bet_type_label = "Jumelé gagnant"
-                  @plr_bet_type_shortcut = 'jumele_gagnant'
-                  plr_display_plr_formula
-                when '3'
-                  @plr_bet_type_label = "Jumelé placé"
-                  @plr_bet_type_shortcut = 'jumele_place'
-                  plr_display_plr_formula
-                when '4'
-                  @plr_bet_type_label = "Simple gagnant"
-                  @plr_bet_type_shortcut = 'simple_gagnant'
-                  plr_display_plr_selection
-                when '5'
-                  @plr_bet_type_label = "Simple placé"
-                  @plr_bet_type_shortcut = 'simple_place'
-                  plr_display_plr_selection
+            when '24'
+              set_session_identifier_depending_on_plr_formula_selected
+              if @status
+                case @ussd_string
+                  when '0'
+                    back_to_plr_bet_type
+                  when '00'
+                    back_list_main_menu
+                  when '1'
+                    @plr_formula_label = 'Long champs'
+                    @plr_formula_shortcut = 'long_champs'
+                    plr_display_plr_selection
+                  when '2'
+                    @plr_formula_label = 'Champ réduit'
+                    @plr_formula_shortcut = 'champ_reduit'
+                    plr_display_plr_base
+                  when '3'
+                    @plr_formula_label = 'Champ total'
+                    @plr_formula_shortcut = 'champ_total'
+                    plr_display_plr_base
+                end
               end
               unless ['0', '00'].include?(@ussd_string)
-                @current_ussd_session.update_attributes(session_identifier: @session_identifier, plr_bet_type_label: @plr_bet_type_label, plr_bet_type_shortcut: @plr_bet_type_shortcut)
+                @current_ussd_session.update_attributes(session_identifier: @session_identifier, plr_formula_label: @plr_formula_label, plr_formula_shortcut: @plr_formula_shortcut)
               end
-            end
-          when '24'
-            set_session_identifier_depending_on_plr_formula_selected
-            if @status
-              case @ussd_string
-                when '0'
-                  back_to_plr_bet_type
-                when '00'
-                  back_list_main_menu
-                when '1'
-                  @plr_formula_label = 'Long champs'
-                  @plr_formula_shortcut = 'long_champs'
-                  plr_display_plr_selection
-                when '2'
-                  @plr_formula_label = 'Champ réduit'
-                  @plr_formula_shortcut = 'champ_reduit'
-                  plr_display_plr_base
-                when '3'
-                  @plr_formula_label = 'Champ total'
-                  @plr_formula_shortcut = 'champ_total'
-                  plr_display_plr_base
+            when '25'
+              plr_selection_or_stake_depending_on_formula
+              unless ['0', '00'].include?(@ussd_string)
+                @current_ussd_session.update_attributes(session_identifier: @session_identifier, plr_base: @ussd_string)
               end
-            end
-            unless ['0', '00'].include?(@ussd_string)
-              @current_ussd_session.update_attributes(session_identifier: @session_identifier, plr_formula_label: @plr_formula_label, plr_formula_shortcut: @plr_formula_shortcut)
-            end
-          when '25'
-            plr_selection_or_stake_depending_on_formula
-            unless ['0', '00'].include?(@ussd_string)
-              @current_ussd_session.update_attributes(session_identifier: @session_identifier, plr_base: @ussd_string)
-            end
-          # PLR, sélectionner le nombre de fois
-          when '26'
-            plr_select_number_of_times
-            unless ['0', '00'].include?(@ussd_string)
-              @current_ussd_session.update_attributes(session_identifier: @session_identifier, plr_selection: @ussd_string)
-            end
-          when '27'
-            plr_evaluate_bet
-            unless ['0', '00'].include?(@ussd_string)
-              @current_ussd_session.update_attributes(session_identifier: @session_identifier, plr_number_of_times: @ussd_string, plr_evaluate_bet_request: @plr_evaluate_bet_request + @request_body, plr_evaluate_bet_response: @plr_evaluate_bet_response, bet_cost_amount: @bet_cost_amount)
-            end
-          when '28'
-            @account_profile = AccountProfile.find_by_msisdn(@msisdn[-8,8])
-            plr_place_bet
-            unless ['0', '00'].include?(@ussd_string)
-              @current_ussd_session.update_attributes(session_identifier: @session_identifier, plr_number_of_times: @plr_number_of_times, plr_place_bet_request: @plr_place_bet_request + @body, plr_place_bet_response: @plr_place_bet_response.body)
-            end
-          when '30'
-            alr_display_bet_type
-            unless ['0', '00'].include?(@ussd_string)
-              @current_ussd_session.update_attributes(session_identifier: @session_identifier, national_label: @national_label, national_shortcut: @national_shortcut, alr_bet_type_menu: @alr_bet_type_menu)
-            end
-          when '31'
-            alr_display_formula
-            unless ['0', '00'].include?(@ussd_string)
-              @current_ussd_session.update_attributes(session_identifier: @session_identifier, alr_bet_type_label: @bet_type_label, alr_bet_id: @alr_bet_id)
-            end
-          when '32'
-            set_session_identifier_depending_on_alr_bet_type_selected
-            if @status
-              case @ussd_string
-                when '0'
-                  back_to_alr_display_formula
-                when '00'
-                  back_list_main_menu
-                when '1'
-                  alr_select_horses
-                  alr_formula_label = 'Long champs'
-                  alr_formula_shortcut = 'longchamps'
-                when '2'
-                  alr_select_base
-                  alr_formula_label = 'Champ réduit'
-                  alr_formula_shortcut = 'champ_reduit'
-                when '3'
-                  alr_select_base
-                  alr_formula_label = 'Champ total'
-                  alr_formula_shortcut = 'champ_total'
+            # PLR, sélectionner le nombre de fois
+            when '26'
+              plr_select_number_of_times
+              unless ['0', '00'].include?(@ussd_string)
+                @current_ussd_session.update_attributes(session_identifier: @session_identifier, plr_selection: @ussd_string)
               end
-            end
-            unless ['0', '00'].include?(@ussd_string)
-              @current_ussd_session.update_attributes(session_identifier: @session_identifier, alr_formula_label: alr_formula_label, alr_formula_shortcut: alr_formula_shortcut)
-            end
-          when '33'
-            set_session_identifier_depending_on_alr_multi_selected
-            if @status
-              case @ussd_string
-                when '0'
-                  back_to_alr_display_formula
-                when '00'
-                  back_list_main_menu
-                when '1'
-                  alr_select_horses
-                  alr_formula_label = 'Multi 4/4'
-                  alr_formula_shortcut = ' 4/4'
-                when '2'
-                  alr_select_horses
-                  alr_formula_label = 'Multi 4/5'
-                  alr_formula_shortcut = ' 4/5'
-                when '3'
-                  alr_select_horses
-                  alr_formula_label = 'Multi 4/6'
-                  alr_formula_shortcut = ' 4/6'
-                when '4'
-                  alr_select_horses
-                  alr_formula_label = 'Multi 4/7'
-                  alr_formula_shortcut = ' 4/7'
+            when '27'
+              plr_evaluate_bet
+              unless ['0', '00'].include?(@ussd_string)
+                @current_ussd_session.update_attributes(session_identifier: @session_identifier, plr_number_of_times: @ussd_string, plr_evaluate_bet_request: @plr_evaluate_bet_request + @request_body, plr_evaluate_bet_response: @plr_evaluate_bet_response, bet_cost_amount: @bet_cost_amount)
               end
-            end
-            unless ['0', '00'].include?(@ussd_string)
-              @current_ussd_session.update_attributes(session_identifier: @session_identifier, alr_formula_label: alr_formula_label, alr_formula_shortcut: alr_formula_shortcut)
-            end
-          when '34'
-            validate_alr_base
-            unless ['0', '00'].include?(@ussd_string)
-              @current_ussd_session.update_attributes(session_identifier: @session_identifier, alr_base: @ussd_string)
-            end
-          when '35'
-            validate_alr_horses
-            unless ['0', '00'].include?(@ussd_string)
-              @current_ussd_session.update_attributes(session_identifier: @session_identifier, alr_selection: @ussd_string)
-            end
-          when '36'
-            alr_set_full_formula
-            unless ['0', '00'].include?(@ussd_string)
-              @current_ussd_session.update_attributes(session_identifier: @session_identifier, full_formula: @full_formula)
-            end
-          when '37'
-            alr_evaluate_bet
-            unless ['0', '00'].include?(@ussd_string)
-              @current_ussd_session.update_attributes(session_identifier: @session_identifier, alr_stake: @ussd_string, alr_evaluate_bet_request: @alr_evaluate_bet_request + @body, alr_evaluate_bet_response: @alr_evaluate_bet_response.body, alr_scratched_list: @alr_scratched_list.to_s, alr_combinations: @alr_combinations.to_s, alr_amount: @alr_amount)
-            end
-          when '38'
-            @account_profile = AccountProfile.find_by_msisdn(@msisdn[-8,8])
-            alr_place_bet
-            unless ['0', '00'].include?(@ussd_string)
-              @current_ussd_session.update_attributes(session_identifier: @session_identifier, alr_place_bet_request: @alr_place_bet_request + @body, alr_place_bet_response: @alr_place_bet_response.body, get_gamer_id_request: @get_gamer_id_request, get_gamer_id_response: @get_gamer_id_response.body)
-            end
-          when '49'
-            set_session_identifier_sportcash_main_menu_selected
-            if @status
-              case @ussd_string
-                when '0'
-                  back_list_games_menu
-                when '00'
-                  back_list_main_menu
-                when '1'
-                  list_sportcash_sports
-                when '2'
-                  spc_top_match
-                  @current_ussd_session.update_attributes(session_identifier: @session_identifier, events_trash: @events_trash, spc_event_list_request: @spc_event_list_request, spc_event_list_response: @spc_event_list_response)
-                when '3'
-                  spc_last_minute_match
-                  @current_ussd_session.update_attributes(session_identifier: @session_identifier, events_trash: @events_trash, spc_event_list_request: @spc_event_list_request, spc_event_list_response: @spc_event_list_response)
-                when '4'
-                  spc_list_opportunities
-                  @current_ussd_session.update_attributes(session_identifier: @session_identifier, opportunities_trash: @opportunities_trash, spc_opportunities_list_request: @spc_opportunities_list_request, spc_opportunities_list_response: @spc_opportunities_list_response)
-                when '5'
-                  spc_live_match
-                  @current_ussd_session.update_attributes(session_identifier: @session_identifier, events_trash: @events_trash, spc_event_list_request: @spc_event_list_request, spc_event_list_response: @spc_event_list_response, spc_live: @spc_live)
-                when '6'
-                  spc_get_event_code
-                  @current_ussd_session.update_attributes(session_identifier: @session_identifier)
+            when '28'
+              @account_profile = AccountProfile.find_by_msisdn(@msisdn[-8,8])
+              plr_place_bet
+              unless ['0', '00'].include?(@ussd_string)
+                @current_ussd_session.update_attributes(session_identifier: @session_identifier, plr_number_of_times: @plr_number_of_times, plr_place_bet_request: @plr_place_bet_request + @body, plr_place_bet_response: @plr_place_bet_response.body)
               end
+            when '30'
+              alr_display_bet_type
+              unless ['0', '00'].include?(@ussd_string)
+                @current_ussd_session.update_attributes(session_identifier: @session_identifier, national_label: @national_label, national_shortcut: @national_shortcut, alr_bet_type_menu: @alr_bet_type_menu)
+              end
+            when '31'
+              alr_display_formula
+              unless ['0', '00'].include?(@ussd_string)
+                @current_ussd_session.update_attributes(session_identifier: @session_identifier, alr_bet_type_label: @bet_type_label, alr_bet_id: @alr_bet_id)
+              end
+            when '32'
+              set_session_identifier_depending_on_alr_bet_type_selected
+              if @status
+                case @ussd_string
+                  when '0'
+                    back_to_alr_display_formula
+                  when '00'
+                    back_list_main_menu
+                  when '1'
+                    alr_select_horses
+                    alr_formula_label = 'Long champs'
+                    alr_formula_shortcut = 'longchamps'
+                  when '2'
+                    alr_select_base
+                    alr_formula_label = 'Champ réduit'
+                    alr_formula_shortcut = 'champ_reduit'
+                  when '3'
+                    alr_select_base
+                    alr_formula_label = 'Champ total'
+                    alr_formula_shortcut = 'champ_total'
+                end
+              end
+              unless ['0', '00'].include?(@ussd_string)
+                @current_ussd_session.update_attributes(session_identifier: @session_identifier, alr_formula_label: alr_formula_label, alr_formula_shortcut: alr_formula_shortcut)
+              end
+            when '33'
+              set_session_identifier_depending_on_alr_multi_selected
+              if @status
+                case @ussd_string
+                  when '0'
+                    back_to_alr_display_formula
+                  when '00'
+                    back_list_main_menu
+                  when '1'
+                    alr_select_horses
+                    alr_formula_label = 'Multi 4/4'
+                    alr_formula_shortcut = ' 4/4'
+                  when '2'
+                    alr_select_horses
+                    alr_formula_label = 'Multi 4/5'
+                    alr_formula_shortcut = ' 4/5'
+                  when '3'
+                    alr_select_horses
+                    alr_formula_label = 'Multi 4/6'
+                    alr_formula_shortcut = ' 4/6'
+                  when '4'
+                    alr_select_horses
+                    alr_formula_label = 'Multi 4/7'
+                    alr_formula_shortcut = ' 4/7'
+                end
+              end
+              unless ['0', '00'].include?(@ussd_string)
+                @current_ussd_session.update_attributes(session_identifier: @session_identifier, alr_formula_label: alr_formula_label, alr_formula_shortcut: alr_formula_shortcut)
+              end
+            when '34'
+              validate_alr_base
+              unless ['0', '00'].include?(@ussd_string)
+                @current_ussd_session.update_attributes(session_identifier: @session_identifier, alr_base: @ussd_string)
+              end
+            when '35'
+              validate_alr_horses
+              unless ['0', '00'].include?(@ussd_string)
+                @current_ussd_session.update_attributes(session_identifier: @session_identifier, alr_selection: @ussd_string)
+              end
+            when '36'
+              alr_set_full_formula
+              unless ['0', '00'].include?(@ussd_string)
+                @current_ussd_session.update_attributes(session_identifier: @session_identifier, full_formula: @full_formula)
+              end
+            when '37'
+              alr_evaluate_bet
+              unless ['0', '00'].include?(@ussd_string)
+                @current_ussd_session.update_attributes(session_identifier: @session_identifier, alr_stake: @ussd_string, alr_evaluate_bet_request: @alr_evaluate_bet_request + @body, alr_evaluate_bet_response: @alr_evaluate_bet_response.body, alr_scratched_list: @alr_scratched_list.to_s, alr_combinations: @alr_combinations.to_s, alr_amount: @alr_amount)
+              end
+            when '38'
+              @account_profile = AccountProfile.find_by_msisdn(@msisdn[-8,8])
+              alr_place_bet
+              unless ['0', '00'].include?(@ussd_string)
+                @current_ussd_session.update_attributes(session_identifier: @session_identifier, alr_place_bet_request: @alr_place_bet_request + @body, alr_place_bet_response: @alr_place_bet_response.body, get_gamer_id_request: @get_gamer_id_request, get_gamer_id_response: @get_gamer_id_response.body)
+              end
+            when '49'
+              set_session_identifier_sportcash_main_menu_selected
+              if @status
+                case @ussd_string
+                  when '0'
+                    back_list_games_menu
+                  when '00'
+                    back_list_main_menu
+                  when '1'
+                    list_sportcash_sports
+                  when '2'
+                    spc_top_match
+                    @current_ussd_session.update_attributes(session_identifier: @session_identifier, events_trash: @events_trash, spc_event_list_request: @spc_event_list_request, spc_event_list_response: @spc_event_list_response)
+                  when '3'
+                    spc_last_minute_match
+                    @current_ussd_session.update_attributes(session_identifier: @session_identifier, events_trash: @events_trash, spc_event_list_request: @spc_event_list_request, spc_event_list_response: @spc_event_list_response)
+                  when '4'
+                    spc_list_opportunities
+                    @current_ussd_session.update_attributes(session_identifier: @session_identifier, opportunities_trash: @opportunities_trash, spc_opportunities_list_request: @spc_opportunities_list_request, spc_opportunities_list_response: @spc_opportunities_list_response)
+                  when '5'
+                    spc_live_match
+                    @current_ussd_session.update_attributes(session_identifier: @session_identifier, events_trash: @events_trash, spc_event_list_request: @spc_event_list_request, spc_event_list_response: @spc_event_list_response, spc_live: @spc_live)
+                  when '6'
+                    spc_get_event_code
+                    @current_ussd_session.update_attributes(session_identifier: @session_identifier)
+                end
+              end
+              @current_ussd_session.update_attributes(session_identifier: @session_identifier, list_sportcash_sports_request: @list_sportcash_sports_request, list_sportcash_sports_response: @list_sportcash_sports_response, list_spc_sport: @sports_trash)
+            when '52-'
+              spc_list_opportunities_details
+              @current_ussd_session.update_attributes(session_identifier: @session_identifier, spc_combined: @spc_combined, spc_combined_string: @spc_combined_string)
+            when '49-'
+              spc_play
+              @current_ussd_session.update_attributes(session_identifier: @session_identifier, spc_bet_type_trash: @bet_types_trash, spc_bet_type_request: @spc_bet_type_request, spc_bet_type_response: @spc_bet_type_response, spc_event_description: @spc_event_description, spc_event_pal_code: @spc_event_pal_code, spc_event_code: @spc_event_code, spc_event_date: @spc_event_date, spc_event_time: @spc_event_time)
+            when '50'
+              set_session_identifier_depending_on_spc_sports_list_selected
+              @current_ussd_session.update_attributes(session_identifier: @session_identifier, tournaments_trash: @tournaments_trash, spc_tournament_list_request: @spc_tournament_list_request, spc_tournament_list_response: @spc_tournament_list_response, spc_sport_label: (@sport_name[0] rescue nil), spc_sport_code: (@sport_name[1] rescue nil))
+            when '51'
+              set_session_identifier_depending_on_spc_sport_selected
+              @current_ussd_session.update_attributes(session_identifier: @session_identifier, events_trash: @events_trash, spc_event_list_request: @spc_event_list_request, spc_event_list_response: @spc_event_list_response, spc_tournament_label: (@tournament[0] rescue nil), spc_tournament_code: (@tournament[1] rescue nil))
+            when '52'
+              set_session_identifier_depending_on_spc_event_selected
+              @current_ussd_session.update_attributes(session_identifier: @session_identifier, spc_bet_type_trash: @bet_types_trash, spc_bet_type_request: @spc_bet_type_request, spc_bet_type_response: @spc_bet_type_response, spc_event_description: (@event[0] rescue nil), spc_event_pal_code: (@event[1] rescue nil), spc_event_code: (@event[2] rescue nil), spc_event_date: (@event[3] rescue nil), spc_event_time: (@event[4] rescue nil))
+            when '53'
+              set_session_identifier_depending_on_bet_type_selected
+              @current_ussd_session.update_attributes(session_identifier: @session_identifier, spc_draw_trash: @draw_trash, spc_draw_request: @spc_draw_request, spc_draw_response: @spc_draw_response, spc_bet_description: (@bet_type[1] rescue nil), spc_bet_code: (@bet_type[0] rescue nil))
+            when '54'
+              set_session_identifier_depending_on_spc_draw_selected
+              @current_ussd_session.update_attributes(session_identifier: @session_identifier, spc_draw_description: @spc_draw_description, spc_odd: @spc_odd)
+            when '55'
+              spc_validate_stake
+              @current_ussd_session.update_attributes(session_identifier: @session_identifier, spc_stake: @spc_stake)
+            when '56'
+              @account_profile = AccountProfile.find_by_msisdn(@msisdn[-8,8])
+              spc_place_bet
+              @current_ussd_session.update_attributes(session_identifier: @session_identifier, spc_place_bet_request: @spc_place_bet_url + @request_body, spc_place_bet_response: @spc_place_bet_response.body)
             end
-            @current_ussd_session.update_attributes(session_identifier: @session_identifier, list_sportcash_sports_request: @list_sportcash_sports_request, list_sportcash_sports_response: @list_sportcash_sports_response, list_spc_sport: @sports_trash)
-          when '52-'
-            spc_list_opportunities_details
-            @current_ussd_session.update_attributes(session_identifier: @session_identifier, spc_combined: @spc_combined, spc_combined_string: @spc_combined_string)
-          when '49-'
-            spc_play
-            @current_ussd_session.update_attributes(session_identifier: @session_identifier, spc_bet_type_trash: @bet_types_trash, spc_bet_type_request: @spc_bet_type_request, spc_bet_type_response: @spc_bet_type_response, spc_event_description: @spc_event_description, spc_event_pal_code: @spc_event_pal_code, spc_event_code: @spc_event_code, spc_event_date: @spc_event_date, spc_event_time: @spc_event_time)
-          when '50'
-            set_session_identifier_depending_on_spc_sports_list_selected
-            @current_ussd_session.update_attributes(session_identifier: @session_identifier, tournaments_trash: @tournaments_trash, spc_tournament_list_request: @spc_tournament_list_request, spc_tournament_list_response: @spc_tournament_list_response, spc_sport_label: (@sport_name[0] rescue nil), spc_sport_code: (@sport_name[1] rescue nil))
-          when '51'
-            set_session_identifier_depending_on_spc_sport_selected
-            @current_ussd_session.update_attributes(session_identifier: @session_identifier, events_trash: @events_trash, spc_event_list_request: @spc_event_list_request, spc_event_list_response: @spc_event_list_response, spc_tournament_label: (@tournament[0] rescue nil), spc_tournament_code: (@tournament[1] rescue nil))
-          when '52'
-            set_session_identifier_depending_on_spc_event_selected
-            @current_ussd_session.update_attributes(session_identifier: @session_identifier, spc_bet_type_trash: @bet_types_trash, spc_bet_type_request: @spc_bet_type_request, spc_bet_type_response: @spc_bet_type_response, spc_event_description: (@event[0] rescue nil), spc_event_pal_code: (@event[1] rescue nil), spc_event_code: (@event[2] rescue nil), spc_event_date: (@event[3] rescue nil), spc_event_time: (@event[4] rescue nil))
-          when '53'
-            set_session_identifier_depending_on_bet_type_selected
-            @current_ussd_session.update_attributes(session_identifier: @session_identifier, spc_draw_trash: @draw_trash, spc_draw_request: @spc_draw_request, spc_draw_response: @spc_draw_response, spc_bet_description: (@bet_type[1] rescue nil), spc_bet_code: (@bet_type[0] rescue nil))
-          when '54'
-            set_session_identifier_depending_on_spc_draw_selected
-            @current_ussd_session.update_attributes(session_identifier: @session_identifier, spc_draw_description: @spc_draw_description, spc_odd: @spc_odd)
-          when '55'
-            spc_validate_stake
-            @current_ussd_session.update_attributes(session_identifier: @session_identifier, spc_stake: @spc_stake)
-          when '56'
-            @account_profile = AccountProfile.find_by_msisdn(@msisdn[-8,8])
-            spc_place_bet
-            @current_ussd_session.update_attributes(session_identifier: @session_identifier, spc_place_bet_request: @spc_place_bet_url + @request_body, spc_place_bet_response: @spc_place_bet_response.body)
+          end
+          unless @exit == true
+            send_ussd(@operation_type, @msisdn, @sender_cb, @linkid, @rendered_text)
           end
         end
-        unless @exit == true
-          send_ussd(@operation_type, @msisdn, @sender_cb, @linkid, @rendered_text)
-        end
       end
+    ensure
+      ActiveRecord::Base.connection_pool.release_connection
     end
 
     #render text: @rendered_text
